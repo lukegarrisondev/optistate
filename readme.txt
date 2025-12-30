@@ -147,3 +147,16 @@ In the Database Structure Analysis, added an option to delete database tables th
 Added four additional cleanup options (Action Scheduler, Embed Cache, WooCommerce Cleanup, Unused Terms).
 Added new descriptions and recommendations to the admin interface to improve user experience.
 Expanded and updated the user manual, added an advanced search functionality and other minor improvements.
+
+--------------------------------------------------------------------------
+
+Plugin's Official Page:
+https://payhip.com/b/AS3Pt
+
+Support:
+https://payhip.com/optistate/contact
+
+User Manual:
+https://spiritualseek.com/wp-content/uploads/2025/11/WP_Optimal_State_PRO_User_Manual.html
+
+

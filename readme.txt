@@ -1,3 +1,5 @@
+WP Optimal State Free/Pro - v1.1.7
+
 Transform your WordPress site into a lean, high-performance machine with WP Optimal State Pro. This all-in-one optimization suite combines professional-grade database maintenance, intelligent backup management, and advanced caching systems into a single powerful plugin.
 
 Why Your Database Needs WP Optimal State Pro

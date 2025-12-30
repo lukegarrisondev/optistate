@@ -44,9 +44,9 @@ Essentially, WP Optimal State Pro is four plugins in one:
 It can easily replace the following plugins, saving you a considerable amount of money:
 UpdraftPlus, WP Database Backup, WP Rocket, WP Super Cache, WP-Optimize, Better Search Replace, Heartbeat Control, Perfmatters, WP Revisions Control, Clearfy, Advanced Database Cleaner.
 
-================================================================================================================================================
+====================================================================================================
 ⚠️ Important:*This plugin is designed for single-site WordPress installations only. It is not compatible with WordPress Multisite networks.
-================================================================================================================================================
+====================================================================================================
 
 Key Features:
 🎯 One-click database optimization
@@ -145,8 +145,7 @@ By using this plugin's admin interface, you acknowledge that the GTranslate widg
 
 == Support ==
 
-For support, feature requests, or bug reports, please visit: 
-
+For support, feature requests, or bug reports, please visit: https://payhip.com/optistate/contact
 Email: lukegarrison.dev@gmail.com
 
 == Privacy Policy ==
@@ -195,6 +194,7 @@ Firefox 88+
 Safari 14+
 Edge 90+
 Opera 76+
+
 
 
 

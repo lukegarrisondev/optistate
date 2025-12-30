@@ -1,1 +1,2455 @@
+# Copyright (C) 2025 Luke Garrison / The Spiritual Seek
+# This file is distributed under the same license as the Optimal State plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Optimal State 1.1.7\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/optistate\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-10-21 17:36+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: Gemini\n"
+"X-Domain: optistate\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
+#: js/admin.js:93
+msgid "0 Bytes"
+msgstr ""
+
+#: js/admin.js:98
+msgid "Bytes"
+msgstr ""
+
+#: js/admin.js:99
+msgid "KB"
+msgstr ""
+
+#: js/admin.js:100
+msgid "MB"
+msgstr ""
+
+#: js/admin.js:101
+msgid "GB"
+msgstr ""
+
+#: js/admin.js:102
+msgid "TB"
+msgstr ""
+
+#: js/admin.js:164
+msgid "⏳ Please wait %d seconds before trying again."
+msgstr ""
+
+#: js/admin.js:197 js/admin.js:862
+msgid "Cancel"
+msgstr ""
+
+#: js/admin.js:198 js/admin.js:863
+msgid "Confirm"
+msgstr ""
+
+#: js/admin.js:231 js/admin.js:410 optistate.php:642
+msgid "No backups found. Create your first backup!"
+msgstr ""
+
+#: js/admin.js:245 optistate.php:652
+msgid "Backup verified - File integrity confirmed (Checksum)"
+msgstr ""
+
+#: js/admin.js:245 js/admin.js:246 optistate.php:652 optistate.php:656
+msgid "File integrity"
+msgstr ""
+
+#: js/admin.js:246 optistate.php:656
+msgid "Backup corrupted or damaged - File integrity not verified (Checksum)"
+msgstr ""
+
+#: js/admin.js:258 optistate.php:665
+msgid "Download"
+msgstr ""
+
+#: js/admin.js:261 js/admin.js:771 optistate.php:668
+msgid "Restore"
+msgstr ""
+
+#: js/admin.js:264 optistate.php:671
+msgid "Delete"
+msgstr ""
+
+#: js/admin.js:283
+msgid "Create Backup"
+msgstr ""
+
+#: js/admin.js:284
+msgid "Create a new database backup?"
+msgstr ""
+
+#: js/admin.js:285
+msgid "This may take a few moments."
+msgstr ""
+
+#: js/admin.js:307 js/admin.js:321
+msgid "An error occurred while creating the backup."
+msgstr ""
+
+#: js/admin.js:311
+msgid "Please wait before creating another backup."
+msgstr ""
+
+#: js/admin.js:338
+msgid "Are you sure you want to delete this backup?"
+msgstr ""
+
+#: js/admin.js:339
+msgid "Backup: %s"
+msgstr ""
+
+#: js/admin.js:340
+msgid "This action cannot be undone."
+msgstr ""
+
+#: js/admin.js:344
+msgid "Confirm Deletion"
+msgstr ""
+
+#: js/admin.js:369
+msgid "Failed to delete backup."
+msgstr ""
+
+#: js/admin.js:374
+msgid "An error occurred while deleting the backup."
+msgstr ""
+
+#: js/admin.js:389 optistate.php:2909
+msgid "Only SQL files are allowed!"
+msgstr ""
+
+#: js/admin.js:395 optistate.php:2889
+msgid "File is too large! Maximum size is 500MB."
+msgstr ""
+
+#: js/admin.js:430
+msgid "100% - Now you can restore your database"
+msgstr ""
+
+#: js/admin.js:432
+msgid "File uploaded successfully! Click \"Restore from File\" to proceed."
+msgstr ""
+
+#: js/admin.js:435
+msgid "Upload failed!"
+msgstr ""
+
+#: js/admin.js:442
+msgid "Upload failed. Please try again."
+msgstr ""
+
+#: js/admin.js:459
+msgid "Select a SQL file from your device first!"
+msgstr ""
+
+#: js/admin.js:470
+msgid "⚠️ WARNING: Restore Database from File"
+msgstr ""
+
+#: js/admin.js:471
+msgid "File: %s"
+msgstr ""
+
+#: js/admin.js:472
+msgid "This will:"
+msgstr ""
+
+#: js/admin.js:473
+msgid "• Create a safety backup first"
+msgstr ""
+
+#: js/admin.js:474
+msgid "• Validate the database structure"
+msgstr ""
+
+#: js/admin.js:475
+msgid "• Replace the current database"
+msgstr ""
+
+#: js/admin.js:476 js/admin.js:712
+msgid "ALL CURRENT DATA WILL BE REPLACED!"
+msgstr ""
+
+#: js/admin.js:477
+msgid "Are you absolutely sure?"
+msgstr ""
+
+#: js/admin.js:480 js/admin.js:512 js/admin.js:524 js/admin.js:688 optistate.php:700
+msgid "Restore from File"
+msgstr ""
+
+#: js/admin.js:486 js/admin.js:722
+msgid "RESTORE IN PROGRESS..."
+msgstr ""
+
+#: js/admin.js:499 js/admin.js:737
+msgid "Page will reload in a few seconds..."
+msgstr ""
+
+#: js/admin.js:509 js/admin.js:744
+msgid "Restore failed!"
+msgstr ""
+
+#: js/admin.js:521 js/admin.js:751
+msgid "Restore failed. Please try again."
+msgstr ""
+
+#: js/admin.js:709
+msgid "This will restore your database from:"
+msgstr ""
+
+#: js/admin.js:710
+msgid "%s"
+msgstr ""
+
+#: js/admin.js:711
+msgid "Your site will enter maintenance mode briefly and then reload."
+msgstr ""
+
+#: js/admin.js:713
+msgid "Are you absolutely sure you want to continue?"
+msgstr ""
+
+#: js/admin.js:717
+msgid "WARNING: Restore Database"
+msgstr ""
+
+#: js/admin.js:743
+msgid "Restore failed."
+msgstr ""
+
+#: js/admin.js:758
+msgid "Please wait before restoring another backup."
+msgstr ""
+
+#: js/admin.js:762
+msgid "A critical error occurred during the restore process."
+msgstr ""
+
+#: js/admin.js:789
+msgid "Please select a valid number of backups (1-10)."
+msgstr ""
+
+#: js/admin.js:795 js/admin.js:989
+msgid "Saving..."
+msgstr ""
+
+#: js/admin.js:806 optistate.php:1209
+msgid "Maximum backups setting saved successfully!"
+msgstr ""
+
+#: js/admin.js:810
+msgid "Failed to save setting."
+msgstr ""
+
+#: js/admin.js:815
+msgid "An error occurred while saving the setting."
+msgstr ""
+
+#: js/admin.js:819 optistate.php:613
+msgid "Save"
+msgstr ""
+
+#: js/admin.js:824 js/admin.js:1270
+msgid "Post Revisions"
+msgstr ""
+
+#: js/admin.js:825
+msgid "Revisions Data Size"
+msgstr ""
+
+#: js/admin.js:826 js/admin.js:1296
+msgid "Expired Transients"
+msgstr ""
+
+#: js/admin.js:827
+msgid "Expired Transients Data Size"
+msgstr ""
+
+#: js/admin.js:828
+msgid "Database Overhead"
+msgstr ""
+
+#: js/admin.js:829
+msgid "Total Indexes Size"
+msgstr ""
+
+#: js/admin.js:830
+msgid "Number of Tables"
+msgstr ""
+
+#: js/admin.js:831
+msgid "Database Created On"
+msgstr ""
+
+#: js/admin.js:832 optistate.php:784
+msgid "Autoloaded Options"
+msgstr ""
+
+#: js/admin.js:833
+msgid "Autoload Data Size"
+msgstr ""
+
+#: js/admin.js:834 js/admin.js:1275
+msgid "Auto Drafts"
+msgstr ""
+
+#: js/admin.js:835 js/admin.js:1278
+msgid "Trashed Posts"
+msgstr ""
+
+#: js/admin.js:836 js/admin.js:1281
+msgid "Spam Comments"
+msgstr ""
+
+#: js/admin.js:837 js/admin.js:1284
+msgid "Trashed Comments"
+msgstr ""
+
+#: js/admin.js:838 js/admin.js:1287
+msgid "Orphaned Post Meta"
+msgstr ""
+
+#: js/admin.js:839 js/admin.js:1290
+msgid "Orphaned Comment Meta"
+msgstr ""
+
+#: js/admin.js:840
+msgid "Orphaned Term Relationships"
+msgstr ""
+
+#: js/admin.js:841 js/admin.js:1308
+msgid "Orphaned User Meta"
+msgstr ""
+
+#: js/admin.js:842 js/admin.js:1302
+msgid "Duplicate Post Meta"
+msgstr ""
+
+#: js/admin.js:843 js/admin.js:1305
+msgid "Duplicate Comment Meta"
+msgstr ""
+
+#: js/admin.js:844 js/admin.js:1311
+msgid "Unapproved Comments"
+msgstr ""
+
+#: js/admin.js:845 js/admin.js:1314
+msgid "Pingbacks"
+msgstr ""
+
+#: js/admin.js:846 js/admin.js:1317
+msgid "Trackbacks"
+msgstr ""
+
+#: js/admin.js:847
+msgid "All Transients (Non-expired)"
+msgstr ""
+
+#: js/admin.js:856
+msgid "Close"
+msgstr ""
+
+#: js/admin.js:893
+msgid "Please wait before performing this action again."
+msgstr ""
+
+#: js/admin.js:895
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: js/admin.js:913
+msgid "Generating database statistics..."
+msgstr ""
+
+#: js/admin.js:933
+msgid "📈 Database statistics refreshed"
+msgstr ""
+
+#: js/admin.js:945
+msgid "Failed to load statistics"
+msgstr ""
+
+#: js/admin.js:957
+msgid "Error"
+msgstr ""
+
+#: js/admin.js:977
+msgid "Please enter a valid number between 0 and 365 for days."
+msgstr ""
+
+#: js/admin.js:983
+msgid "Please select a valid time from the dropdown."
+msgstr ""
+
+#: js/admin.js:998 optistate.php:2093
+msgid "Failed to save settings."
+msgstr ""
+
+#: js/admin.js:1003 optistate.php:1885
+msgid "A network error occurred. Please try again."
+msgstr ""
+
+#: js/admin.js:1007 optistate.php:879
+msgid "Save Settings"
+msgstr ""
+
+#: js/admin.js:1039
+msgid "Maximum days allowed is 365"
+msgstr ""
+
+#: js/admin.js:1082
+msgid "Invalid Time"
+msgstr ""
+
+#: js/admin.js:1097 js/admin.js:1108 optistate.php:838
+msgid "Automated optimization is enabled and will run every %d days at %s."
+msgstr ""
+
+#: js/admin.js:1123
+msgid "📊 Health analysis refreshed"
+msgstr ""
+
+#: js/admin.js:1152
+msgid "Failed to load health score"
+msgstr ""
+
+#: js/admin.js:1157
+msgid "Network error loading health score"
+msgstr ""
+
+#: js/admin.js:1203
+msgid "No recommendations at this time"
+msgstr ""
+
+#: js/admin.js:1210
+msgid "Error:"
+msgstr ""
+
+#: js/admin.js:1257
+msgid "Activity Log"
+msgstr ""
+
+#: js/admin.js:1263
+msgid "No significant events have been recorded yet."
+msgstr ""
+
+#: js/admin.js:1269
+msgid "Manual"
+msgstr ""
+
+#: js/admin.js:1270
+msgid "Scheduled"
+msgstr ""
+
+#: js/admin.js:1271
+msgid "🚀 One-Click Optimization"
+msgstr ""
+
+#: js/admin.js:1272
+msgid "Old versions of posts and pages"
+msgstr ""
+
+#: js/admin.js:1276
+msgid "Automatically saved drafts"
+msgstr ""
+
+#: js/admin.js:1279
+msgid "Posts in trash"
+msgstr ""
+
+#: js/admin.js:1282
+msgid "Comments marked as spam"
+msgstr ""
+
+#: js/admin.js:1285
+msgid "Comments in trash"
+msgstr ""
+
+#: js/admin.js:1288
+msgid "Metadata for deleted posts"
+msgstr ""
+
+#: js/admin.js:1291
+msgid "Metadata for deleted comments"
+msgstr ""
+
+#: js/admin.js:1293
+msgid "Orphaned Relationships"
+msgstr ""
+
+#: js/admin.js:1294
+msgid "Term relationships for deleted posts"
+msgstr ""
+
+#: js/admin.js:1297
+msgid "Expired temporary options"
+msgstr ""
+
+#: js/admin.js:1299
+msgid "All Transients"
+msgstr ""
+
+#: js/admin.js:1300
+msgid "All cached temporary data"
+msgstr ""
+
+#: js/admin.js:1303
+msgid "Duplicate metadata entries"
+msgstr ""
+
+#: js/admin.js:1306
+msgid "Duplicate comment metadata"
+msgstr ""
+
+#: js/admin.js:1309
+msgid "Metadata for deleted users"
+msgstr ""
+
+#: js/admin.js:1312
+msgid "Comments awaiting moderation"
+msgstr ""
+
+#: js/admin.js:1315
+msgid "Pingback notifications"
+msgstr ""
+
+#: js/admin.js:1318
+msgid "Trackback notifications"
+msgstr ""
+
+#: js/admin.js:1330
+msgid "Review before cleaning"
+msgstr ""
+
+#: js/admin.js:1341
+msgid "Clean Now"
+msgstr ""
+
+#: js/admin.js:1367
+msgid "Show Less Stats"
+msgstr ""
+
+#: js/admin.js:1377
+msgid "Show More Stats"
+msgstr ""
+
+#: js/admin.js:1396
+msgid "Clean this item? This action cannot be undone."
+msgstr ""
+
+#: js/admin.js:1398
+msgid "This operation should be reviewed carefully. Are you sure you want to continue?"
+msgstr ""
+
+#: js/admin.js:1401
+msgid "🧹 Confirm Cleanup"
+msgstr ""
+
+#: js/admin.js:1403
+msgid "⚠️ Warning"
+msgstr ""
+
+#: js/admin.js:1407
+msgid "🧹 Cleaning..."
+msgstr ""
+
+#: js/admin.js:1418
+msgid "✓ Cleaned"
+msgstr ""
+
+#: js/admin.js:1419
+msgid "Successfully cleaned!"
+msgstr ""
+
+#: js/admin.js:1423
+msgid "Cleanup failed"
+msgstr ""
+
+#: js/admin.js:1425 js/admin.js:1432
+msgid "Error - Try Again"
+msgstr ""
+
+#: js/admin.js:1444 js/admin.js:1590 js/admin.js:1670
+msgid "Optimizing..."
+msgstr ""
+
+#: js/admin.js:1455
+msgid "Successfully optimized %d tables!"
+msgstr ""
+
+#: js/admin.js:1463
+msgid "Reclaimed %s of space."
+msgstr ""
+
+#: js/admin.js:1470
+msgid "%d tables skipped (no optimization needed)."
+msgstr ""
+
+#: js/admin.js:1477
+msgid "%d tables failed to optimize."
+msgstr ""
+
+#: js/admin.js:1484
+msgid "Detailed Results:"
+msgstr ""
+
+#: js/admin.js:1493
+msgid "reclaimed %s"
+msgstr ""
+
+#: js/admin.js:1510
+msgid "⚡ Optimize All Tables"
+msgstr ""
+
+#: js/admin.js:1517
+msgid "🔎 Analyzing..."
+msgstr ""
+
+#: js/admin.js:1527
+msgid "Analyzed %d tables. "
+msgstr ""
+
+#: js/admin.js:1529
+msgid "Found %d corrupted tables. "
+msgstr ""
+
+#: js/admin.js:1532
+msgid "Successfully repaired %d tables. "
+msgstr ""
+
+#: js/admin.js:1535
+msgid "Successfully optimized %d tables. "
+msgstr ""
+
+#: js/admin.js:1538
+msgid "%d operations failed."
+msgstr ""
+
+#: js/admin.js:1541
+msgid "All tables are in optimal condition!"
+msgstr ""
+
+#: js/admin.js:1544
+msgid "No tables were found to analyze."
+msgstr ""
+
+#: js/admin.js:1551
+msgid "Table Analysis Details:"
+msgstr ""
+
+#: js/admin.js:1562
+msgid "Corrupted"
+msgstr ""
+
+#: js/admin.js:1563
+msgid "Repaired"
+msgstr ""
+
+DOM-based string (L1564).
+#: js/admin.js:1564
+msgid "Optimized"
+msgstr ""
+
+#: js/admin.js:1565
+msgid "Healthy"
+msgstr ""
+
+#: js/admin.js:1568
+msgid "Error: %s"
+msgstr ""
+
+#: js/admin.js:1584
+msgid "🛠️ Analyze & Repair Tables"
+msgstr ""
+
+#: js/admin.js:1598
+msgid "Optimized %d autoloaded options"
+msgstr ""
+
+#: js/admin.js:1605
+msgid "reduced autoload size by %s MB"
+msgstr ""
+
+#: js/admin.js:1612
+msgid "%d essential options preserved."
+msgstr ""
+
+#: js/admin.js:1615
+msgid "No autoloaded options needed optimization."
+msgstr ""
+
+#: js/admin.js:1616
+msgid "Your autoloaded options are already optimized!"
+msgstr ""
+
+#: js/admin.js:1623
+msgid "Optimized Options (%d total):"
+msgstr ""
+
+#: js/admin.js:1634
+msgid "... and %d more options optimized"
+msgstr ""
+
+#: js/admin.js:1649
+msgid "⚙️ Optimize Autoloaded Options"
+msgstr ""
+
+#: js/admin.js:1656
+msgid "This will perform a full database optimization including:"
+msgstr ""
+
+#: js/admin.js:1657
+msgid "• Clean post revisions"
+msgstr ""
+
+#: js/admin.js:1658
+msgid "• Remove auto-drafts"
+msgstr ""
+
+#: js/admin.js:1659
+msgid "• Delete spam comments"
+msgstr ""
+
+#: js/admin.js:1660
+msgid "• Remove orphaned data"
+msgstr ""
+
+#: js/admin.js:1661
+msgid "• Optimize database tables"
+msgstr ""
+
+#: js/admin.js:1662
+msgid "This is safe but cannot be undone."
+msgstr ""
+
+#: js/admin.js:1665
+msgid "🚀 Full Optimization"
+msgstr ""
+
+#: js/admin.js:1679
+msgid "Optimization Complete!"
+msgstr ""
+
+#: js/admin.js:1686
+msgid "Cleaned %d %s"
+msgstr ""
+
+#: js/admin.js:1690
+msgid "Optimization completed successfully!"
+msgstr ""
+
+#: js/admin.js:1694 js/admin.js:1701
+msgid "🚀 Optimize Now"
+msgstr ""
+
+#: js/admin.js:1729
+msgid "Failed to analyze tables"
+msgstr ""
+
+#: js/admin.js:1734
+msgid "Network error while analyzing tables"
+msgstr ""
+
+#: js/admin.js:1747
+msgid "Database Summary"
+msgstr ""
+
+#: js/admin.js:1751
+msgid "Total Tables"
+msgstr ""
+
+#: js/admin.js:1756
+msgid "WordPress Core"
+msgstr ""
+
+#: js/admin.js:1761
+msgid "Plugin/Theme"
+msgstr ""
+
+#: js/admin.js:1766
+msgid "Total Size"
+msgstr ""
+
+#: js/admin.js:1773
+msgid "%d third-party tables detected"
+msgstr ""
+
+#: js/admin.js:1774
+msgid "These tables belong to plugins or themes. They will be included in backups."
+msgstr ""
+
+#: js/admin.js:1780
+msgid "WordPress Core Tables"
+msgstr ""
+
+#: js/admin.js:1790
+msgid "Plugin & Theme Tables"
+msgstr ""
+
+#: js/admin.js:1807
+msgid "Hide Details"
+msgstr ""
+
+#: js/admin.js:1809
+msgid "Show Details"
+msgstr ""
+
+#: js/admin.js:1821
+msgid "Rows:"
+msgstr ""
+
+#: js/admin.js:1822
+msgid "Size:"
+msgstr ""
+
+#: js/admin.js:1825
+msgid "Overhead:"
+msgstr ""
+
+#: js/admin.js:1828
+msgid "Engine:"
+msgstr ""
+
+#: js/admin.js:1832
+msgid "Data Size:"
+msgstr ""
+
+#: js/admin.js:1833
+msgid "Index Size:"
+msgstr ""
+
+#: js/admin.js:1834
+msgid "Collation:"
+msgstr ""
+
+#: js/admin.js:1837
+msgid "Last Updated:"
+msgstr ""
+
+#: js/admin.js:1878
+msgid "Performance settings have been saved successfully."
+msgstr ""
+
+#: js/admin.js:1880 optistate.php:2093
+msgid "Failed to save settings."
+msgstr ""
+
+#: js/admin.js:1885
+msgid "A network error occurred. Please try again."
+msgstr ""
+
+#: js/admin.js:1889 js/admin.js:2145 optistate.php:2174
+msgid "Save Performance Settings"
+msgstr ""
+
+#: js/admin.js:1906 js/admin.js:1911
+msgid "Failed to load performance features"
+msgstr ""
+
+#: js/admin.js:1916
+msgid "Network error loading performance features"
+msgstr ""
+
+#: js/admin.js:1934
+msgid "TEST CAREFULLY"
+msgstr ""
+
+#: js/admin.js:1937
+msgid "High Impact"
+msgstr ""
+
+#: js/admin.js:1938
+msgid "Medium Impact"
+msgstr ""
+
+#: js/admin.js:1939
+msgid "Low Impact"
+msgstr ""
+
+#: js/admin.js:1944 js/admin.js:2001
+msgid "✔ Active"
+msgstr ""
+
+#: js/admin.js:1944 js/admin.js:2001 js/admin.js:2087
+msgid "✗ Inactive"
+msgstr ""
+
+#: js/admin.js:2079
+msgid "Ready:"
+msgstr ""
+
+#: js/admin.js:2086
+msgid "Cannot Enable:"
+msgstr ""
+
+#: js/admin.js:2089
+msgid "The .htaccess file could not be created. This usually means WordPress does not have write permissions in the root directory."
+msgstr ""
+
+#: js/admin.js:2092
+msgid "Try setting file permissions to 644 using your FTP client or hosting control panel."
+msgstr ""
+
+#: js/admin.js:2150 optistate.php:2150
+msgid "Click to toggle section"
+msgstr ""
+
+#: js/admin.js:2153 optistate.php:2153
+msgid "8. Performance Features Manager"
+msgstr ""
+
+#: js/admin.js:2159 optistate.php:2159
+msgid "Disable WordPress features you don't use to improve performance and reduce server load."
+msgstr ""
+
+#: js/admin.js:2160 optistate.php:2160
+msgid "Important:"
+msgstr ""
+
+#: js/admin.js:2161 optistate.php:2161
+msgid "Some features may affect functionality. Features marked with ⚠️ should be tested carefully."
+msgstr ""
+
+#: js/admin.js:2165 optistate.php:2165
+msgid "Loading performance features..."
+msgstr ""
+
+#: optistate.php:51
+msgid "Optimal State - Critical Error"
+msgstr ""
+
+#: optistate.php:52
+msgid "The plugin cannot access the file system. This is usually caused by:"
+msgstr ""
+
+#: optistate.php:54
+msgid "Incorrect file permissions on wp-content/uploads/"
+msgstr ""
+
+#: optistate.php:55
+msgid "Server configuration preventing file operations"
+msgstr ""
+
+#: optistate.php:56
+msgid "FTP credentials not configured (if using FTP mode)"
+msgstr ""
+
+#: optistate.php:58
+msgid "Action required:"
+msgstr ""
+
+#: optistate.php:59
+msgid "Contact your hosting provider to resolve file system access issues."
+msgstr ""
+
+#: optistate.php:176
+msgid "WP_Filesystem is not initialized. File operations cannot proceed."
+msgstr ""
+
+#: optistate.php:183
+msgid "Plugin data directory is not writable. Settings and logs cannot be saved."
+msgstr ""
+
+#: optistate.php:189
+msgid "Backup directory could not be created."
+msgstr ""
+
+#: optistate.php:196
+msgid "Backup directory is not writable. Database backups cannot be created."
+msgstr ""
+
+#: optistate.php:208
+msgid "Optimal State - Permission Issues"
+msgstr ""
+
+#: optistate.php:209
+msgid "The following issues prevent the plugin from functioning properly:"
+msgstr ""
+
+#: optistate.php:216
+msgid "How to fix:"
+msgstr ""
+
+#: optistate.php:217
+msgid "Please ensure the following directories have write permissions (typically 755 or higher):"
+msgstr ""
+
+#: optistate.php:225
+msgid "You may need to contact your hosting provider to adjust these permissions."
+msgstr ""
+
+#: optistate.php:439
+msgid ".htaccess file does not exist and cannot be created. Check file permissions in your WordPress root directory."
+msgstr ""
+
+#: optistate.php:447
+msgid ".htaccess file exists but is not writable. Please set permissions to 644 or contact your hosting provider."
+msgstr ""
+
+#: optistate.php:454
+msgid "Security error: Invalid .htaccess path detected."
+msgstr ""
+
+#: optistate.php:458
+msgid ".htaccess file is writable and ready."
+msgstr ""
+
+#: optistate.php:512
+msgid "Invalid data format for days."
+msgstr ""
+
+#: optistate.php:518
+msgid "Invalid days value. Must be between 0 and 365."
+msgstr ""
+
+#: optistate.php:529
+msgid "Invalid time value selected."
+msgstr ""
+
+#: optistate.php:536
+msgid "Invalid data format for max backups."
+msgstr ""
+
+#: optistate.php:542
+msgid "Invalid max backups value. Must be between 1 and 10."
+msgstr ""
+
+#: optistate.php:550
+msgid "Automatic optimization and email settings saved successfully!"
+msgstr ""
+
+#: optistate.php:567
+msgid "Optimal State"
+msgstr ""
+
+#: optistate.php:575
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: optistate.php:586
+msgid "Need Help?"
+msgstr ""
+
+#: optistate.php:587
+msgid "Check out the full plugin manual for detailed instructions and best practices."
+msgstr ""
+
+#: optistate.php:589
+msgid "READ THE MANUAL"
+msgstr ""
+
+#: optistate.php:593
+msgid "1. Create a Database Backup"
+msgstr ""
+
+#: optistate.php:595
+msgid "Always backup your database before performing cleanup operations."
+msgstr ""
+
+#: optistate.php:596
+msgid "You will be able to restore it if something goes wrong during cleanup."
+msgstr ""
+
+#: optistate.php:598
+msgid "Backups are securely stored in your %s folder."
+msgstr ""
+
+#: optistate.php:602
+msgid "Maximum Backups to Keep:"
+msgstr ""
+
+#: optistate.php:622
+msgid "Create Backup Now"
+msgstr ""
+
+#: optistate.php:626
+msgid "CREATING BACKUP..."
+msgstr ""
+
+#: optistate.php:630
+msgid "1.1 Manage Existing Backups"
+msgstr ""
+
+#: optistate.php:634
+msgid "Backup Name"
+msgstr ""
+
+#: optistate.php:635
+msgid "Date Created"
+msgstr ""
+
+#: optistate.php:636
+msgid "Size"
+msgstr ""
+
+#: optistate.php:637
+msgid "Actions"
+msgstr ""
+
+#: optistate.php:680
+msgid "Restore Database from File"
+msgstr ""
+
+#: optistate.php:682
+msgid "Upload a SQL backup file generated by WP Optimal State to restore your database."
+msgstr ""
+
+#: optistate.php:683
+msgid "Please Note: "
+msgstr ""
+
+#: optistate.php:683
+msgid "This is not a website migration tool. It cannot replace your files, plugins, etc."
+msgstr ""
+
+#: optistate.php:684
+msgid "Extreme Caution: "
+msgstr ""
+
+#: optistate.php:684
+msgid "Restoring an incorrect or damaged database could ruin your website."
+msgstr ""
+
+#: optistate.php:687
+msgid "Choose SQL File"
+msgstr ""
+
+#: optistate.php:691
+msgid "Selected:"
+msgstr ""
+
+#: optistate.php:705
+msgid "2. One-Click Optimization"
+msgstr ""
+
+#: optistate.php:706
+msgid "Perform all safe optimizations with one click"
+msgstr ""
+
+#: optistate.php:708
+msgid "🚀 Optimize Now"
+msgstr ""
+
+#: optistate.php:712
+msgid "3. Database Health Score"
+msgstr ""
+
+#: optistate.php:714
+msgid "Analyzing database health..."
+msgstr ""
+
+#: optistate.php:719
+msgid "Overall Score"
+msgstr ""
+
+#: optistate.php:723
+msgid "Performance"
+msgstr ""
+
+#: optistate.php:727
+msgid "Cleanliness"
+msgstr ""
+
+#: optistate.php:731
+msgid "Efficiency"
+msgstr ""
+
+#: optistate.php:736
+msgid "⭐ Details & Recommendations"
+msgstr ""
+
+#: optistate.php:740
+msgid "⟲ Refresh Analysis"
+msgstr ""
+
+#: optistate.php:747
+msgid "4. Database Statistics"
+msgstr ""
+
+#: optistate.php:748
+msgid "Loading statistics..."
+msgstr ""
+
+#: optistate.php:753
+msgid "↓ Show More Stats ↓"
+msgstr ""
+
+#: optistate.php:756
+msgid "Total Database Size:"
+msgstr ""
+
+#: optistate.php:756
+msgid "Calculating..."
+msgstr ""
+
+#: optistate.php:758
+msgid "⟲ Refresh Stats"
+msgstr ""
+
+#: optistate.php:761
+msgid "5. Detailed Database Cleanup"
+msgstr ""
+
+#: optistate.php:765
+msgid "6. Advanced Database Optimization"
+msgstr ""
+
+#: optistate.php:767
+msgid "Optimize and repair database tables to improve performance."
+msgstr ""
+
+#: optistate.php:768
+msgid "Caution"
+msgstr ""
+
+#: optistate.php:769
+msgid "These operations may make your website unresponsive for a few minutes, especially if your database is large and has never been optimized!"
+msgstr ""
+
+#: optistate.php:772
+msgid "Optimize All Tables"
+msgstr ""
+
+#: optistate.php:773
+msgid "Analyze & Repair Tables"
+msgstr ""
+
+#: optistate.php:774
+msgid "Optimize Autoloaded Options"
+msgstr ""
+
+#: optistate.php:778
+msgid "Optimize Tables"
+msgstr ""
+
+#: optistate.php:779
+msgid "Runs OPTIMIZE TABLE on all database tables to reclaim space and improve query speed."
+msgstr ""
+
+#: optistate.php:781
+msgid "Analyze & Repair"
+msgstr ""
+
+#: optistate.php:782
+msgid "Checks tables for errors/corruption (CHECK TABLE), then runs REPAIR TABLE to fix issues."
+msgstr ""
+
+#: optistate.php:785
+msgid "Identifies large autoloaded options and sets them to non-autoload to boost site speed."
+msgstr ""
+
+#: optistate.php:789
+msgid "Database Structure Analysis"
+msgstr ""
+
+#: optistate.php:792
+msgid "Understand the architecture of your WordPress database better."
+msgstr ""
+
+#: optistate.php:793
+msgid "Core WordPress tables are explained in detail."
+msgstr ""
+
+#: optistate.php:794
+msgid "Third-party tables (from plugins/themes) are highlighted."
+msgstr ""
+
+#: optistate.php:797
+msgid "Analyze Database Structure"
+msgstr ""
+
+#: optistate.php:801
+msgid "⏳ Analyzing database structure..."
+msgstr ""
+
+#: optistate.php:806
+msgid "7. Automatic Backup and Cleaning"
+msgstr ""
+
+#: optistate.php:810
+msgid "Run Tasks Automatically Every"
+msgstr ""
+
+#: optistate.php:813
+msgid "DAYS"
+msgstr ""
+
+#: optistate.php:814
+msgid "(0 to disable)"
+msgstr ""
+
+#: optistate.php:816
+msgid "at"
+msgstr ""
+
+#: optistate.php:832
+msgid "Automated optimization is enabled and will run every %1$d days at %2$s."
+msgstr ""
+
+#: optistate.php:835 optistate.php:841
+msgid "Automated optimization is currently disabled."
+msgstr ""
+
+#: optistate.php:845
+msgid "When enabled, the following tasks will be performed regularly:"
+msgstr ""
+
+#: optistate.php:846
+msgid "Database Backup"
+msgstr ""
+
+#: optistate.php:847
+msgid "One-Click Optimization."
+msgstr ""
+
+#: optistate.php:853
+msgid "Email Notifications"
+msgstr ""
+
+#: optistate.php:857
+msgid "Send completion email with backup and cleanup details"
+msgstr ""
+
+#: optistate.php:861 optistate.php:867
+msgid "Email notifications are enabled."
+msgstr ""
+
+#: optistate.php:862 optistate.php:868
+msgid "Email notifications are disabled."
+msgstr ""
+
+#: optistate.php:873
+msgid "Notifications will be sent to: %s"
+msgstr ""
+
+#: optistate.php:953
+msgid "Comment Meta: Stores custom fields and extra data for comments."
+msgstr ""
+
+#: optistate.php:954
+msgid "Comments: Contains all comments on posts, pages, and attachments."
+msgstr ""
+
+#: optistate.php:955
+msgid "Links: Stores blogroll links. Deprecated and rarely used in modern sites."
+msgstr ""
+
+#: optistate.php:956
+msgid "Options: Stores sitewide settings, plugin/theme configurations, and cached data."
+msgstr ""
+
+#: optistate.php:957
+msgid "Post Meta: Contains custom fields and extra data for posts, pages, and CPTs."
+msgstr ""
+
+#: optistate.php:958
+msgid "Posts: Stores all content, including posts, pages, attachments, and revisions."
+msgstr ""
+
+#: optistate.php:959
+msgid "Term Meta: Stores custom fields and extra data for taxonomy terms (categories, tags)."
+msgstr ""
+
+#: optistate.php:960
+msgid "Terms: Stores the names and slugs for all categories, tags, and custom taxonomy terms."
+msgstr ""
+
+#: optistate.php:961
+msgid "Term Relationships: Links posts (from wp_posts) to their terms (from wp_terms)."
+msgstr ""
+
+#: optistate.php:962
+msgid "Term Taxonomy: Defines the taxonomy (e.g., category, tag) for each term in wp_terms."
+msgstr ""
+
+#: optistate.php:963
+msgid "User Meta: Stores extra user data, like first/last name, and user preferences."
+msgstr ""
+
+#: optistate.php:964
+msgid "Users: Stores all user accounts, including login names, hashed passwords, and emails."
+msgstr ""
+
+#: optistate.php:967
+msgid "Blog Meta: Stores extra data for sites in the network."
+msgstr ""
+
+#: optistate.php:968
+msgid "Blogs: Stores information about each site in the network."
+msgstr ""
+
+#: optistate.php:969
+msgid "Registration Log: Stores log of new user registrations."
+msgstr ""
+
+#: optistate.php:970
+msgid "Signups: Stores user signups, used when new blog/user registration is enabled."
+msgstr ""
+
+#: optistate.php:971
+msgid "Site: Stores network-wide site data."
+msgstr ""
+
+#: optistate.php:972
+msgid "Site Meta: Stores extra network-wide site meta data."
+msgstr ""
+
+#: optistate.php:989
+msgid "Failed to retrieve table information"
+msgstr ""
+
+#: optistate.php:1007
+msgid "Third-party plugin/theme table"
+msgstr ""
+
+#: optistate.php:1045 optistate.php:1138
+msgid "Your database is in excellent condition!"
+msgstr ""
+
+#: optistate.php:1071
+msgid "High table overhead (%s) is slowing down database queries."
+msgstr ""
+
+#: optistate.php:1075
+msgid "Moderate table overhead (%s) is present. Optimization is recommended."
+msgstr ""
+
+#: optistate.php:1079
+msgid "Minor table overhead (%s) found. You can reclaim this space."
+msgstr ""
+
+#: optistate.php:1084
+msgid "Very large autoloaded options size (%s) is impacting every page load."
+msgstr ""
+
+#: optistate.php:1088
+msgid "Large autoloaded options size (%s). Reducing this will improve performance."
+msgstr ""
+
+#: optistate.php:1094
+msgid "%d excessive post revisions are bloating the database."
+msgstr ""
+
+#: optistate.php:1100
+msgid "%d unused auto-drafts found."
+msgstr ""
+
+#: optistate.php:1106
+msgid "%d orphaned post meta entries found."
+msgstr ""
+
+#: optistate.php:1112
+msgid "%d expired transients can be safely removed."
+msgstr ""
+
+#: optistate.php:1134
+msgid "Run One-Click Optimization to address critical issues"
+msgstr ""
+
+#: optistate.php:1140
+msgid "%d optimization areas available - use detailed cleanup for better control"
+msgstr ""
+
+#: optistate.php:1148
+msgid "Create a backup before performing optimizations"
+msgstr ""
+
+#: optistate.php:1161
+msgid "Failed to calculate health score"
+msgstr ""
+
+#: optistate.php:1172 optistate.php:1203 optistate.php:1234 optistate.php:1260 optistate.php:1285 optistate.php:1309
+msgid "Insufficient permissions for optimization operations"
+msgstr ""
+
+#: optistate.php:1183
+msgid "Invalid cleanup type"
+msgstr ""
+
+#: optistate.php:1192 optistate.php:1217 optistate.php:1304 optistate.php:1320 optistate.php:2038 optistate.php:2073
+msgid "Unauthorized access"
+msgstr ""
+
+#: optistate.php:1245
+msgid "No overhead or not supported"
+msgstr ""
+
+#: optistate.php:1249
+msgid "Invalid table name"
+msgstr ""
+
+#: optistate.php:1377
+msgid "Essential WordPress option"
+msgstr ""
+
+#: optistate.php:1388
+msgid "Below optimization threshold"
+msgstr ""
+
+#: optistate.php:1412
+msgid "Update failed"
+msgstr ""
+
+#: optistate.php:1445
+msgid "WP Optimal State: Database Optimization Completed"
+msgstr ""
+
+#: optistate.php:1446
+msgid "Hello,\n\nYour scheduled database optimization and backup for %s has been completed successfully.\n\n"
+msgstr ""
+
+#: optistate.php:1447
+msgid "Site: %s\n"
+msgstr ""
+
+#: optistate.php:1448
+msgid "Completed: %s\n"
+msgstr ""
+
+#: optistate.php:1451
+msgid "Backup Created: %s\n"
+msgstr ""
+
+#: optistate.php:1455
+msgid "Backup: No new backup created (may have reached limit)\n"
+msgstr ""
+
+#: optistate.php:1460
+msgid "Cleanup Results:"
+msgstr ""
+
+#: optistate.php:1472
+msgid "\nTotal items cleaned: %d\n"
+msgstr ""
+
+#: optistate.php:1476
+msgid "No cleanup was needed - database was already optimized.\n"
+msgstr ""
+
+#: optistate.php:1481
+msgid "\nCleanup Results: No items needed cleaning\n"
+msgstr ""
+
+#: optistate.php:1483
+msgid "\n\n----------------------------"
+msgstr ""
+
+#: optistate.php:1484
+msgid "\nPLUGIN SETTINGS:\n"
+msgstr ""
+
+#: optistate.php:1485
+msgid "Dashboard: %s\n"
+msgstr ""
+
+#: optistate.php:1486
+msgid "Automatic tasks: Every %d days at %s\n"
+msgstr ""
+
+#: optistate.php:1487
+msgid "\nThis is an automated alert from WP Optimal State plugin."
+msgstr ""
+
+#: optistate.php:1488
+msgid "\nYou are receiving this because email notifications are enabled in the plugin settings."
+msgstr ""
+
+#: optistate.php:1542 optistate.php:1549 optistate.php:1565 optistate.php:1581
+msgid "Scheduled Backup & Cleaning Failed: Server Error"
+msgstr ""
+
+#: optistate.php:1543
+msgid "Database backup creation failed"
+msgstr ""
+
+#: optistate.php:1543
+msgid "Insufficient disk space"
+msgstr ""
+
+#: optistate.php:1543
+msgid "Database connection issues"
+msgstr ""
+
+#: optistate.php:1543
+msgid "File permission problems in backup directory"
+msgstr ""
+
+#: optistate.php:1543
+msgid "PHP memory limit reached"
+msgstr ""
+
+#: optistate.php:1543 optistate.php:1550
+msgid "PHP execution time limit reached"
+msgstr ""
+
+#: optistate.php:1550
+msgid "Database cleanup operations failed"
+msgstr ""
+
+#: optistate.php:1550
+msgid "Database connection lost during cleanup"
+msgstr ""
+
+#: optistate.php:1550
+msgid "Database table corruption"
+msgstr ""
+
+#: optistate.php:1550
+msgid "Insufficient database privileges"
+msgstr ""
+
+#: optistate.php:1550
+msgid "PHP memory limit reached during cleanup"
+msgstr ""
+
+#: optistate.php:1556
+msgid "One-Click Optimization + 💾 Database Backup (%s)"
+msgstr ""
+
+#: optistate.php:1558
+msgctxt "concatenating log messages"
+msgid "%1$s + %2$s"
+msgstr ""
+
+#: optistate.php:1558
+msgid "Email Sent"
+msgstr ""
+
+#: optistate.php:1562
+msgid "Email Not Sent (check settings)"
+msgstr ""
+
+#: optistate.php:1566
+msgid "Unexpected error occurred"
+msgstr ""
+
+#: optistate.php:1584
+msgid "WP Optimal State: Scheduled Database Maintenance Failed"
+msgstr ""
+
+#: optistate.php:1585
+msgid "ALERT: Scheduled database maintenance for %s has failed.\n\n"
+msgstr ""
+
+#: optistate.php:1587
+msgid "Failed: %s\n"
+msgstr ""
+
+#: optistate.php:1590
+msgid "FAILURE DETAILS:\n"
+msgstr ""
+
+#: optistate.php:1591
+msgid "Type: %s\n"
+msgstr ""
+
+#: optistate.php:1592
+msgid "Error: %s\n\n"
+msgstr ""
+
+#: optistate.php:1595 optistate.php:1615
+msgid "BACKUP STATUS:\n"
+msgstr ""
+
+#: optistate.php:1596
+msgid "✗ Database backup creation FAILED\n"
+msgstr ""
+
+#: optistate.php:1597
+msgid "✗ Cleanup operations were NOT performed (for safety)\n\n"
+msgstr ""
+
+#: optistate.php:1598 optistate.php:1625
+msgid "POSSIBLE CAUSES:\n"
+msgstr ""
+
+#: optistate.php:1606 optistate.php:1631 optistate.php:1651
+msgid "RECOMMENDED ACTIONS:\n"
+msgstr ""
+
+#: optistate.php:1607
+msgid "Check available disk space on your server"
+msgstr ""
+
+#: optistate.php:1608
+msgid "Verify backup directory permissions (wp-content/uploads/optistate/db-backups/)"
+msgstr ""
+
+#: optistate.php:1609
+msgid "Review PHP error logs for detailed error messages"
+msgstr ""
+
+#: optistate.php:1610
+msgid "Try creating a manual backup from the plugin dashboard"
+msgstr ""
+
+#: optistate.php:1611 optistate.php:1637 optistate.php:1655
+msgid "Contact your hosting provider if the issue persists"
+msgstr ""
+
+#: optistate.php:1615
+msgid "✓ Database backup created successfully\n"
+msgstr ""
+
+#: optistate.php:1618
+msgid "💾 Backup file: %s\n"
+msgstr ""
+
+#: optistate.php:1622
+msgid "CLEANUP STATUS:\n"
+msgstr ""
+
+#: optistate.php:1623
+msgid "✗ Database cleanup operations FAILED\n\n"
+msgstr ""
+
+#: optistate.php:1632
+msgid "Check database connection status"
+msgstr ""
+
+#: optistate.php:1633
+msgid "Verify database user has sufficient privileges"
+msgstr ""
+
+#: optistate.php:1634
+msgid "Review PHP and MySQL error logs"
+msgstr ""
+
+#: optistate.php:1635
+msgid "Try running optimization manually from the plugin dashboard"
+msgstr ""
+
+#: optistate.php:1636
+msgid "Consider increasing PHP memory_limit and max_execution_time"
+msgstr ""
+
+#: optistate.php:1640
+msgid "EXCEPTION DETAILS:\n"
+msgstr ""
+
+#: optistate.php:1643
+msgid "Message: %s\n"
+msgstr ""
+
+#: optistate.php:1648
+msgid "Location: %s (line %d)\n"
+msgstr ""
+
+#: optistate.php:1650
+msgid "\nFull stack trace has been logged to PHP error logs.\n"
+msgstr ""
+
+#: optistate.php:1652
+msgid "Review the error details above"
+msgstr ""
+
+#: optistate.php:1653
+msgid "Check PHP error logs for more information"
+msgstr ""
+
+#: optistate.php:1654
+msgid "Verify server resources (memory, disk space, CPU)"
+msgstr ""
+
+#: optistate.php:1656
+msgid "If the issue persists, contact Optimal State support"
+msgstr ""
+
+#: optistate.php:1659
+msgid "WHAT HAPPENS NEXT?\n"
+msgstr ""
+
+#: optistate.php:1660
+msgid "• The scheduled task will retry at the next scheduled time"
+msgstr ""
+
+#: optistate.php:1661
+msgid "• Your database has NOT been modified"
+msgstr ""
+
+#: optistate.php:1662
+msgid "• You can try running the operations manually from your WordPress admin"
+msgstr ""
+
+#: optistate.php:1666
+msgid "Backup Creation Failed"
+msgstr ""
+
+#: optistate.php:1666
+msgid "Cleanup Operations Failed"
+msgstr ""
+
+#: optistate.php:1666
+msgid "Unexpected Exception"
+msgstr ""
+
+#: optistate.php:1667
+msgid "Unknown Failure"
+msgstr ""
+
+#: optistate.php:1801
+msgid "Optimal State - Backup Warning"
+msgstr ""
+
+#: optistate.php:1802
+msgid "The backup directory is not writable. Database backup functionality will not work until this is resolved."
+msgstr ""
+
+#: optistate.php:1808
+msgid "Please ensure this directory has write permissions (typically 700 or higher)."
+msgstr ""
+
+#: optistate.php:1870 optistate.php:2534 optistate.php:2579 optistate.php:2655 optistate.php:2740 optistate.php:3098
+msgid "Failed to initialize filesystem."
+msgstr ""
+
+#: optistate.php:1876
+msgid "Backup file not found or not readable."
+msgstr ""
+
+#: optistate.php:1882
+msgid "Failed to open backup file for reading."
+msgstr ""
+
+#: optistate.php:1897
+msgid "Restore process timed out."
+msgstr ""
+
+#: optistate.php:1950
+msgid "Database name mismatch detected."
+msgstr ""
+
+#: optistate.php:1965
+msgid "Query buffer exceeded memory limit."
+msgstr ""
+
+#: optistate.php:1987
+msgid "SQL Error: "
+msgstr ""
+
+#: optistate.php:2005
+msgid "Restore failed: Could not commit final transaction."
+msgstr ""
+
+#: optistate.php:2023
+msgid "Insufficient queries executed from the backup file."
+msgstr ""
+
+#: optistate.php:2030
+msgid "Temp table verification failed: "
+msgstr ""
+
+#: optistate.php:2037
+msgid "Table swap failed: %s"
+msgstr ""
+
+#: optistate.php:2041
+msgid "Database restored successfully."
+msgstr ""
+
+#: optistate.php:2051
+msgid "An exception occurred: "
+msgstr ""
+
+#: optistate.php:2063
+msgid "No temporary tables were created during restore."
+msgstr ""
+
+#: optistate.php:2090
+msgid "Required WordPress core tables (%s) were not found in the backup."
+msgstr ""
+
+#: optistate.php:2103
+msgid "Temporary table %1$s (for %2$s) was not created successfully."
+msgstr ""
+
+#: optistate.php:2110
+msgid "Temporary table %s is empty. Restore may be corrupted."
+msgstr ""
+
+#: optistate.php:2116
+msgid "Critical WordPress option 'siteurl' not found in restored data."
+msgstr ""
+
+#: optistate.php:2119
+msgid "All "
+msgstr ""
+
+#: optistate.php:2119
+msgid " temporary tables verified successfully."
+msgstr ""
+
+#: optistate.php:2126
+msgid "No tables to swap."
+msgstr ""
+
+#: optistate.php:2200
+msgid "Failed to backup live table '%s'. Error: "
+msgstr ""
+
+#: optistate.php:2212
+msgid "Failed to activate temp table '%s'. Error: "
+msgstr ""
+
+#: optistate.php:2220
+msgid "CRITICAL: Transaction commit failed."
+msgstr ""
+
+#: optistate.php:2242
+msgid "All %d tables swapped successfully."
+msgstr ""
+
+#: optistate.php:2251
+msgid "Restore failed: "
+msgstr ""
+
+#: optistate.php:2251
+msgid " All changes have been rolled back."
+msgstr ""
+
+#: optistate.php:2273
+msgid "No database tables found."
+msgstr ""
+
+#: optistate.php:2279
+msgid "Failed to get structure for table: %s"
+msgstr ""
+
+#: optistate.php:2298 optistate.php:2398
+msgid "💾 Database Backup (%s)"
+msgstr ""
+
+#: optistate.php:2461
+msgid "Could not initialize filesystem for verification."
+msgstr ""
+
+#: optistate.php:2466
+msgid "Backup verification data missing. "
+msgstr ""
+
+#: optistate.php:2471
+msgid "Backup file is missing or too small."
+msgstr ""
+
+#: optistate.php:2476
+msgid "Failed to compute checksum."
+msgstr ""
+
+#: optistate.php:2482
+msgid "Backup file checksum mismatch: File may be corrupted. "
+msgstr ""
+
+#: optistate.php:2487
+msgid "Invalid backup metadata."
+msgstr ""
+
+#: optistate.php:2490
+msgid "Backup verified successfully."
+msgstr ""
+
+#: optistate.php:2508
+msgid "Insufficient permissions for database operations"
+msgstr ""
+
+#: optistate.php:2513
+msgid "Backup directory is not writable. Please check file permissions."
+msgstr ""
+
+#: optistate.php:2518
+msgid "Please wait 60 seconds before performing a new backup."
+msgstr ""
+
+#: optistate.php:2529
+msgid "Backup created successfully!"
+msgstr ""
+
+#: optistate.php:2538
+msgid "Backup failed. The process could not be completed. Check server error logs for more details."
+msgstr ""
+
+#: optistate.php:2648
+msgid "Insufficient permissions for file deletion operations"
+msgstr ""
+
+#: optistate.php:2659 optistate.php:2709 optistate.php:2750
+msgid "Invalid filename."
+msgstr ""
+
+#: optistate.php:2665 optistate.php:2715 optistate.php:2831
+msgid "Invalid file path."
+msgstr ""
+
+#: optistate.php:2670 optistate.php:2726
+msgid "Backup file not found."
+msgstr ""
+
+#: optistate.php:2682
+msgid "Backup and all associated files deleted successfully!"
+msgstr ""
+
+#: optistate.php:2686
+msgid "Failed to delete some backup files: "
+msgstr ""
+
+#: optistate.php:2693
+msgid "Insufficient permissions for backup verification"
+msgstr ""
+
+#: optistate.php:2706
+msgid "Insufficient permissions for database restore operations"
+msgstr ""
+
+#: optistate.php:2710
+msgid "Please wait 60 seconds before restoring another backup."
+msgstr ""
+
+#: optistate.php:2731
+msgid "Failed to read backup file for security scan."
+msgstr ""
+
+#: optistate.php:2734 optistate.php:2938
+msgid "Security risk detected. The file contains suspicious code and cannot be restored."
+msgstr ""
+
+#: optistate.php:2742
+msgid "Backup verification failed! "
+msgstr ""
+
+#: optistate.php:2742
+msgid " Restore operation aborted for security."
+msgstr ""
+
+#: optistate.php:2746
+msgid "Failed to create safety backup. Restore aborted for your protection."
+msgstr ""
+
+#: optistate.php:2758
+msgid "Database restored successfully! "
+msgstr ""
+
+#: optistate.php:2758
+msgid " queries executed in "
+msgstr ""
+
+#: optistate.php:2758
+msgid " seconds. "
+msgstr ""
+
+#: optistate.php:2758
+msgid " tables restored via temporary table swap."
+msgstr ""
+
+#: optistate.php:2780
+msgid "✅ Database successfully rolled back to pre-restore state."
+msgstr ""
+
+#: optistate.php:2784
+msgid "❌ Rollback also failed! Your site may be in an inconsistent state. Please check immediately."
+msgstr ""
+
+#: optistate.php:2790
+msgid "⚠️ No safety backup was available for rollback."
+msgstr ""
+
+#: optistate.php:2809 optistate.php:3034
+msgid "An unexpected error occurred during the restore process."
+msgstr ""
+
+#: optistate.php:2816
+msgid "Database Backup Restored (%s)"
+msgstr ""
+
+#: optistate.php:2840 optistate.php:2940
+msgid "Insufficient permissions"
+msgstr ""
+
+#: optistate.php:2845
+msgid "Please wait 60 seconds before uploading another file."
+msgstr ""
+
+#: optistate.php:2850 optistate.php:2869
+msgid "No file uploaded."
+msgstr ""
+
+#: optistate.php:2863
+msgid "File upload failed."
+msgstr ""
+
+#: optistate.php:2867 optistate.php:2889
+msgid "File is too large. Maximum size is 500MB."
+msgstr ""
+
+#: optistate.php:2872
+msgid "File upload was interrupted. Please try again."
+msgstr ""
+
+Try to upload your file again.
+#: optistate.php:2876
+msgid "Server configuration error. Please contact your hosting provider."
+msgstr ""
+
+#: optistate.php:2882
+msgid "Invalid file upload."
+msgstr ""
+
+#: optistate.php:2894 optistate.php:2909
+msgid "Only SQL files are allowed."
+msgstr ""
+
+#: optistate.php:2747 optistate.php:2900
+msgid "Invalid filename. Security risk detected (double extension)."
+msgstr ""
+
+#: optistate.php:2905
+msgid "Invalid filename. Path traversal attempt detected."
+msgstr ""
+
+#: optistate.php:2918
+msgid "Invalid file type. Only SQL files are allowed."
+msgstr ""
+
+#: optistate.php:2924
+msgid "Invalid file size."
+msgstr ""
+
+#: optistate.php:2930
+msgid "Failed to read uploaded file."
+msgstr ""
+
+#: optistate.php:2944
+msgid "File does not appear to be a valid SQL file."
+msgstr ""
+
+#: optistate.php:2951
+msgid "Failed to create temporary directory."
+msgstr ""
+
+#: optistate.php:2981 optistate.php:2991
+msgid "File uploaded successfully!"
+msgstr ""
+
+#: optistate.php:3075
+msgid "Briefly unavailable for scheduled maintenance"
+msgstr ""
+
+#: optistate.php:3076
+msgid "Briefly unavailable for scheduled maintenance."
+msgstr ""
+
+#: optistate.php:3076
+msgid "We are currently performing critical database maintenance."
+msgstr ""
+
+#: optistate.php:3076
+msgid "Please check back in a minute."
+msgstr ""
+
+#: optistate.php:3095
+msgid "Please wait 60 seconds before restoring again."
+msgstr ""
+
+#: optistate.php:3101
+msgid "Invalid or missing file identifier."
+msgstr ""
+
+#: optistate.php:3107
+msgid "File session expired or is invalid. Please upload again."
+msgstr ""
+
+#: optistate.php:3115
+msgid "🔓 File not found or has been tampered with."
+msgstr ""
+
+#: optistate.php:3121
+msgid "Aborted for security reasons. "
+msgstr ""
+
+#: optistate.php:3127
+msgid "Failed to create safety backup. Restore aborted."
+msgstr ""
+
+#: optistate.php:3139
+msgid "Database restored successfully from file! "
+msgstr ""
+
+#: optistate.php:3149 optistate.php:3167
+msgid "⏪ Database rolled back to pre-restore state."
+msgstr ""
+
+#: optistate.php:3153
+msgid " WARNING: The safety rollback may have also failed. Please check your site's integrity immediately. "
+msgstr ""
+
+#: optistate.php:3171
+msgid " Safety Rollback is not necessary."
+msgstr ""
+
+#: optistate.php:3180
+msgid "Cannot initialize filesystem."
+msgstr ""
+
+#: optistate.php:3186
+msgid "Cannot read file."
+msgstr ""
+
+#: optistate.php:3199
+msgid "Database mismatch: File is for database '%s' but current database is '%s'. This backup cannot be restored to this site."
+msgstr ""
+
+#: optistate.php:3233
+msgid "File does not contain valid SQL statements. This does not appear to be a database backup file."
+msgstr ""
+
+#: optistate.php:3237
+msgid "Cannot verify database name in file. This may not be a valid WordPress database backup."
+msgstr ""
+
+#: optistate.php:3245
+msgid "File does not contain all WordPress core tables. Missing: %s. This does not appear tobe a complete WordPress database backup."
+msgstr ""
+
+#: optistate.php:3249
+msgid "File validated successfully."
+msgstr ""
+
+#: optistate.php:3255
+msgid "Database Restored from File (%s)"
+msgstr ""
+
+#: optistate.php:3281
+msgid "Failed Database Restore"
+msgstr ""
+
+#: optistate.php:3281
+msgid "Rollback"
+msgstr ""
+
+#: optistate.php:3290
+msgid "Security check failed (Nonce validation failed)."
+msgstr ""
+
+#: optistate.php:3294
+msgid "You do not have sufficient permissions to download backup files"
+msgstr ""
+
+#: optistate.php:3299
+msgid "Verification failed: Could not initialize filesystem. Download aborted."
+msgstr ""
+
+#: optistate.php:3304
+msgid "Invalid file type. Only SQL backup files can be downloaded."
+msgstr ""
+
+#: optistate.php:3308
+msgid "Invalid filename (Directory traversal attempt detected)."
+msgstr ""
+
+#: optistate.php:3318
+msgid "Verification failed: The backup file or its checksum file is missing. Download aborted."
+msgstr ""
+
+#: optistate.php:3323
+msgid "Verification failed: The backup file is too small or empty. Download aborted."
+msgstr ""
+
+#: optistate.php:3332
+msgid "Verification failed: Could not read checksum file. Download aborted."
+msgstr ""
+
+#: optistate.php:3338
+msgid "Verification failed: Checksum file contains invalid data. Download aborted."
+msgstr ""
+
+#: optistate.php:3343
+msgid "Verification failed: Could not calculate file checksum. Download aborted."
+msgstr ""
+
+#: optistate.php:3347
+msgid "Download Aborted: File Integrity Check Failed"
+msgstr ""
+
+#: optistate.php:3348
+msgid "The backup file you are trying to download appears to be corrupted or has been modified since it was created."
+msgstr ""
+
+#: optistate.php:3349
+msgid "File:"
+msgstr ""
+
+#: optistate.php:3350
+msgid "File Size:"
+msgstr ""
+
+#: optistate.php:3351
+msgid "To protect your site, the download has been stopped."
+msgstr ""
+
+#: optistate.php:3352
+msgid "Technical Details:"
+msgstr ""
+
+#: optistate.php:3352
+msgid "Expected Checksum:"
+msgstr ""
+
+#: optistate.php:3352
+msgid "length:"
+msgstr ""
+
+#: optistate.php:3353
+msgid "Actual Checksum:"
+msgstr ""
+
+#: optistate.php:3354
+msgid "This file should not be used for restoration as it may cause database corruption."
+msgstr ""
+
+#: optistate.php:3356
+msgid "Return to Optimal State"
+msgstr ""
+
+#: optistate.php:1923
+msgid "Browser Caching (.htaccess)"
+msgstr ""
+
+#: optistate.php:1924
+msgid "Enables browser caching by adding optimized caching rules to your .htaccess file. This dramatically improves page load times for returning visitors by storing static assets in their browser. Requires .htaccess file to be writable. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc."
+msgstr ""
+
+#: optistate.php:1931
+msgid "Heartbeat API Control"
+msgstr ""
+
+#: optistate.php:1932
+msgid "Reduces or disables the WordPress Heartbeat API that creates frequent AJAX calls (every 15-60 seconds). This saves server resources but may disable real-time features like post editing locks."
+msgstr ""
+
+#: optistate.php:1935
+msgid "WordPress Default (Every 15-60 seconds)"
+msgstr ""
+
+#: optistate.php:1936
+msgid "Slow Down (Every 2 minutes)"
+msgstr ""
+
+#: optistate.php:1937
+msgid "Disable in Admin Area"
+msgstr ""
+
+#: optistate.php:1938
+msgid "Disable on Frontend Only"
+msgstr ""
+
+#: optistate.php:1939
+msgid "Disable Everywhere"
+msgstr ""
+
+#: optistate.php:1942
+msgid "Post Revisions Limit"
+msgstr ""
+
+#: optistate.php:1943
+msgid "WordPress saves a new copy every time you click \"Save Draft\". Limiting revisions prevents database bloat while keeping recent versions for safety."
+msgstr ""
+
+#: optistate.php:1946
+msgid "WordPress Default (Unlimited)"
+msgstr ""
+
+#: optistate.php:1947
+msgid "Limit to 3 Revisions"
+msgstr ""
+
+#: optistate.php:1948
+msgid "Limit to 5 Revisions"
+msgstr ""
+
+#: optistate.php:1949
+msgid "Limit to 10 Revisions"
+msgstr ""
+
+#: optistate.php:1950
+msgid "Disable Revisions (not recommended)"
+msgstr ""
+
+#: optistate.php:1953
+msgid "Emoji Scripts"
+msgstr ""
+
+#: optistate.php:1954
+msgid "Removes the emoji detection JavaScript (wp-emoji-release.min.js) loaded on every page. Modern browsers display emojis natively, making this script redundant."
+msgstr ""
+
+#: optistate.php:1960
+msgid "XML-RPC Interface"
+msgstr ""
+
+#: optistate.php:1961
+msgid "Disables the XML-RPC API used by legacy mobile apps. It has been replaced by the REST API and is a frequent target for brute-force attacks."
+msgstr ""
+
+#: optistate.php:1967
+msgid "Self Pingbacks"
+msgstr ""
+
+#: optistate.php:1968
+msgid "Prevents WordPress from creating pingback notifications when you link to your own posts, reducing unnecessary database operations."
+msgstr ""
+
+#: optistate.php:1974
+msgid "REST API Link Tag"
+msgstr ""
+
+#: optistate.php:1975
+msgid "Removes the REST API discovery link from page headers. The REST API will still work, but external discovery is disabled."
+msgstr ""
+
+#: optistate.php:1981
+msgid "Shortlink Tag"
+msgstr ""
+
+#: optistate.php:1982
+msgid "Removes the shortlink meta tag from page headers. Shortlinks are rarely used and removing them saves minimal bandwidth."
+msgstr ""
+
+#: optistate.php:1988
+msgid "RSD (Really Simple Discovery) Link"
+msgstr ""
+
+#: optistate.php:1989
+msgid "Removes the RSD link used by external blog clients. Unless you use desktop blogging software, this can be safely removed."
+msgstr ""
+
+#: optistate.php:1995
+msgid "Windows Live Writer Manifest"
+msgstr ""
+
+#: optistate.php:1996
+msgid "Removes the Windows Live Writer manifest link. This software is discontinued and the link is no longer needed."
+msgstr ""
+
+#: optistate.php:2002
+msgid "WordPress Version Meta Tag"
+msgstr ""
+
+#: optistate.php:2003
+msgid "Removes the WordPress version number from page headers. This improves security by hiding your WordPress version from potential attackers."
+msgstr ""
+
+#: optistate.php:2081
+msgid "Invalid data format"
+msgstr ""
+
+#: optistate.php:2089
+msgid "Performance settings saved successfully!"
+msgstr ""

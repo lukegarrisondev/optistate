@@ -150,6 +150,9 @@ Expanded and updated the user manual, added an advanced search functionality and
 
 --------------------------------------------------------------------------
 
+Developer:
+Luke Garrison - https://x.com/lukegarri - https://github.com/lukegarrisondev
+
 Plugin's Official Page:
 https://payhip.com/b/AS3Pt
 

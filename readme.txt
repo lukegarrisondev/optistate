@@ -1,3 +1,22 @@
+== INSTALLATION ==
+
+= Method 1 - Manual Upload =
+1. Download the plugin ZIP file (optistate-main.zip)
+2. In WordPress: Go to Plugins → Add New → Upload Plugin
+3. Choose the ZIP file and click Install Now
+4. Click Activate after installation
+5. Look for "Optimal State" in you admin menu
+
+= Method 2 - FTP Upload =
+1. Download the plugin ZIP file (optistate-main.zip)
+2. Extract the ZIP file
+3. Upload the 'optistate-main' folder to /wp-content/plugins/
+4. Activate through Plugins menu in WordPress
+5. Look for "Optimal State" in you admin menu
+
+================================================
+================================================
+
 === WP Optimal State ===
 Contributors: Luke Garrison
 Tags: optimize, caching, performance, backup, clean, database, database-optimization, database-cleanup, wordpress-speed
@@ -42,24 +61,6 @@ Keep your WordPress database lean, fast, and healthy with WP Optimal State.
 = Why Use WP Optimal State? =
 
 Over time, WordPress databases accumulate unnecessary data like post revisions, spam comments, orphaned metadata, and expired transients. This bloat slows down queries, increases backup sizes, and degrades performance. WP Optimal State removes this clutter safely while providing integrated backup protection. Unlike other optimization plugins, it combines cleaning, analysis, backup, and restore in one secure solution with automated scheduling and email notifications.
-
-== Installation ==
-
-= Method 1 - Manual Upload =
-
-1. Download the plugin ZIP file (optistate-main.zip)
-2. In WordPress: Go to Plugins → Add New → Upload Plugin
-3. Choose the ZIP file and click Install Now
-4. Click Activate after installation
-5. Look for "Optimal State" in you admin menu
-
-= Method 2 - FTP Upload =
-
-1. Download the plugin ZIP file (optistate-main.zip)
-2. Extract the ZIP file
-3. Upload the 'optistate-main' folder to /wp-content/plugins/
-4. Activate through Plugins menu in WordPress
-5. Look for "Optimal State" in you admin menu
 
 == Frequently Asked Questions ==
 
@@ -214,3 +215,4 @@ Special thanks to all our beta testers and contributors who helped make this plu
 * Optimized database queries
 
 * Efficient AJAX operations
+

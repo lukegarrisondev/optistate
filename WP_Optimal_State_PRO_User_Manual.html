@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WP Optimal State PRO - User Manual v1.1.7</title>
+    <meta name="description" content="Full user manual for WP Optimal State PRO WordPress plugin.">
+<style>
+#back-to-toc{position:fixed;bottom:13px;left:13px;background-color:#16358a;color:#fff;border:none;border-radius:50px;padding:10px 14px;font-size:.8em;font-weight:500;cursor:pointer;box-shadow:0 3px 12px #0003;z-index:9999;opacity:0;visibility:hidden;transition:all .3s cubic-bezier(0.4,0,0.2,1);transform:translateY(20px);display:flex;align-items:center;gap:10px;letter-spacing:.5px;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif}
+#back-to-toc.show{opacity:1;visibility:visible;transform:translateY(0)}
+#back-to-toc:active{transform:translateY(0);box-shadow:0 4px 12px #0003}
+#back-to-toc .toc-icon{width:16px;height:16px;position:relative;transition:transform .3s ease}
+.toc-icon{display:inline-block}
+.toc-icon::before,.toc-icon::after{content:'';position:absolute;background-color:currentColor;border-radius:1px}
+.toc-icon::before{width:3px;height:100%;left:3px;top:0}
+.toc-icon::after{width:12px;height:3px;right:0;background-color:currentColor;border-radius:1px;top:3px}
+.toc-icon .middle-line{position:absolute;width:8px;height:3px;background-color:currentColor;right:0;top:50%;transform:translateY(-50%);border-radius:1px}
+.toc-icon .bottom-line{position:absolute;width:14px;height:3px;background-color:currentColor;right:0;bottom:3px;border-radius:1px}
+#optistate-search-container{margin:25px 0;padding:20px;background:#fff;border-radius:12px;border:1px solid #e2e8f0;box-shadow:0 6px 20px -10px #00000026;position:relative}
+#optistate-search-header h3{margin:-8px 0 8px;font-size:1.1em;color:#1e293b;font-weight:600;display:flex;align-items:center;gap:8px}
+.search-input-wrapper{position:relative;display:flex;align-items:center}
+#optistate-search-input{width:100%;padding:12px 16px;padding-right:120px;font-size:1.05em;border:2px solid #e2e8f0;border-radius:8px;background:#F9FFF7;transition:all .2s ease;color:#334155}
+#optistate-search-input:focus{outline:none;border-color:#2271b1;background:#fff;box-shadow:0 0 0 4px #2271b11a}
+.search-shortcut-hint{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:#fff;border:1px solid #cbd5e1;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:600;color:#64748b;pointer-events:none;box-shadow:0 1px 2px #0000000d}
+#optistate-search-results{margin-top:15px;max-height:500px;overflow-y:auto;border-radius:8px;border:1px solid #e2e8f0;background:#fff;display:none;box-shadow:0 4px 20px #00000014}
+#optistate-search-results.show{display:block}
+.search-result-item{padding:16px 20px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background-color .1s ease}
+.search-result-item:last-child{border-bottom:none}
+.search-result-item:hover,.search-result-item.selected{background-color:#f0f9ff;border-left:4px solid #2271b1;padding-left:16px}
+.result-breadcrumbs{font-size:.75em;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.result-title{font-size:1.1em;font-weight:600;color:#1e3a8a;margin-bottom:6px}
+.result-excerpt{font-size:.95em;color:#475569;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.highlight{background-color:#fef08a;color:#854d0e;padding:0 2px;border-radius:2px;font-weight:600}
+#optistate-search-stats{text-align:right;font-size:.85em;color:#94a3b8;margin-top:8px;display:none}
+#optistate-search-stats.show { display: block; }
+code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f4f6!important;padding:1px 4px!important;border-radius:4px!important;font-size:.9em!important;color:#A51F43!important;display:inline-block;margin:0 2px}
+.h2title{font-size:1.7em;color:#16358a;border-bottom:2px solid #e2e8f0;padding-bottom:5px;margin-top:40px;padding-top:20px}
+.h3title{font-size:1.25em!important;color:#1e40af;margin-top:30px;padding-top:15px;margin-bottom:10px}
+.h4title{font-size:1.2em;color:#1e40af;margin-top:25px;margin-bottom:10px}
+.niceblock{border-left:4px solid#f59e0b;padding:12px 18px;margin-left:0;margin-right:0;margin-bottom:15px;font-style:italic;color:#555;background-color:#fffbeb;border-radius:4px}
+.code-block-wrapper{position:relative}
+.copy-code-btn{position:absolute;top:10px;right:10px;background:#2271b1;color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:.85em;font-weight:600;cursor:pointer;transition:all .2s ease;z-index:10;display:flex;align-items:center;gap:6px;box-shadow:0 2px 4px #0000001a}
+.copy-code-btn:hover{background:#135e96;transform:translateY(-1px);box-shadow:0 4px 8px #00000026}
+.copy-code-btn:active{transform:translateY(0)}
+.copy-code-btn.copied{background:#00a32a}
+.copy-code-btn .icon{font-size:1em}
+</style>
+</head>
+<body>
+<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; font-size: 16px; line-height: 1.6; margin: 25px auto; max-width: 1200px; color: #333;">
+<p data-pm-slice="1 1 []"><a href="https://payhip.com/b/AS3Pt" target="_blank"><img class="aligncenter size-full wp-image-20367" style="max-width: 100%; height: auto; border-radius: 8px;" src="https://spiritualseek.com/wp-content/uploads/2025/10/wp-optimal-state-wordpress-plugin.webp" alt="WP Optimal State Plugin Banner" width="1200" height="270" /></a></p>
+<p data-pm-slice="1 1 []"><span style="color: #16358a; font-size: 1.25em; font-weight: bold; display: block; margin-top: 10px;"><strong>📘 User Manual - PRO Version 1.1.7</strong></span></p>
+<div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 18px; margin-left: 0; margin-right: 0; margin-bottom: 10px; color: #555; border-radius: 4px;">
+ℹ️ <strong style="color: #135e96;">NOTICE:</strong> This manual applies to both the PRO and FREE versions. However, some features described in the manual are not available in the free version.
+</div>
+<div style="border-left: 4px solid #f59e0b; padding: 10px 18px; margin-left: 0; margin-right: 0; margin-bottom: 15px; color: #555; background-color: #fffbeb; border-radius: 4px;">
+⚠️ <strong style="color: #b45309;">WARNING:</strong> If your server is running Nginx, you need to add basic security rules to your configuration - <strong><a href="#ch-7-3-1" style="color: #b45309; text-decoration: underline;">Section 7.3.1</a></strong>.
+</div>
+
+<h2 style="font-size: 1.8em; color: #16358a; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-top: 20px;">📑 Table of Contents</h2>
+<div id="optistate-search-container">
+    <div id="optistate-search-header">
+        <h3>🔎 Search the Manual</h3>
+    </div>
+    <div class="search-input-wrapper">
+        <input 
+            type="text" 
+            id="optistate-search-input" 
+            placeholder="Type to search (e.g. 'backup', 'cache', 'error')..."
+            autocomplete="off"
+            aria-label="Search the manual"
+        >
+        <div class="search-shortcut-hint">Ctrl + K</div>
+    </div>
+    <div id="optistate-search-stats">
+        Found <span id="optistate-search-count">0</span> results
+    </div>
+    <div id="optistate-search-results"></div>
+</div>
+<ol style="padding-left: 25px; margin-top: 10px; list-style-type: none;">
+ 	<li>
+<ol style="padding-left: 25px; margin-top: 10px;">
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-1">🚀 Introduction</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-1-1">1.1. 🧠 The Philosophy of WP Optimal State PRO</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-1-2">1.2. 👥 Who is This Manual For?</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-1-3">1.3. ⚠️ A CRITICAL First Warning: ALWAYS BACK UP</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-2">🛠️ Getting Started</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-1">2.1. 💻 System Requirements</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-2">2.2. 📁 A Note on File &amp; Directory Permissions</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-3">2.3. 🚫 CRITICAL: Multisite Not Supported</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-4">2.4. ⚡ Installation &amp; Activation</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-5">2.5. 🔄 Upgrading From Free Version</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-6">2.6. 📊 Filesystem Footprint (What the Plugin Creates)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-2-7">2.7. 🔔 Keep the Plugin Updated</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-3">🎯 Dashboard Philosophy: The 3-Step Workflow</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-3-1">🛡️ Step 1: The Safety Net (Backup)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-3-2">🔍 Step 2: The Diagnosis (Analyze)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-3-3">✨ Step 3: The Solution (Optimize)</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-4">💾 The Database Backup &amp; Restore Manager (Section 1)</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-4-1">4.1. 📥 Creating a Database Backup</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-4-2">4.2. 🔧 Under the Hood: The Backup & Verification Process</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-4-3">4.3. 📋 Managing Existing Backups (The Action Buttons)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-4-4">4.4. 🛡️ The Chunked, 4-Phase Safety Restore (In-Depth)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-4-5">4.5. 📤 How to Restore Database from an Uploaded File</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-4-6">4.6. 🔒 Security-First: The Upload Validation Process</a></li>
+</ul>
+</li>
+<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-5">🧹 The Database Optimization Suite (Sections 2-6)</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-1">5.1. ❤️ Database Health Score (The "Why")</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-2">5.2. 📈 Database Statistics (The "What" - A Detailed Glossary)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-3">5.3. 🚀 One-Click Optimization (The "Easy Button")</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-4">5.4. 🎯 Targeted Optimizations (The "Middle Ground")</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-5">5.5. 🔪 Detailed Database Cleanup (The "Scalpel")</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-6">5.6. ⚡ Advanced Database Optimization (The "Power Tools")</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-7">5.7. 🔍 Database Structure Analysis</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-8">5.8. ↳↰ Database Search &amp; Replace</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-6">⏰ Automatic Backup &amp; Cleanup (Section 7)</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-6-1">6.1. ⚙️ Configuring the Scheduler</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-6-2">6.2. 🔄 What the Scheduler Does</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-6-3">6.3. 📧 Understanding Email Notifications (Success &amp; Failure)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-6-4">6.4. ⏱️ A Note on WP-Cron</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-7">⚡ Performance Features Manager (Section 8)</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-1">7.1. 🚫 CRITICAL: Do NOT Use With Other Caching Plugins</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-2">7.2. 💨 Feature: Server-Side Page Caching (Deep Dive)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-3">7.3. 🌐 Feature: Browser Caching (.htaccess)</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-3-1">7.3.1 🖥 Nginx Server Configuration (Security + Caching)</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-4">7.4. 🏗️ Feature: WordPress Core Optimizations (A-Z)</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-5">7.5. 📊 Feature: Performance Metrics (PageSpeed)</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-8">🎯 Optimization Strategies: Putting It All Together</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-8-1">8.1. 🚀 Strategy 1: The First-Time Setup</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-8-2">8.2. 🆘 Strategy 2: The "My Site is Slow" Emergency Plan</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-8-3">8.3. 📅 Strategy 3: The Monthly Maintenance Tune-Up</a></li>
+</ul>
+</li>
+<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-9">📥 Settings Export/Import & User Access (Section 9)</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-9-1">9.1. Exporting Settings</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-9-2">9.2. Importing Settings</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-9-3">9.3. User Access Control</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-10">🔧 Troubleshooting &amp; Advanced FAQ</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-1">10.1. 🚧 "I'm stuck in maintenance mode!"</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-2">10.2. 🔄 "My restore failed, and the rollback <em>also</em> failed!"</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-3">10.3. 🎨 "I enabled caching and my site looks broken (CSS is missing)."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-4">10.4. 🌐 "I enabled Browser Caching and my site is broken!"</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-5">10.5. ⏳ "The 'Automatic Preload' gets stuck or times out."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-6">10.6. ❌ "The plugin shows a 'Critical Error: Cannot initialize WP_Filesystem'."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-7">10.7. ☁️ "I'm using a CDN (like Cloudflare). Will this work?"</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-8">10.8. 🖥 "Does this plugin work on Nginx servers?"</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-9">10.9. 🚦 "My PageSpeed Audit is showing an "API Error" or failing to load."</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-11">🏗️ Technical Architecture</a></strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-11-1">11.1. 🔒 Security-First Principles</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-11-2">11.2. 🧩 Key PHP Classes &amp; JavaScript Objects</a></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-12">📝 Disclaimer</a></strong></li>
+	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-13">📝 Developer API (Hooks & Filters)</a></strong></li>
+ 	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-14">🆘 Technical Support</a></strong></li>
+</ol>
+</li>
+</ol>
+<h2 id="ch-1" class="h2title">🚀 1. Introduction</h2>
+<h3 id="ch-1-1" class="h3title">🧠 1.1. The Philosophy of WP Optimal State PRO</h3>
+<p style="margin-bottom: 15px;">WP Optimal State PRO is an advanced, all-in-one WordPress optimization and management suite. It was built on the philosophy that site management should be comprehensive, secure, and powerful. It provides a complete set of tools to clean, optimize, back up, and secure your WordPress database, combined with a robust performance module to make your site exceptionally fast.</p>
+<p style="margin-bottom: 15px;">This plugin is not just a simple "cleaner." It's a complete toolkit for database management and site performance, giving you both "one-click" simplicity and the granular, advanced control that professionals demand.</p>
+
+<h3 id="ch-1-2" class="h3title">👥 1.2. Who is This Manual For?</h3>
+<p style="margin-bottom: 15px;">This manual is for every user of WP Optimal State PRO.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>👶 For Beginners:</strong> We will guide you through the safest, most effective features, like the One-Click Optimization and the automatic scheduler, allowing you to get 90% of the benefit with zero risk.</li>
+ 	<li style="margin-bottom: 8px;"><strong>👨‍💻 For Advanced Users:</strong> We will explore the "why" behind each tool, helping you fine-tune your database, analyze its structure, and configure the performance cache for maximum speed.</li>
+ 	<li style="margin-bottom: 8px;"><strong>👨‍💼 For Developers:</strong> We will explain the underlying architecture, the security measures in place, and the specific SQL commands and file modifications the plugin performs.</li>
+</ul>
+<h3 id="ch-1-3" class="h3title">⚠️ 1.3. A CRITICAL First Warning: ALWAYS BACK UP</h3>
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 WARNING: THIS IS A POWERFUL TOOL</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">WP Optimal State PRO interacts directly and deeply with your website's database. Operations like cleanup, optimization, and restoration are powerful and, in most cases, <strong>irreversible</strong>.</p>
+    <p style="margin-bottom: 15px;">While this plugin includes its own robust, best-in-class backup system, we cannot overstate the importance of caution.</p>
+    <p style="margin-bottom: 15px;"><strong>💾 Before performing ANY cleanup or restore operation, you MUST create a fresh backup.</strong></p>
+    <p style="margin-bottom: 0;">The plugin's built-in "Safety Backup" feature during restores provides a strong safety net, but a separate, downloadable backup is your ultimate insurance policy. Use this plugin responsibly. The author and this manual are not responsible for any data loss.</p>
+</blockquote>
+<h2 id="ch-2" class="h2title">🛠️ 2. Getting Started</h2>
+<h3 id="ch-2-1" class="h3title">💻 2.1. System Requirements</h3>
+<p style="margin-bottom: 15px;">To ensure full compatibility and smooth operation, your server should meet these minimum requirements:</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>🖥️ WordPress:</strong> Version 5.5 or higher.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⚙️ PHP:</strong> Version 7.4 or higher.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗄️ Database:</strong> MySQL 5.6+ or MariaDB 10.1+.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🌐 Server:</strong> Apache, Nginx, or a compatible server. (Browser Caching feature requires Apache with <code>mod_expires</code>, <code>mod_deflate</code>, and <code>mod_headers</code>).</li>
+</ul>
+<h3 id="ch-2-2" class="h3title">📁 2.2. A Note on File &amp; Directory Permissions</h3>
+<p style="margin-bottom: 15px;">This plugin requires the ability to write files to your <code>wp-content/uploads/</code> directory. This is a standard WordPress capability, but if your server has non-standard or overly restrictive permissions, you may encounter errors.</p>
+<p style="margin-bottom: 15px;">The plugin uses the <code>WP_Filesystem</code> API to safely read and write files. If you see an error like "Cannot initialize WP_Filesystem," it means your server is not configured to allow WordPress to manage its own files. You must contact your hosting provider to resolve this.</p>
+
+<h3 id="ch-2-3" class="h3title">🚫 2.3. CRITICAL: Multisite Not Supported</h3>
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 IMPORTANT</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">WP Optimal State PRO <strong>cannot be activated on a WordPress Multisite (WPMU) installation.</strong></p>
+    <p style="margin-bottom: 0;">The plugin is designed specifically for single-site WordPress installations. Its database operations (which target tables like <code>wp_options</code> and <code>wp_posts</code>) are not compatible with a multisite network (which uses <code>wp_sitemeta</code>, <code>wp_blogs</code>, and per-site tables like <code>wp_2_options</code>). Running it on a multisite network could cause irreversible data integrity issues. The plugin will automatically block its own activation if it detects a multisite environment.</p>
+</blockquote>
+<h3 id="ch-2-4" class="h3title">⚡ 2.4. Installation &amp; Activation</h3>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;">Navigate to your WordPress Admin Dashboard.</li>
+ 	<li style="margin-bottom: 8px;">Go to <strong>Plugins &gt; Add New</strong>.</li>
+ 	<li style="margin-bottom: 8px;">Click <strong>Upload Plugin</strong>.</li>
+ 	<li style="margin-bottom: 8px;">Choose the <code>WP_Optimal_State_PRO_vX-X-X.zip</code> file from your computer and click <strong>Install Now</strong>.</li>
+ 	<li style="margin-bottom: 8px;">Once installed, click <strong>Activate Plugin</strong>.</li>
+ 	<li style="margin-bottom: 8px;">Upon activation, the plugin will immediately check for and create its required directories and default settings files (Section 2.6).</li>
+ 	<li style="margin-bottom: 8px;">Look for "Optimal State" in you admin menu.</li>
+</ol>
+<h3 id="ch-2-5" class="h3title">🔄 2.5. Upgrading From FREE Version</h3>
+<p style="margin-bottom: 15px;">The upgrade process is straightforward. Simply replace the free version with the PRO version.</p>
+<p style="margin-top: 23px;"><strong>👉 Follow these quick steps:</strong></p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">In the plugin interface, go to section 1 and download your database backups (they will download as compressed <code>.sql.gz</code> files).</li>
+<li style="margin-bottom: 8px;">Then, go to section 9 (Settings Export & Import) and click <strong>Export Settings</strong> to download your <code>.json</code> settings file.</li>
+<li style="margin-bottom: 8px;">Go to <strong>Plugins &gt; Add Plugin</strong>, then click <strong>Upload Plugin</strong>. Choose the zip file <code>WP_Optimal_State_PRO_vX-X-X.zip</code> containing the PRO version and click <strong>Install Now</strong>.</li>
+<li style="margin-bottom: 8px;">At this point, you will now be asked to either replace the current version with the uploaded one, or cancel and go back. Click <strong>Replace current with uploaded</strong>.</li>
+<li style="margin-bottom: 8px;"><strong>The update is complete!</strong> Visit the plugin admin panel to confirm that your backups and settings are intact.</li> 
+<li style="margin-bottom: 8px;">If your settings have not been properly preserved, go to section 9 and <strong>import the <code>.json</code> file</strong> you downloaded in step 2.</li> </ol>
+<h3 id="ch-2-6" class="h3title">📊 2.6. Filesystem Footprint (What the Plugin Creates)</h3>
+<p style="margin-bottom: 15px;">On activation, the plugin creates the following directories and database tables to ensure persistent operation and data integrity.</p>
+<h4 class="h4title">📂 Filesystem (wp-content/uploads)</h4> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><code>.../uploads/optistate-settings/</code>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><code>settings.json</code>: Stores all your saved settings (schedule, backup limits, performance toggles).</li>
+ 	<li style="margin-bottom: 5px;"><code>optimization-log.json</code>: A log of all major operations (backups, restores, cleanups).</li>
+ 	<li style="margin-bottom: 5px;"><code>.htaccess</code>: A security file that blocks all direct web access to this directory.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><code>.../uploads/optistate/db-backups/</code>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">Stores your compressed <code>.sql.gz</code> backups.</li>
+ 	<li style="margin-bottom: 5px;"><code>.htaccess</code>: A security file that blocks web access.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><code>.../uploads/optistate/db-restore-temp/</code>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">A temporary, secure location for <code>.sql</code> and <code>.sql.gz</code> files you upload for restoration. Files are scanned and deleted after use.</li>
+ 	<li style="margin-bottom: 5px;"><code>.htaccess</code>: A security file that blocks all access.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><code>.../uploads/optistate/page-cache/</code>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">Stores the static <code>.html</code> files for the Server-Side Page Caching feature.</li>
+ 	<li style="margin-bottom: 5px;"><code>.htaccess</code>: A security file that blocks web access to anything <em>except</em> <code>.html</code> files.</li>
+</ul>
+</li>
+</ul>
+<h4 class="h4title">🗄️ Database Tables</h4> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;"><code>wp_optistate_backup_metadata</code>: Stores cryptographic checksums (SHA-256), file sizes, and timestamps for every backup. This allows the plugin to verify file integrity instantly without reading the entire file from disk.</li> <li style="margin-bottom: 8px;"><code>wp_optistate_processes</code>: A specialized state-management table. It persists the progress of long-running tasks (like backups and restores) to the database, ensuring that processes can resume automatically if a server timeout occurs.</li> </ul>
+<blockquote style="border-left: 4px solid #f59e0b; padding: 12px 18px; margin-left: 0; margin-right: 0; margin-top: 25px; margin-bottom: 15px; font-style: italic; color: #555; background-color: #fffbeb; border-radius: 4px;">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">⚠️ WARNING - NGINX SERVERS</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">If your server is running Nginx, your site's sensitive directories are currently unprotected. The <code>.htaccess</code> files this plugin relies on are ignored, leaving your files and settings exposed.</p>
+    <p style="margin-bottom: 0;">To secure your server, you must manually add the security rules to your Nginx configuration. Read <strong><a href="#ch-7-3-1" style="color: #b45309; text-decoration: underline;">Section 7.3.1</a></strong> for immediate instructions.</p>
+</blockquote>
+<h3 id="ch-2-7" class="h3title">🔔 2.7. Keep the Plugin Updated</h3> <p style="margin-bottom: 15px;">Your update process depends on whether you are using the FREE or PRO version. Please read the correct section for your plugin.</p>
+<div style="width: 40%; margin: 25px 0; border: 1px dashed #C0C0C0;"></div>
+<p style="margin-bottom: 15px;"><strong>✔ UPDATING THE FREE VERSION</strong></p> <p style="margin-bottom: 15px;">If you installed the free version of WP Optimal State from the official <a href="https://wordpress.org/plugins/optistate/" target="_blank" style="color: #16358a; text-decoration: underline;">WordPress plugin repository</a>, you can update it directly from your WordPress dashboard.</p> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">Go to <strong>Plugins → Installed Plugins</strong>.</li> <li style="margin-bottom: 8px;">Find "Optimal State" and click the "update now" link.</li> </ul> <p style="margin-bottom: 15px;">✅ All your database backups and settings will be preserved automatically.</p>
+<div style="width: 40%; margin: 25px 0; border: 1px dashed #C0C0C0;"></div>
+<p style="margin-bottom: 15px;"><strong>⭐ UPDATING THE PRO VERSION</strong></p> <p style="margin-bottom: 15px;">Updating the PRO version (which you received as a <code>.zip</code> file) takes just a couple of minutes. You have two equally valid options.</p>
+<p style="margin-top: 23px;"><strong>💡 Option 1: Via the Dashboard</strong></p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">In the plugin interface, go to section 1 and download your database backups (they will download as compressed <code>.sql.gz</code> files).</li>
+<li style="margin-bottom: 8px;">Then, go to section 9 (Settings Export & Import) and click <strong>Export Settings</strong> to download your <code>.json</code> settings file.</li>
+<li style="margin-bottom: 8px;">Go to <strong>Plugins &gt; Add Plugin</strong>, then click <strong>Upload Plugin</strong>. Choose the <code>.zip</code> file containing the latest plugin release and click <strong>Install Now</strong>.</li>
+<li style="margin-bottom: 8px;">At this point, you will now be asked to either replace the current version with the uploaded one, or cancel and go back. Click <strong>Replace current with uploaded</strong>.</li>
+<li style="margin-bottom: 8px;"><strong>The update is complete!</strong> Visit the plugin admin panel to confirm that your backups and settings are intact.</li>
+<li style="margin-bottom: 8px;">If your settings have not been properly preserved, go to section 9 and <strong>import the <code>.json</code> file</strong> you downloaded in step 2.</li></ol>
+<p style="margin-top: 28px;"><strong>👨‍💻 Option 2: Via FTP Client</strong></p> <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">Unzip the new plugin <code>.zip</code> file on your computer to get a folder named <code>optistate</code>.</li> <li style="margin-bottom: 8px;">Open your FTP client or hosting file explorer and navigate to <code>wp-content/plugins/</code>.</li> <li style="margin-bottom: 8px;">Upload the <code>optistate</code> folder from your computer, choosing to <strong>replace or overwrite</strong> all existing files in the <code>/wp-content/plugins/optistate/</code> directory.</li> <li style="margin-bottom: 8px;">Once complete, go to <strong>Plugins &gt; Installed Plugins</strong>, find WP Optimal State and verify that the new version number is displayed.</li> <li style="margin-bottom: 8px;"><strong>The update is complete!</strong> Visit the plugin admin panel to confirm that your backups and settings are intact.</li> </ol>
+<div style="width: 40%; margin: 25px 0; border: 1px dashed #C0C0C0;"></div>
+<p style="margin-bottom: 15px;"><strong>📥 How to Get PRO Updates</strong></p> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">You will receive an email notification when a new version is released.</li> <li style="margin-bottom: 8px;">Download the update from your account on the purchase site (Payhip.com).</li> <li style="margin-bottom: 8px;">If you did not register at the time of purchase or no longer have access to your account, contact <a href="https://payhip.com/optistate/contact" target="_blank" rel="noopener" style="color: #16358a; text-decoration: underline;"><strong>🆘 Technical Support</strong></a> with your license key and website URL. We will send the update package to you via email.</li> </ul>
+<h2 id="ch-3" class="h2title">🎯 3. Dashboard Philosophy: The 3-Step Workflow</h2>
+<p style="margin-bottom: 15px;">The plugin dashboard is organized to guide you through a logical and safe workflow.</p>
+
+<h3 id="ch-3-1" class="h3title">🛡️ Step 1: The Safety Net (Backup)</h3>
+<p style="margin-bottom: 15px;"><strong>Section: 1. Create a Database Backup</strong></p>
+<p style="margin-bottom: 15px;">Before you diagnose or fix <em>anything</em>, you must have an exit strategy. This section is your safety net. You can create a new, verifiable backup in seconds.</p>
+
+<h3 id="ch-3-2" class="h3title">🔍 Step 2: The Diagnosis (Analyze)</h3>
+<p style="margin-bottom: 15px;"><strong>Sections: 3. Database Health Score, 4. Database Statistics, 6. Database Structure Analysis</strong></p>
+<p style="margin-bottom: 15px;">You can't fix what you don't understand. These sections are your diagnostic tools.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>❤️ Health Score:</strong> Gives you a high-level "grade" of your site's condition.</li>
+ 	<li style="margin-bottom: 8px;"><strong>📊 Statistics:</strong> Shows you the <em>raw numbers</em>—how many post revisions you have, how much database overhead, etc.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔍 Structure Analysis:</strong> Gives you a "map" of your database, showing you what's core, what's from plugins, and how big each table is.</li>
+</ul>
+<h3 id="ch-3-3" class="h3title">✨ Step 3: The Solution (Optimize)</h3>
+<p style="margin-bottom: 15px;"><strong>Sections: 2. One-Click Optimization, 5. Detailed Cleanup, 6. Advanced Optimization, 7. Automation, 8. Performance</strong></p>
+<p style="margin-bottom: 15px;">Once you have a backup and have diagnosed the problems, you can apply the solution.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>🚀 For a Quick Fix:</strong> Use <strong>Section 2 (One-Click Optimization)</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔪 For Granular Control:</strong> Use <strong>Section 5 (Detailed Cleanup)</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⚡ For Deep Issues:</strong> Use <strong>Section 6 (Advanced Optimization)</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⏰ For Future-Proofing:</strong> Use <strong>Section 7 (Automation)</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>💨 For Site Speed:</strong> Use <strong>Section 8 (Performance Manager)</strong>.</li>
+</ul>
+<h2 id="ch-4" class="h2title">💾 4. The Database Backup &amp; Restore Manager (Section 1)</h2>
+<p style="margin-bottom: 15px;">This is the plugin's most critical feature. It allows you to create, manage, download, and restore your database with a focus on security and integrity.</p>
+
+<h3 id="ch-4-1" class="h3title">📥 4.1. Creating a Database Backup</h3>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>📊 Maximum Backups to Keep:</strong> This setting (a number from 1 to 10) controls how many backups are stored on your server. When you create a new backup that exceeds this limit, the <em>oldest</em> backup will be automatically deleted.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> Set this to <code style="font-weight: bold;">3</code>. This provides a good balance between having recent restore points and saving server disk space.
+        </div>
+    </li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔄 Create Backup Now Button:</strong> Clicking this button will:
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">Instantly begin backing up your <em>entire</em> WordPress database.</li>
+ 	<li style="margin-bottom: 5px;">Package it into a compressed <code>.sql.gz</code> file.</li>
+ 	<li style="margin-bottom: 5px;">Generate a <code>.checksum</code> file (a unique SHA-256 "fingerprint") to verify the file is not corrupted.</li>
+ 	<li style="margin-bottom: 5px;">Generate a <code>.meta</code> file containing information about the backup (date, WP version, etc.).</li>
+ 	<li style="margin-bottom: 5px;">Store all three files in your <code>wp-content/uploads/optistate/db-backups/</code> directory.</li>
+ 	<li style="margin-bottom: 5px;">Refresh the "Manage Existing Backups" list.</li>
+</ul>
+</li>
+</ol>
+<h3 id="ch-4-2" class="h3title">🔧 4.2. Under the Hood: The Backup &amp; Verification Process</h3>
+<p style="margin-bottom: 15px;">The backup mechanism is designed to be <strong>server-timeout proof</strong> using an asynchronous, chunked process. The plugin executes a series of timed AJAX requests, ensuring reliability on any hosting environment.</p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>🔓 Lock File:</strong> When you start a backup, a temporary lock is created to prevent concurrent operations.</li>
+    <li style="margin-bottom: 8px;"><strong>🏗️ Structure Dump:</strong> The plugin retrieves the <code>SHOW CREATE TABLE</code> command for every table, ensuring the database structure is perfectly preserved.</li>
+    <li style="margin-bottom: 8px;"><strong>🧠 Adaptive Resource Management (AI Tiering):</strong> Before processing data, the engine scans your server's available resources (CPU cores via <code>shell_exec</code> and PHP Memory Limit). It assigns a <strong>Performance Tier</strong> to optimize speed without crashing:
+        <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+            <li style="margin-bottom: 5px;"><strong>High Tier:</strong> (High RAM/CPU) Processes 5 chunks per request with short delays.</li>
+            <li style="margin-bottom: 5px;"><strong>Medium Tier:</strong> Processes 3 chunks per request.</li>
+            <li style="margin-bottom: 5px;"><strong>Low Tier:</strong> (Shared Hosting) Processes 2 chunks with longer cooldowns to prevent resource exhaustion.</li>
+        </ul>
+    </li>
+    <li style="margin-bottom: 8px;"><strong>📦 Data Dump (Chunked):</strong> It selects data in batches (<code>SELECT * FROM ... LIMIT ... OFFSET ...</code>) and streams it to the file. The "Chunk Size" is dynamically calculated based on the average row length of each table.</li>
+    <li style="margin-bottom: 8px;"><strong>✅ Verification:</strong> The plugin generates a secure SHA-256 checksum of the final file and stores it in the <code>wp_optistate_backup_metadata</code> table.</li>
+    <li style="margin-bottom: 8px;"><strong>🗜 Compression:</strong> The file is compressed using GZIP (or PIGZ if available on the server for multi-core compression) to reduce size by ~80%.</li>
+</ol>
+<h3 id="ch-4-3" class="h3title">📋 4.3. Managing Existing Backups (The Action Buttons)</h3>
+<p style="margin-bottom: 15px;">This table lists all available backups.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>✅ File Integrity:</strong> This is the most important column.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>✅ File integrity:</strong> The plugin has just performed an on-the-fly checksum of the backup file and confirmed that it <strong>exactly matches</strong> the "fingerprint" saved in the <code>.checksum</code> file. The backup is 100% valid and safe to restore.</li>
+ 	<li style="margin-bottom: 5px;"><strong>⚠️ File integrity:</strong> The live checksum <em>does not</em> match the saved fingerprint. This means the backup file has been modified, truncated, or corrupted since it was created. <strong>🚫 DO NOT RESTORE THIS FILE.</strong> Delete it immediately and create a new backup.</li>
+</ul>
+</li>
+<li style="margin-bottom: 8px;"><strong>📥 Download:</strong> This securely prepares and downloads a compressed <code>.sql.gz</code> version of the file to your computer.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;"> <li style="margin-bottom: 5px;"><strong>🔒 Security:</strong> Before preparation, the plugin re-verifies the original file's SHA-256 checksum. If the check fails, the download is <em>aborted</em>, protecting you from downloading a corrupted file.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗑️ Delete:</strong> This permanently deletes the backup file and all associated integrity data from your server. A confirmation modal will appear.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔄 Restore:</strong> This is the most powerful action. It will <strong>completely replace your current database</strong> with the data from this backup file. Please read the next section <em>carefully</em>.</li>
+</ul>
+<h3 id="ch-4-4" class="h3title">🛡️ 4.4. The Chunked, 4-Phase Safety Restore (In-Depth)</h3>
+<p style="margin-bottom: 15px;">Restoring a database backup is the most critical operation the plugin performs. To ensure <strong>zero-risk data integrity</strong> against server timeouts, crashes, or corrupted files, the restore is broken down into four transactional, asynchronous phases.</p>
+
+<p style="margin-bottom: 15px;"><strong style="color: #a31d84; font-size: 1.1em;">🔐 Phase 1: Preemptive Safety Backup & Validation</strong></p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 5px;"><strong>✅ Validation:</strong> The plugin verifies the selected backup file's SHA-256 checksum against its saved fingerprint. If the file is corrupted or tampered with, the process is aborted.</li>
+    <li style="margin-bottom: 5px;"><strong>💾 Safety Backup (Chunked):</strong> A complete, real-time <code>SAFETY-RESTORE-*.sql.gz</code> is created in a reliable, chunked manner. This is your guaranteed rollback point.</li>
+    <li style="margin-bottom: 5px;"><strong>🚧 Maintenance Mode:</strong> The site is put into a brief, non-WordPress maintenance mode to prevent data inconsistencies while the database tables are being swapped.</li>
+</ol>
+
+<p style="margin-bottom: 15px;"><strong style="color: #a31d84; font-size: 1.1em;">⚙️ Phase 2: Isolated & Chunked Staging</strong></p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 5px;"><strong>📊 Temporary Tables:</strong> The restore process begins by creating temporary tables (e.g., <code>optistate_temp_wp_posts</code>) instead of directly overwriting your live tables.</li>
+    <li style="margin-bottom: 5px;"><strong>📦 Chunked Import:</strong> The backup file is imported asynchronously. The script runs for ~25 seconds, imports a chunk of SQL data into the temporary tables, saves the file position, and initiates the next request. This process runs until the entire backup is staged.</li>
+</ol>
+
+<p style="margin-bottom: 15px;"><strong style="color: #a31d84; font-size: 1.1em;">🔍 Phase 3: Critical Data Verification</strong></p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 5px;"><strong>✨ Sanity Check:</strong> The plugin performs a fast check on the temporary tables to ensure key WordPress tables exist. It recognizes custom table prefixes by verifying that the table names end with the standard WordPress core suffixes (e.g., <code>_options</code>, <code>_posts</code>, <code>_users</code>), ensuring compatibility with any WordPress installation.</li>
+</ul>
+
+<p style="margin-bottom: 15px;"><strong style="color: #a31d84; font-size: 1.1em;">⚡ Phase 4: Atomic Swap & Rollback Guarantee</strong></p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 5px;"><strong>🔄 Atomic Transaction:</strong> The swap is executed as a single, all-or-nothing database transaction. The live tables are instantly renamed to `_old` and the temporary tables are renamed to the live prefix.</li>
+    <li style="margin-bottom: 5px;"><strong>🛟 Safety Rollback:</strong> If the atomic transaction fails (or if a fatal PHP error occurs), the database engine automatically rolls back all renames. Furthermore, the script is guaranteed to trigger an asynchronous rollback to the `SAFETY-RESTORE` backup created in Phase 1, ensuring zero data loss.</li>
+</ol>
+<p style="margin-bottom: 15px;">Upon successful completion, the old tables are cleaned up, the safety backup is deleted, and maintenance mode is deactivated.</p>
+<p style="margin-bottom: 15px;">This "Safety Restore" mechanism is your ultimate protection against a failed restore process, which could otherwise leave your site in a broken, half-restored state.</p>
+
+<h3 id="ch-4-5" class="h3title">📤 4.5. How to Restore Database from an Uploaded File</h3> <p style="margin-bottom: 15px;">This feature is designed to upload a <code>.sql</code> or <code>.sql.gz</code> file. You can upload a compressed backup downloaded from this plugin or an uncompressed file from phpMyAdmin.</p>
+<blockquote class="niceblock"> <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 WARNING</strong> <p style="margin-bottom: 0; margin-top: 5px;">Only upload <code>.sql</code> or <code>.sql.gz</code> files generated by WP Optimal State or phpMyAdmin. Uploading a random file or a backup from another plugin may damage your database structure. <strong>🧩 phpMyAdmin Compatibility:</strong> To ensure 100% compatibility with WP Optimal State, <strong>uncheck</strong> the <code>Enclose export in a transaction</code> option before performing exports. </p>
+</blockquote> <p style="margin-bottom: 15px;"><strong>🔄 Process:</strong></p> <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+<li style="margin-bottom: 8px;"><strong>📁 Choose SQL File:</strong> Click the button to select a <code>.sql</code> or <code>.sql.gz</code> file from your computer.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔍 Validation &amp; Upload:</strong> The file will be uploaded, and a progress bar will be displayed. During this process, a multi-step security validation occurs (see 4.6).</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔄 Restore from File:</strong> Once the upload is complete and validated, the "Restore from File" button will appear.</li>
+ 	<li style="margin-bottom: 8px;"><strong>✅ Confirmation:</strong> Clicking this button will trigger the same confirmation modal and the <strong>exact same 4-Phase Safety Restore process</strong> described in section 4.4.</li>
+	<li style="margin-bottom: 8px;"><strong>⏳ Execution:</strong> The time required to complete the restore will vary significantly depending on both the size of the database and the available server resources (<strong>from a few seconds to 30-60 minutes</strong>).</li>
+</ol>
+<h3 id="ch-4-6" class="h3title">🔒 4.6. Security-First: The Upload Validation Process</h3> <p style="margin-bottom: 15px;">When you upload a <code>.sql</code> or <code>.sql.gz</code> file, it undergoes a rigorous security scan <em>before</em> it is ever used.</p> <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;"><strong>📄 File Type Check:</strong> Verifies the file extension is <code>.sql</code> or <code>.sql.gz</code>. It also verifies the MIME type (e.g., <code>text/plain</code>, <code>application/sql</code>, <code>application/gzip</code>) to prevent file type spoofing.</li> <li style="margin-bottom: 8px;"><strong>📏 File Size Check:</strong> Enforces a 3GB maximum file size.</li> <li style="margin-bottom: 8px;"><strong>🛡️ Malicious Content Scan:</strong> If the file is compressed (<code>.sql.gz</code>), it is first securely decompressed. The plugin then reads the <em>content</em> of the <code>.sql</code> file, scanning for:
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">PHP tags (<code>&lt;?php</code>, <code>&lt;?=</code>)</li>
+ 	<li style="margin-bottom: 5px;">Suspicious functions (<code>eval(</code>, <code>system(</code>, <code>exec(</code>, <code>base64_decode</code>)</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗄️ Database Name Check:</strong> The plugin (during the restore phase) reads the header of the SQL file and looks for the <code>-- Database: dbname</code> comment. If the database name in the file does <em>not</em> match your current WordPress database name, the restore is aborted. This is a critical check that prevents you from accidentally restoring a backup from a different website.</li>
+</ol>
+<p style="margin-bottom: 15px;">If any of these checks fail, the file is deleted, and the restore is aborted.</p>
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>🛑 FALSE POSITIVES</strong> (security risks detected)<br> In some cases, the security scan may detect issues that do not pose a real threat.<br>
+			If you are sure that your backup is secure, select <span style="color: #992729; font-weight: bold;">Disable Restore Security Checks</span> just below the database upload function in section 1.1. 
+        </div>
+<h2 id="ch-5" class="h2title">🧹 5. The Database Optimization Suite (Sections 2-6)</h2>
+<p style="margin-bottom: 15px;">This is the core optimization suite. These sections work together to help you diagnose and clean your database.</p>
+
+<h3 id="ch-5-1" class="h3title">❤️ 5.1. Database Health Score (The "Why")</h3>
+<p style="margin-bottom: 15px;">This is your central diagnostic hub. It gives you a "grade" from 0-100 based on the current state of your database.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>📊 Overall Score:</strong> A weighted average of the three categories below (<code>Performance * 40%</code>, <code>Cleanliness * 35%</code>, <code>Efficiency * 25%</code>).
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>🎉 90-100 (Excellent):</strong> Your database is in optimal condition.</li>
+ 	<li style="margin-bottom: 5px;"><strong>👍 75-89 (Good):</strong> A few minor areas for cleanup.</li>
+ 	<li style="margin-bottom: 5px;"><strong>😐 60-74 (Fair):</strong> You have some clutter that should be addressed.</li>
+ 	<li style="margin-bottom: 5px;"><strong>👎 40-59 (Poor):</strong> Your database is likely bloated and needs optimization.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🚨 0-39 (Critical):</strong> Your database health is poor and may be impacting site performance.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>📈 Category Scores:</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>⚡ Performance:</strong> Graded on factors like database overhead, the size of your autoloaded data, and total database size.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🧹 Cleanliness:</strong> Graded on the amount of "junk" data, such as old post revisions, auto-drafts, spam comments, and orphaned data.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🎯 Efficiency:</strong> Graded on technical factors like your database's index-to-data ratio and total table count.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>💡 Details &amp; Recommendations:</strong> This is the most important part. It provides <em>actionable advice</em> based on your score.</li>
+</ul>
+<h3 id="ch-5-2" class="h3title">📈 5.2. Database Statistics (The "What" - A Detailed Glossary)</h3>
+<p style="margin-bottom: 15px;">This is the raw data used to calculate your Health Score. It shows you <em>exactly</em> what was found in your database.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>📝 Post Revisions:</strong> Old, saved versions of your posts and pages.</li>
+ 	<li style="margin-bottom: 8px;"><strong>📄 Auto Drafts:</strong> Unsaved drafts automatically created by WordPress.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗑️ Trashed Posts:</strong> Posts and pages in your trash bin.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🚮 Spam Comments:</strong> Comments marked as spam.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗑️ Trashed Comments:</strong> Comments in your trash bin.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🧩 Orphaned Post Meta:</strong> Data from plugins/themes that was left behind after a post was deleted. This is "junk" data with no post to attach to.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🧩 Orphaned Comment Meta:</strong> Data left behind after a comment was deleted.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🧩 Orphaned Term Relationships:</strong> Data linking non-existent posts to categories or tags.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⏰ Expired Transients:</strong> Temporary cached data (like a weather widget's data) that has passed its expiration date and can be deleted.</li>
+ 	<li style="margin-bottom: 8px;"><strong>💾 All Transients:</strong> All temporary cached data, including expired <em>and</em> active.</li>
+ 	<li style="margin-bottom: 8px;"><strong>📋 Duplicate Post Meta:</strong> Redundant, identical metadata entries for posts.</li>
+ 	<li style="margin-bottom: 8px;"><strong>📋 Duplicate Comment Meta:</strong> Redundant, identical metadata entries for comments.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🧩 Orphaned User Meta:</strong> Data left behind from deleted users.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⏳ Unapproved Comments:</strong> Comments awaiting moderation.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 Pingbacks:</strong> "Pingback" notifications in your comments.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 Trackbacks:</strong> "Trackback" notifications in your comments.</li>
+ 	<li style="margin-bottom: 8px;"><strong>💾 Database Overhead:</strong> "Empty" space in your tables, similar to file fragmentation. This space can be reclaimed.</li>
+ 	<li style="margin-bottom: 8px;"><strong>📚 Total Indexes Size:</strong> The size of the database "phone book" used for fast lookups.</li>
+ 	<li style="margin-bottom: 8px;"><strong>📊 Number of Tables:</strong> The total count of tables in your database.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⚡ Autoloaded Options:</strong> The number of settings set to load on <em>every single page</em>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>💽 Autoload Data Size:</strong> The total size of all autoloaded settings. This is a <em>critical</em> performance metric. A high number (e.g., &gt; 1MB) can significantly slow down your site.</li>
+</ul>
+<h3 id="ch-5-3" class="h3title">🚀 5.3. One-Click Optimization (The "Easy Button")</h3>
+<p style="margin-bottom: 15px;">This is the simplest and safest way to clean your database. Clicking the <strong>"🚀 Optimize Now"</strong> button will:</p>
+
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;">Ask for confirmation.</li>
+ 	<li style="margin-bottom: 8px;">Run all <strong>safe</strong> cleanup tasks (it will <em>not</em> touch your trash bins or unapproved comments).</li>
+ 	<li style="margin-bottom: 8px;">Perform "Optimize All Tables" (see section 5.5).</li>
+ 	<li style="margin-bottom: 8px;">Show you a summary of what was cleaned.</li>
+ 	<li style="margin-bottom: 8px;">Refresh your Health Score.</li>
+</ol>
+<p style="margin-bottom: 15px;">This is the recommended action for most users after creating a backup.</p>
+<h3 id="ch-5-4" class="h3title">🎯 5.4. Targeted Optimizations (The "Middle Ground")</h3>
+<p style="margin-bottom: 15px;">Located directly under the Database Health Score, this section offers four specialized cleanup tools that target specific areas of database bloat often missed by general cleaners.</p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>🗓️ Action Logs:</strong> Cleans up completed, failed, and canceled actions from the <code>wp_actionscheduler</code> logs. These tables often grow rapidly (especially with WooCommerce), leaving behind thousands of rows of old log data.</li>
+    <li style="margin-bottom: 8px;"><strong>🎥 Embed Cache:</strong> Clears cached oEmbed data (like YouTube videos, Tweets, or Spotify tracks) stored in your post meta. This forces WordPress to refresh the external content, which is useful if embeds are broken or outdated.</li>
+    <li style="margin-bottom: 8px;"><strong>🛒 WooCommerce Cleanup:</strong> Specifically targets WooCommerce bloat by clearing customer sessions and transient logs. This helps reduce the size of the <code>wp_options</code> table in active stores.</li>
+    <li style="margin-bottom: 8px;"><strong>🏷️ Empty Taxonomies:</strong> Scans for and deletes taxonomy terms (categories, tags, or custom attributes) that are empty (count = 0) and not assigned to any posts or products.</li>
+</ul>
+<h3 id="ch-5-5" class="h3title">🔪 5.5. Detailed Database Cleanup (The "Scalpel")</h3>
+<p style="margin-bottom: 15px;">This section provides a button for <em>every single</em> item listed in the Database Statistics. It allows you to clean items one by one.</p>
+
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">⚠️ IMPORTANT: Safe vs. Unsafe (Review First)</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">Most items are "safe" to clean. However, some items are marked with a <strong>⚠️ Warning Icon</strong>. These are "unsafe" because they involve deleting data you might want to review first.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>✅ Safe to Clean:</strong> * Post Revisions, Auto Drafts, Trashed Comments, Orphaned Meta (all types), Expired Transients, Duplicate Meta, Pingbacks, Trackbacks.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⚠️ Unsafe (Review First):</strong> <strong>*🗑️ Trashed Posts:</strong> This will <em>permanently empty</em> your posts trash bin. <strong>*💬 Spam Comments:</strong> This will <em>permanently delete</em> comments marked as spam. <strong>*⏳ Unapproved Comments:</strong> This will <em>permanently delete</em> all comments awaiting moderation. <strong>*💾 All Transients:</strong> This will clear <em>all</em> cached data, including non-expired. While generally safe, it can temporarily break parts of your site that rely on active cache.</li>
+</ul>
+</blockquote>
+<h3 id="ch-5-6" class="h3title">⚡ 5.6. Advanced Database Optimization (The "Power Tools")</h3>
+<p style="margin-bottom: 15px;">These are powerful tools for database maintenance. <strong>💾 Always create a backup</strong> before using them.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>⚡ Optimize All Tables:</strong> This runs the <code>OPTIMIZE TABLE</code> SQL command. It's like defragmenting your hard drive. It re-organizes tables and reclaims "Database Overhead" (empty space). This is safe to run and is included in the One-Click Optimization.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🛠️ Analyze &amp; Repair Tables:</strong> This is a diagnostic and repair tool. It runs <code>CHECK TABLE</code> to find errors or corruption. If it finds any, it automatically runs <code>REPAIR TABLE</code> to fix them. If your site is experiencing strange database errors, run this.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⚙️ Optimize Autoloaded Options:</strong> This is a highly advanced performance tool.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>❓ What is Autoloaded Data?</strong> In your <code>wp_options</code> table, some settings (<code>autoload='yes'</code>) are loaded on <em>every single page load</em>. If plugins store large amounts of data here (e.g., 1MB+), it can severely slow down your site.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🔧 What This Tool Does:</strong> This tool scans for large autoloaded options. It uses a "skip list" to ignore essential WordPress core options (like <code>active_plugins</code>, <code>siteurl</code>) and options from major plugins (WooCommerce, Elementor, Yoast, etc.). For other large options it finds, it changes them from <code>autoload='yes'</code> to <code>autoload='no'</code>.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🎯 The Result:</strong> The data is still safely in your database, but it's only loaded by its plugin when it's actually <em>needed</em>, not on every single page of your site. This can provide a major performance boost.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ch-5-7" class="h3title">🔍 5.7. Database Structure Analysis</h3>
+<p style="margin-bottom: 15px;">At the bottom of Section 6, this tool provides a complete map of your database structure and allows you to remove unused tables.</p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>📊 Database Summary:</strong> Shows total tables, core vs. plugin tables, and total size.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🏗️ WordPress Core Tables:</strong> Lists all standard WP tables (e.g., <code>wp_posts</code>, <code>wp_users</code>) with descriptions of what they do.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🧩 Plugin &amp; Theme Tables:</strong> Lists all <em>other</em> tables created by your plugins and theme. This is extremely useful for identifying "orphaned tables" left behind by old, uninstalled plugins.</li>
+    <li style="margin-bottom: 8px;"><strong>🗑️ Delete Unused Tables:</strong> You can permanently delete third-party tables directly from this interface.
+        <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+            <li style="margin-bottom: 5px;"><strong>🕸️ Abandoned Detection:</strong> Tables that haven't been updated in over 30 days are marked with a spider web icon, helping you identify potential junk data.</li>
+            <li style="margin-bottom: 5px;"><strong>⚠️ Safety First:</strong> This action is irreversible. Only delete a table if you are certain the associated plugin/theme has been fully uninstalled.</li>
+        </ul>
+    </li>
+</ul>
+<h3 id="ch-5-8" class="h3title">↳↰ 5.8. Database Search &amp; Replace</h3>
+<p style="margin-bottom: 15px;">Located in the "Advanced" tab, this professional-grade tool allows you to find and replace text strings across your entire database. It is essential for tasks like migrating domains (http to https), updating shortcodes, or fixing bulk content errors.</p>
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 CRITICAL WARNING</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;"><strong>This is a destructive operation</strong>. Changes made here cannot be "undone" without restoring a backup.<br>💾 You must create a fresh database backup (Section 1) immediately before running this tool.</strong></p>
+</blockquote>
+<p style="margin-bottom: 15px;"><strong>🌟 Key Features:</strong></p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>📦 Serialized Data Support:</strong> Unlike standard SQL queries, this tool safely handles WordPress "serialized data" (PHP arrays stored as text strings). It deserializes the data, performs the replacement, and reserializes it, ensuring your widgets and plugin settings don't break.</li>
+    <li style="margin-bottom: 8px;"><strong>👁️ Dry Run (Preview):</strong> Scan your database without changing anything. See exactly how many matches are found and preview the changes in context.</li>
+    <li style="margin-bottom: 8px;"><strong>🎯 Target Specific Tables:</strong> Choose to run on "All Tables" or select specific ones (e.g., just <code>wp_posts</code>) to limit the scope.</li>
+<li style="margin-bottom: 8px;"><strong>⚡ Binary Matching:</strong> When Case Sensitivity is enabled, the tool uses SQL <code>BINARY</code> operators to ensure maximum performance and 100% accuracy in matching exact character casings.
+</li>
+</ul>
+<p style="margin-bottom: 15px;"><strong>🛠️ How to Use:</strong></p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Input Terms:</strong> Enter the text you want to find (e.g., <code>http://old-site.com</code>) and the text to replace it with (e.g., <code>https://new-site.com</code>).</li>
+    <li style="margin-bottom: 8px;"><strong>🔡 Case Sensitivity:</strong> By default, searches are "Case Insensitive" (searching for <em>'WordPress'</em> will find <em>'wordpress'</em> as well). Check the <strong>"Case Sensitive"</strong> box if you need an exact match (e.g., replacing a specific variable name or brand capitalization).
+</li>
+<li style="margin-bottom: 8px;"><strong>Select Tables:</strong> Leave as "All Tables" for a full site update, or use Ctrl/Cmd+Click to select specific tables.</li>
+    <li style="margin-bottom: 8px;"><strong>🔎 Step 1: Perform Dry Run:</strong> Click this button first. The plugin will scan your database and show you a table of results, including the Column, ID, and a highlighted preview of the found text.</li>
+    <li style="margin-bottom: 8px;"><strong>↳↰ Step 2: Execute Replacement:</strong> Once you have verified the Dry Run results, click this button to perform the actual replacement.</li>
+</ol>
+<h2 id="ch-6" class="h2title">⏰ 6. Automatic Backup &amp; Cleanup (Section 7)</h2>
+<p style="margin-bottom: 15px;">This section provides a "set it and forget it" scheduler for all the tools you just learned about.</p>
+<h3 id="ch-6-1" class="h3title">⚙️ 6.1. Configuring the Scheduler</h3>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>🔄 Run Tasks Automatically Every X DAYS:</strong> Set the frequency.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><code>0</code> = ❌ Disabled</li>
+ 	<li style="margin-bottom: 5px;"><code>1</code> = 📅 Daily</li>
+ 	<li style="margin-bottom: 5px;"><code>7</code> = 📅 Weekly</li>
+ 	<li style="margin-bottom: 5px;"><code>30</code> = 📅 Monthly</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>⏰ Run at (Time):</strong> Select the time of day for the tasks to run.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+ 	        <strong>💡 Recommendation:</strong> Choose a low-traffic time for your site (e.g., 3:00 AM).
+        </div>
+    </li>
+</ul>
+</li>
+    <li style="margin-bottom: 8px;"><strong>💾 Backup Only:</strong> Check this box to perform <em>only</em> the database backup at the scheduled time. The automatic cleanup tasks will be skipped.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+ 	        <strong>💡 Recommendation:</strong> This is useful if you want daily backups but prefer to run cleanup operations manually.
+        </div>
+    </li>
+</ul>
+</li>
+    <li style="margin-bottom: 8px;"><strong>📧 Email Notifications:</strong> Check this box to have a summary report sent to your site's admin email address.</li>
+</ul>
+<h3 id="ch-6-2" class="h3title">🔄 6.2. What the Scheduler Does (when it runs):</h3>
+<p style="margin-bottom: 15px;">The scheduler will run in one of two modes, depending on your settings: *backup &amp;  cleanup* or *backup only*:</p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;">First, it <strong>💾 creates a new database backup</strong>.</li>
+ 	<li style="margin-bottom: 8px;">Then, it <strong>🚀 runs the One-Click Optimization</strong> (all safe cleanups + table optimization).</li>
+ 	<li style="margin-bottom: 8px;">Finally, it <strong>📊 enforces the backup limit</strong>, deleting the oldest backup if necessary.</li>
+ 	<li style="margin-bottom: 8px;">If enabled, it sends a success or failure email.</li>
+</ol>
+<h3 id="ch-6-3" class="h3title">📧 6.3. Understanding Email Notifications (Success &amp; Failure)</h3>
+<p style="margin-bottom: 15px;">This is a key "pro" feature.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>✅ Success Email:</strong> If tasks are completed, you get a simple report summarizing what was backed up and what was cleaned.</li>
+ 	<li style="margin-bottom: 8px;"><strong>❌ Failure Email:</strong> If the backup <em>or</em> the cleanup fails, the plugin will send you a <strong>Failure Notification</strong>. This email is critical, as it will include:
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">What stage failed (e.g., "Backup Creation Failed").</li>
+ 	<li style="margin-bottom: 5px;">A list of possible causes (e.g., "Insufficient disk space," "File permission problems," "PHP memory limit reached").</li>
+ 	<li style="margin-bottom: 5px;">Recommended actions to resolve the issue.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ch-6-4" class="h3title">⏱️ 6.4. A Note on WP-Cron</h3>
+<p style="margin-bottom: 15px;">This scheduler uses the built-in WordPress Cron system (<code>wp_schedule_single_event</code>). This is not a "true" cron job, which means it relies on someone visiting your website to trigger the schedule.</p>
+<p style="margin-bottom: 15px;">If you set a schedule for 3:00 AM, the tasks will run on the <em>first site visit</em> that occurs <em>at or after</em> 3:00 AM. For most sites, this is perfectly reliable.</p>
+
+<h2 id="ch-7" class="h2title">⚡ 7. Performance Features Manager (Section 8)</h2>
+<p style="margin-bottom: 15px;">This is a complete, standalone performance suite.</p>
+
+<h3 id="ch-7-1" class="h3title">🚫 7.1. CRITICAL: Do NOT Use With Other Caching Plugins</h3>
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 WARNING</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">The <strong>Server-Side Page Caching</strong> and <strong>Browser Caching</strong> features in this section will conflict with other caching plugins like <strong>WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache,</strong> etc.</p>
+    <p style="margin-bottom: 15px;"><strong>🤔 You must choose ONE.</strong></p>
+    <p style="margin-bottom: 0;">If you are already using another caching plugin, <strong>🚫 DO NOT</strong> enable "Server-Side Page Caching" or "Browser Caching" in WP Optimal State PRO. You can, however, still use all the "WordPress Core Optimizations" (Section 7.4).</p>
+</blockquote>
+
+<h3 id="ch-7-2" class="h3title">💨 7.2. Feature: Server-Side Page Caching (Deep Dive)</h3>
+<p style="margin-bottom: 15px;">This is the single most effective way to speed up your site. It converts heavy PHP processing into instant static HTML.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>🎯 The Concept (Dynamic vs. Static):</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>Dynamic (Slow):</strong> By default, WordPress builds every page from scratch for every visitor. It executes PHP, queries the database, and assembles the HTML.</li>
+ 	<li style="margin-bottom: 5px;"><strong>Static (Fast):</strong> This feature saves that final HTML to a file in <code>wp-content/uploads/optistate/page-cache/</code>. Subsequent visitors get this file instantly, bypassing WordPress entirely.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🧠 The "Smart Cache" Engine:</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+    <li style="margin-bottom: 5px;"><strong>🛡️ Smart Exclusions (Automatic):</strong> The plugin automatically <strong>bypasses</strong> the cache for:
+        <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+            <li><strong>Logged-in Users:</strong> Administrators and members always see live content.</li>
+            <li><strong>E-Commerce:</strong> Cart and Checkout pages (WooCommerce & Easy Digital Downloads) detected via session cookies (<code>woocommerce_items_in_cart</code>, <code>edd_items_in_cart</code>, etc.).</li>
+            <li><strong>Tracking URLs:</strong> URLs containing marketing parameters: <code>utm_*</code>, <code>fbclid</code>, <code>gclid</code>, <code>msclkid</code>, <code>mc_cid</code>, <code>mc_eid</code>, <code>_ga</code>, <code>ref</code>, <code>source</code>.</li>
+            <li><strong>Special Pages:</strong> Search results (<code>?s=</code>), 404 Error pages, Password-protected posts, and the Theme Customizer.</li>
+        </ul>
+    </li>
+    <li style="margin-bottom: 5px;"><strong>🍪 Enterprise Cookie Detection:</strong> To comply with GDPR/CCPA, the cache is <strong>bypassed</strong> if a user has not given consent (unless "Disable Cookie Checks" is on). It supports consent cookies from:
+        <div style="background: #f9f9f9; padding: 10px; border: 1px solid #eee; border-radius: 4px; margin-top: 5px; margin-bottom: 5px; color: #444; line-height: 1.5;">
+            CookieYes, Complianz, Borlabs Cookie, Real Cookie Banner, Cookiebot, OneTrust, Termly, Iubenda, Moove GDPR, WP GDPR Cookie Consent, GDPR Cookie Consent, Cookie Control, and Cookie Notice.<br>
+			<em>(You can also define a <strong>custom consent cookie</strong> in the settings)</em>
+        </div>
+    </li>
+    <li style="margin-bottom: 5px;"><strong>🔄 "Smart Purge" Logic:</strong> You rarely need to clear the cache manually. The plugin automatically clears the specific relevant files when you:
+        <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+            <li><strong>Update/Publish a Post:</strong> Clears the post itself, the Homepage, the Blog Feed (RSS/Atom), Author Archives, and Post Type Archives.</li>
+            <li><strong>Edit Terms:</strong> Clears Category and Tag archives (including pagination).</li>
+            <li><strong>Comments:</strong> Approving or changing a comment status refreshes the post.</li>
+            <li><strong>Site Structure:</strong> Updating Menus, Widgets, or the Customizer clears the <strong>entire</strong> cache.</li>
+        </ul>
+    </li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>⚙️ Configuration Options:</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>📊 Cache Status:</strong> Real-time stats showing Total Cached Pages, Mobile-Specific Pages, Total Size, and Last Write time.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🗑️ Purge All Cache:</strong> Instantly deletes all <code>.html</code> files in the cache directory.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🔋 Automatic Preload:</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>Function:</strong> Scans your <code>sitemap.xml</code> (detects from robots.txt or standard paths) and simulates a visit to every URL to generate the cache file.</li>
+ 	<li style="margin-bottom: 5px;"><strong>Note:</strong> Runs in background batches to prevent timeouts. High CPU usage.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 5px;"><strong>🕒 Cache Lifetime:</strong> The maximum age of a cache file (default: 24 hours). After this expires, the next visitor will trigger a fresh page generation.</li>
+ 	<li style="margin-bottom: 5px;"><strong>❓ Query String Handling:</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>1. Ignore All:</strong> <code>example.com/page?ref=twitter</code> serves the exact same file as <code>example.com/page</code>. <span style="color: #2271b1;">(Fastest)</span>.</li>
+    <li style="margin-bottom: 5px;"><strong>2. Include Safe (Recommended):</strong> Ignores tracking params (like UTMs) but creates unique cache files for functional parameters. <span style="color: #2271b1;">(Default)</span>.
+        <br><span style="color: #666;"><strong>Safe Param List:</strong> <code>page</code>, <code>paged</code>, <code>s</code>, <code>lang</code>, <code>sort</code>, <code>orderby</code>, <code>replytocom</code>, <code>view</code>, <code>amp</code>, <code>product_cat</code>, <code>product_tag</code>, <code>product-page</code>, <code>brand</code>, <code>eventDisplay</code>, <code>eventDate</code>, <code>forum-page</code>.</span>
+    </li>
+ 	<li style="margin-bottom: 5px;"><strong>3. Unique Cache:</strong> Every unique URL creates a unique file. <strong>⚠️ Risk:</strong> Can fill disk space rapidly if bot traffic hits random query strings.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 5px;"><strong>⛔️ Exclude Pages:</strong> Enter URL fragments to block caching (e.g., <code>/my-account/*</code> or <code>/forum/</code>). Supports wildcards (<code>*</code>).</li>
+ 	<li style="margin-bottom: 5px;"><strong>📲 Mobile-Specific Cache:</strong> Creates a separate <code>-mobile.html</code> cache file for mobile User-Agents. Enable <strong>ONLY</strong> if your site serves different HTML/Layouts to mobile devices (rare in modern responsive themes).</li>
+ 	<li style="margin-bottom: 5px;"><strong>🛡️ Disable Cookie Checks:</strong> Serves cached pages to everyone, ignoring consent cookies. <strong>⚠️ GDPR Warning:</strong> Only use if you do not use a cookie banner or if your cached content is fully compliant without consent.</li>
+    <li style="margin-bottom: 5px;"><strong>⤷ Custom Consent Cookie:</strong> If you use a custom solution, enter your specific cookie name here (e.g., <code>my_custom_consent</code>). When this cookie is detected, the system will automatically serve cached pages to the user.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ch-7-3" class="h3title">🌐 7.3. Feature: Browser Caching (.htaccess)</h3>
+<p style="margin-bottom: 15px;">This complements Server Caching. It tells a visitor's <em>browser</em> to save static files (like your logo, CSS, and JS) on their computer.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>❓ What it is:</strong> When a user visits a second page, their browser doesn't need to re-download your logo; it can pull it from its local storage.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔧 How it works:</strong> This feature modifies your website's root <code>.htaccess</code> file (this feature only works on Apache servers).</li>
+ 	<li style="margin-bottom: 8px;"><strong>📝 The <code>.htaccess</code> Writable Check:</strong> The plugin will check if it can write to this file. If this section shows a warning, you must fix your server's file permissions (usually <code>644</code>) for <code>.htaccess</code>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>➕ What it Adds:</strong>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong><code>mod_expires</code>:</strong> Tells browsers how long to cache file types (e.g., "cache images for 1 year," "cache CSS for 1 month").</li>
+ 	<li style="margin-bottom: 5px;"><strong><code>mod_deflate</code> / <code>mod_brotli</code>:</strong> Enables Gzip and Brotli compression, making your files smaller.</li>
+ 	<li style="margin-bottom: 5px;"><strong><code>mod_headers</code>:</strong> Adds security headers (like X-Content-Type-Options, X-Frame-Options) to improve your site's security score.</li>
+</ol>
+</li>
+</ul>
+<p style="margin-bottom: 15px;">The following code block will be automatically added to the <code>.htaccess</code> file when this feature is activated:</p>
+<details><summary style="cursor: pointer; font-weight: bold; color: #16358a;">👉 CLICK TO EXPAND (.htaccess code)</summary>
+<div style="height: 12px;"></div>
+<div style="font-family: monospace; font-size: 13px; background: #f5f5f5; padding: 18px; border: 1px solid #ccc; border-radius: 6px; overflow-x: auto;">
+<div class="notranslate" style="color: #666; margin-bottom: 20px; font-weight: bold; font-size: 1.1em;"># ============================================================<br># BEGIN WP Optimal State Caching<br># ============================================================</div>
+<div style="margin-bottom: 15px;">
+<div class="notranslate" style="color: #2271b1; font-weight: bold; margin-bottom: 5px; font-size: 1.1em;"># 1. EXPIRATION HEADERS</div>
+<div class="notranslate">&lt;IfModule mod_expires.c&gt;<br><br>
+ExpiresActive On<br><br>
+# Default: 30 days<br>
+ExpiresDefault "access plus 30 days"<br><br>
+# Static Assets: 1 year<br>
+ExpiresByType image/jpg "access plus 1 year"<br>
+ExpiresByType image/jpeg "access plus 1 year"<br>
+ExpiresByType image/png "access plus 1 year"<br>
+ExpiresByType image/gif "access plus 1 year"<br>
+ExpiresByType image/webp "access plus 1 year"<br>
+ExpiresByType image/svg+xml "access plus 1 year"<br>
+ExpiresByType image/x-icon "access plus 1 year"<br>
+ExpiresByType font/woff "access plus 1 year"<br>
+ExpiresByType font/woff2 "access plus 1 year"<br>
+ExpiresByType application/font-woff "access plus 1 year"<br><br>
+# CSS & JavaScript: 1 month<br>
+ExpiresByType text/css "access plus 1 month"<br>
+ExpiresByType application/javascript "access plus 1 month"<br>
+ExpiresByType application/x-javascript "access plus 1 month"<br><br>
+# HTML: Respect server-side caching headers<br>
+ExpiresByType text/html "access plus 24 hours"<br>
+&lt;/IfModule&gt;
+</div>
+</div>
+<br>
+<div style="margin-bottom: 15px;">
+<div class="notranslate" style="color: #2271b1; font-weight: bold; margin-bottom: 5px; font-size: 1.1em;"># 2. CACHE-CONTROL & SECURITY HEADERS</div>
+<div class="notranslate">&lt;IfModule mod_headers.c&gt;<br><br>
+# Security Headers<br>
+Header always set X-Content-Type-Options "nosniff"<br>
+Header always set X-Frame-Options "SAMEORIGIN"<br>
+Header always set Referrer-Policy "strict-origin-when-cross-origin"<br>
+Header always set X-XSS-Protection "1; mode=block"<br><br>
+# Long cache for static assets<br>
+&lt;FilesMatch "\.(css|js|ico|pdf|jpg|jpeg|png|gif|webp|svg|woff|woff2|eot|ttf|mp4|webm|mp3|ogg|wav|aac|m4a|flac)$"&gt;<br>
+Header set Cache-Control "max-age=31536000, public, immutable"<br>
+&lt;/FilesMatch&gt;<br><br>
+# Dynamic content<br>
+&lt;FilesMatch "\.(php|html|htm)$"&gt;<br>
+Header set Cache-Control "public, max-age=86400" env=!PHP_CACHE_HEADERS<br>
+&lt;/FilesMatch&gt;<br><br>
+# Protect sensitive WP files<br>
+&lt;FilesMatch "(wp-config\.php|readme\.html|license\.txt|wp-login\.php|wp-admin/|xmlrpc\.php)"&gt;<br>
+Header set Cache-Control "no-cache, no-store, must-revalidate"<br>
+Header set Pragma "no-cache"<br>
+Header set Expires "0"<br>
+&lt;/FilesMatch&gt;<br><br>
+# Ensure proper encoding handling<br>
+&lt;FilesMatch "\.(js|css|html|htm|xml|json)$"&gt;<br>
+Header append Vary Accept-Encoding<br>
+&lt;/FilesMatch&gt;<br><br>
+# Remove ETag<br>
+Header unset ETag<br>
+FileETag None<br>
+&lt;/IfModule&gt;
+</div>
+</div>
+<br>
+<div style="margin-bottom: 15px;">
+<div class="notranslate" style="color: #2271b1; font-weight: bold; margin-bottom: 5px; font-size: 1.1em;"># 3. COMPRESSION</div>
+<div class="notranslate"># Brotli Compression<br>
+&lt;IfModule mod_brotli.c&gt;<br>
+AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css application/javascript application/json image/svg+xml application/xml<br>
+&lt;/IfModule&gt;<br><br>
+# GZIP Compression<br>
+&lt;IfModule mod_deflate.c&gt;<br>
+AddOutputFilterByType DEFLATE text/plain<br>
+AddOutputFilterByType DEFLATE text/html<br>
+AddOutputFilterByType DEFLATE text/css<br>
+AddOutputFilterByType DEFLATE text/javascript<br>
+AddOutputFilterByType DEFLATE application/javascript<br>
+AddOutputFilterByType DEFLATE application/x-javascript<br>
+AddOutputFilterByType DEFLATE application/xml<br>
+AddOutputFilterByType DEFLATE application/xhtml+xml<br>
+AddOutputFilterByType DEFLATE application/rss+xml<br>
+AddOutputFilterByType DEFLATE application/json<br>
+AddOutputFilterByType DEFLATE font/woff<br>
+AddOutputFilterByType DEFLATE font/woff2<br>
+AddOutputFilterByType DEFLATE image/svg+xml<br><br>
+# Skip already compressed files<br>
+SetEnvIfNoCase Request_URI \.(?:gz|zip|bz2|rar|7z|mp4|webm|avi)$ no-gzip dont-vary<br><br>
+# Browser workarounds<br>
+BrowserMatch ^Mozilla/4 gzip-only-text/html<br>
+BrowserMatch ^Mozilla/4\.0[678] no-gzip<br>
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html<br>
+&lt;/IfModule&gt;
+</div>
+</div>
+<br>
+<div style="margin-bottom: 15px;">
+<div class="notranslate" style="color: #2271b1; font-weight: bold; margin-bottom: 5px; font-size: 1.1em;"># 4. OPTIONAL PERFORMANCE TUNING</div>
+<div class="notranslate"># Disable directory listing<br>
+Options -Indexes<br><br>
+# Leverage Keep-Alive connections<br>
+&lt;IfModule mod_headers.c&gt;<br>
+Header set Connection keep-alive<br>
+&lt;/IfModule&gt;
+</div>
+</div>
+<div class="notranslate" style="color: #666; margin-top: 20px; font-weight: bold; font-size: 1.1em;"># ============================================================<br># END WP Optimal State Caching<br># ============================================================</div>
+</div>
+</details>
+<h3 id="ch-7-3-1" class="h3title">🖥 7.3.1. Nginx Server Configuration (Security + Caching)</h3>
+
+<blockquote style="border-left: 4px solid #2271b1; padding: 12px 18px; margin-left: 0; margin-right: 0; margin-bottom: 15px; color: #555; background-color: #f0f6fc; border-radius: 4px;">
+    <strong style="color: #135e96; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">ℹ️ IMPORTANT: Nginx Users</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">If your server runs on Nginx instead of Apache, the <strong>Browser Caching (.htaccess)</strong> feature cannot be activated automatically because Nginx does not use .htaccess files.</p>
+    <p style="margin-bottom: 15px;"><strong>All other plugin features work normally on Nginx servers</strong>, including:</p>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+        <li style="margin-bottom: 5px;">✅ Database backup and restore</li>
+        <li style="margin-bottom: 5px;">✅ Database cleanup and optimization</li>
+        <li style="margin-bottom: 5px;">✅ Server-side page caching</li>
+        <li style="margin-bottom: 5px;">✅ WordPress core optimizations</li>
+        <li style="margin-bottom: 5px;">✅ Automatic scheduling</li>
+    </ul>
+    <p style="margin-bottom: 0;">This section provides the configuration you need to manually add to your Nginx configuration file to enable browser caching and secure your plugin directories.</p>
+</blockquote>
+
+<h4 class="h4title">📍 Where to Add This Configuration</h4>
+
+<p style="margin-bottom: 15px;">You need to add the configuration blocks below to your Nginx configuration file. This file is typically located at:</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><code>/etc/nginx/sites-available/your-domain.com</code> (Debian/Ubuntu)</li>
+    <li style="margin-bottom: 8px;"><code>/etc/nginx/conf.d/your-domain.conf</code> (CentOS/RHEL)</li>
+    <li style="margin-bottom: 8px;">Or inside your main <code>nginx.conf</code> file</li>
+</ul>
+
+<p style="margin-bottom: 15px;"><strong>⚠️ Important:</strong> Add these blocks inside your <code>server { ... }</code> block for your WordPress site.</p>
+
+<h4 class="h4title">🔐 Step 1: Secure Plugin Directories (Important)</h4>
+
+<p style="margin-bottom: 15px;">Add this configuration to block direct access to sensitive plugin directories, such as database backups and your custom settings:</p>
+
+<details style="margin-bottom: 20px;">
+    <summary style="cursor: pointer; background: #f0f6fc; padding: 12px; border: 1px solid #2271b1; border-radius: 4px; font-weight: 600; color: #135e96;">
+        <span style="font-size: 1.1em;">👉 CLICK TO EXPAND: Directory Security Configuration</span>
+    </summary>
+    <div style="margin-top: 10px;">
+        <div class="code-block-wrapper">
+            <button class="copy-code-btn" onclick="copyNginxCode(this, 'security')" aria-label="Copy code to clipboard">
+                <span class="icon">📋</span>
+                <span class="btn-text">Copy Code</span>
+            </button>
+            <div class="notranslate" style="font-family: monospace; font-size: 13px; background: #f5f5f5; padding: 18px; padding-top: 50px; border: 1px solid #ccc; border-radius: 6px; overflow-x: auto;">
+<pre id="nginx-security-code" style="margin: 0; white-space: pre-wrap;"># ============================================================
+# WP Optimal State - Directory Security (Nginx)
+# ============================================================
+
+# Block access to plugin settings directory
+location ~* /wp-content/uploads/optistate-settings/ {
+    deny all;
+    return 403;
+}
+
+# Block access to database backup directory
+location ~* /wp-content/uploads/optistate/db-backups/ {
+    deny all;
+    return 403;
+}
+
+# Block access to temp restore directory
+location ~* /wp-content/uploads/optistate/db-restore-temp/ {
+    deny all;
+    return 403;
+}
+
+# Allow only .html files in cache directory, block everything else
+location ~* /wp-content/uploads/optistate/page-cache/ {
+    location ~* \.html$ {
+        # Allow HTML files to be served
+    }
+    location ~* {
+        deny all;
+        return 403;
+    }
+}</pre>
+            </div>
+        </div>
+    </div>
+</details>
+-------------------
+<h4 class="h4title">🚀 Step 2: Browser Caching Configuration (Optional)</h4>
+
+<p style="margin-bottom: 15px;">Add this configuration to enable browser caching for static assets and speed up site loading for returning visitors:</p>
+
+<details style="margin-bottom: 20px;">
+    <summary style="cursor: pointer; background: #f0f6fc; padding: 12px; border: 1px solid #2271b1; border-radius: 4px; font-weight: 600; color: #135e96;">
+        <span style="font-size: 1.1em;">👉 CLICK TO EXPAND: Browser Caching Configuration</span>
+    </summary>
+    <div style="margin-top: 10px;">
+        <div class="code-block-wrapper">
+            <button class="copy-code-btn" onclick="copyNginxCode(this, 'caching')" aria-label="Copy code to clipboard">
+                <span class="icon">📋</span>
+                <span class="btn-text">Copy Code</span>
+            </button>
+            <div class="notranslate" style="font-family: monospace; font-size: 13px; background: #f5f5f5; padding: 18px; padding-top: 50px; border: 1px solid #ccc; border-radius: 6px; overflow-x: auto;">
+<pre id="nginx-caching-code" style="margin: 0; white-space: pre-wrap;">
+# ============================================================
+# WP Optimal State - Browser Caching (Nginx)
+# ============================================================
+
+# Static Assets: 1 year caching
+location ~* \.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|eot|ttf|mp4|webm|mp3|ogg|wav|aac|m4a|flac|pdf)$ {
+    expires 1y;
+    add_header Cache-Control "max-age=31536000, public, immutable";
+    add_header Vary "Accept-Encoding";
+}
+
+# CSS and JavaScript: 1 month caching
+location ~* \.(css|js)$ {
+    expires 1M;
+    add_header Cache-Control "max-age=2592000, public, immutable";
+    add_header Vary "Accept-Encoding";
+}
+
+# HTML: 24 hours (for static .html files)
+location ~* \.(html|htm)$ {
+    expires 24h;
+    add_header Cache-Control "public, max-age=86400";
+    add_header Vary "Accept-Encoding";
+}
+
+# Protect sensitive WP files - always no cache
+location ~* (wp-config\.php|readme\.html|license\.txt|wp-login\.php|wp-admin/|xmlrpc\.php) {
+    add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    add_header Pragma "no-cache" always;
+    expires 0;
+}
+
+# Security headers for all responses
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-XSS-Protection "1; mode=block" always; # For legacy browsers
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header X-Content-Type-Options "nosniff" always; # Set globally once
+
+# Remove ETag for consistency across CDNs
+etag off;
+
+# Gzip compression
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 6;
+gzip_types text/plain text/html text/css text/xml text/javascript 
+           application/json application/javascript application/xml+rss 
+           application/rss+xml application/xml application/x-javascript
+           font/woff font/woff2 font/truetype font/opentype 
+           application/vnd.ms-fontobject image/svg+xml;
+gzip_disable "msie6";
+
+# Brotli compression (if available)
+brotli on;
+brotli_comp_level 6;
+brotli_types text/plain text/html text/css text/xml text/javascript 
+             application/json application/javascript application/xml+rss 
+             application/rss+xml application/xml application/x-javascript
+             font/woff font/woff2 font/truetype font/opentype 
+             application/vnd.ms-fontobject image/svg+xml;</pre>
+            </div>
+        </div>
+    </div>
+</details>
+-------------------
+<h4 class="h4title">📝 Step 3: Apply the Configuration</h4>
+
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Access your server via SSH</strong> or your hosting control panel's file manager.</li>
+    <li style="margin-bottom: 8px;"><strong>Open your Nginx configuration file</strong> for editing (the location depends on your server setup).</li>
+    <li style="margin-bottom: 8px;"><strong>Add both configuration blocks</strong> inside your <code>server { ... }</code> block.</li>
+    <li style="margin-bottom: 8px;"><strong>Test your configuration</strong> by running:<br>
+        <code>sudo nginx -t</code>
+    </li>
+    <li style="margin-bottom: 8px;"><strong>If the test passes</strong>, reload Nginx:<br>
+        <code>sudo systemctl reload nginx</code>
+    </li>
+</ol>
+
+<blockquote style="border-left: 4px solid #f59e0b; padding: 12px 18px; margin-left: 0; margin-right: 0; margin-bottom: 15px; color: #555; background-color: #fffbeb; border-radius: 4px;">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">⚠️ IMPORTANT</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">If you're not comfortable editing Nginx configuration files, please contact your hosting provider or system administrator for assistance. Incorrect Nginx configuration can cause your site to become inaccessible.</p>
+    <p style="margin-bottom: 0;"><strong>Always backup your configuration file before making changes.</strong></p>
+</blockquote>
+
+<h4 class="h4title">✅ Verification</h4>
+
+<p style="margin-bottom: 15px;">After applying the configuration, you can verify it's working by:</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Browser Caching:</strong> Open your browser's Developer Tools (F12), go to the Network tab, and reload your site. Check the response headers for static files - you should see <code>Cache-Control</code> and <code>Expires</code> headers.</li>
+    <li style="margin-bottom: 8px;"><strong>Directory Security:</strong> Try accessing <code>https://yoursite.com/wp-content/uploads/optistate-settings/</code> - you should get a 403 Forbidden error.</li>
+</ul>
+<h3 id="ch-7-4" class="h3title">🏗️ 7.4. Feature: WordPress Core Optimizations (A-Z)</h3>
+<p style="margin-bottom: 15px;">This is a list of toggles and dropdowns to disable or modify non-essential WordPress features that can slow down your site. These are all <strong>safe to use</strong> even with other caching plugins.</p>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+<li style="margin-bottom: 8px;"><strong>🗄️ Database Query Caching:</strong> Reduces database load by storing the results of complex queries in your persistent object cache (Redis or Memcached). This is highly effective for read-heavy sites.
+    <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+        <li style="margin-bottom: 5px;">
+            <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+                <strong>💡 Recommendation:</strong> <strong>Activate</strong> (Requires Redis or Memcached).
+            </div>
+        </li>
+        <li style="margin-bottom: 5px; margin-top: 8px;"><strong>⚙️ Configuration Settings:</strong>
+            <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+                <li style="margin-bottom: 8px;"><strong>Main Query TTL:</strong> Controls how long the primary content of a page (e.g., the main blog loop, single post content, or archive list) is stored in memory.
+                    <br><span style="color: #666;"><em>Recommended: 12-24 hours for static sites, 1-4 hours for news/blogs.</em></span></li>
+                
+                <li style="margin-bottom: 8px;"><strong>Secondary Query TTL:</strong> Controls the lifespan of auxiliary data found in sidebars, widgets, "Related Posts" sections, and menus. These usually update less frequently than main content.
+                    <br><span style="color: #666;"><em>Recommended: Can typically be set 2x-3x longer than Main Query TTL (e.g., 24 hours).</em></span></li>
+                
+                <li style="margin-bottom: 8px;"><strong>⛔ Exclude Post Types:</strong> A comma-separated list of post types that should <strong>never</strong> be cached to ensure data accuracy.
+                    <br><span style="color: #666;"><em>Default: <code>shop_order, ticket, product</code> (Essential for e-commerce sites to prevent caching order data).</em></span></li>
+                
+                <li style="margin-bottom: 5px;"><strong>🗨️ Flush on New Comment:</strong> When enabled, the query cache is automatically cleared whenever a visitor posts a comment.
+                    <br><span style="color: #666;"><em>Why? It ensures "Comment Counts" and "Recent Comments" widgets update immediately across the site.</em></span></li>
+            </ul>
+        </li>
+    </ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🖼️ Lazy Load Images &amp; Iframes:</strong> Defers loading of images and iframes until they are about to enter the viewport, reducing initial page load time and bandwidth usage.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+        </div>
+    </li>
+ 	<li style="margin-bottom: 5px; margin-top: 8px;"><em>(Note: This uses native browser lazy loading with the <code>loading="lazy"</code> attribute. Particularly beneficial for content-heavy pages with multiple images.)</em></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>😀 Emoji Scripts:</strong> Disables the <code>wp-emoji-release.min.js</code> script. All modern browsers render emojis natively.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+        </div>
+    </li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>💓 Heartbeat API Control:</strong> The Heartbeat API creates frequent server requests to handle auto-saving and post-locking. This can cause high server CPU load.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> "Slow Down (Every 2 minutes)."
+        </div>
+    </li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>📝 Post Revisions Limit:</strong> Controls how many old versions of a post are saved.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> "Limit to 5 Revisions."
+        </div>
+    </li>
+ 	<li style="margin-bottom: 5px; margin-top: 8px;"><em>(Note: If this setting is defined in your <code>wp-config.php</code> file, this control will be disabled.)</em></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 REST API Link Tag:</strong> Removes the <code>&lt;link rel="https://api.w.org/" ...&gt;</code> tag from your site's header. (Safe to activate).</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 RSD (Really Simple Discovery) Link:</strong> Removes the RSD link tag, which is only used by old desktop blogging clients. (Safe to activate).</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 Self Pingbacks:</strong> Prevents your site from sending <em>itself</em> a "pingback" notification when you link to one of your own posts.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+        </div>
+    </li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 Shortlink Tag:</strong> Removes the <code>&lt;link rel='shortlink' ...&gt;</code> tag. (Safe to activate).</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗑️ Automatic Trash Emptying:</strong> Sets how long items stay in the trash before being permanently deleted.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> "WordPress Default (30 days)" or "14 Days."
+        </div>
+    </li>
+ 	<li style="margin-bottom: 5px; margin-top: 8px;"><em>(Note: If this setting is defined in your <code>wp-config.php</code> file, this control will be disabled.)</em></li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔗 Windows Live Writer Manifest:</strong> Removes the <code>wlwmanifest.xml</code> link tag, used by a discontinued Microsoft product. (Safe to activate).</li>
+ 	<li style="margin-bottom: 8px;"><strong>🏷️ WordPress Version Meta Tag:</strong> Removes the <code>&lt;meta name="generator" ...&gt;</code> tag. This is a minor security improvement, as it hides your WP version from simple scanners. (Safe to activate).</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔌 XML-RPC Interface:</strong> Disables a legacy API (<code>xmlrpc.php</code>) that is no longer needed by most sites and is a common target for brute-force attacks.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">
+        <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
+            <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+        </div>
+    </li>
+</ul>
+</li>
+</ul>
+<h3 id="ch-7-5" class="h3title">📊 7.5. Feature: Performance Metrics (PageSpeed)</h3>
+<p style="margin-bottom: 15px;">Located under the 'Statistics' tab in section 4.1, this module integrates the Google PageSpeed Insights API directly into your WordPress dashboard, allowing you to monitor real-world performance metrics without leaving the platform. It focuses on the <strong>Core Web Vitals</strong> that impact your search engine rankings and user experience.</p>
+
+<h4 class="h4title">🔑 API Configuration & Security</h4>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>API Key Requirement:</strong> To use this feature, you must enter a valid Google PageSpeed Insights API key. This key remains visible in the settings field for easy management and verification.</li>
+    <li style="margin-bottom: 8px;"><strong>Persistence:</strong> Once saved, the key is stored securely in your <code>settings.json</code> file.</li>
+</ul>
+
+<h4 class="h4title">📈 Understanding the Metrics & Performance Indicators</h4>
+<p style="margin-bottom: 15px;">The results are color-coded based on Google's official performance thresholds. Each metric card features a left border indicator:</p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><span style="color: #28a745; font-weight: bold;">● Green (Good):</span> The metric meets the recommended fast threshold.</li>
+    <li style="margin-bottom: 8px;"><span style="color: #ffa400; font-weight: bold;">● Orange (Needs Improvement):</span> Performance is acceptable but should be optimized.</li>
+    <li style="margin-bottom: 8px;"><span style="color: #dc3545; font-weight: bold;">● Red (Poor):</span> The metric is significantly below recommendations and likely hurting UX.</li>
+</ul>
+
+<p style="margin-bottom: 15px;"><strong>Logged Metrics include:</strong></p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 5px;"><strong>FCP (First Contentful Paint):</strong> Time until the first text or image is painted.</li>
+    <li style="margin-bottom: 5px;"><strong>LCP (Largest Contentful Paint):</strong> Time until the largest content element is visible.</li>
+    <li style="margin-bottom: 5px;"><strong>CLS (Cumulative Layout Shift):</strong> Measures visual stability.</li>
+    <li style="margin-bottom: 5px;"><strong>TBT (Total Blocking Time):</strong> Measures responsiveness to user input.</li>
+</ul>
+
+<h4 class="h4title">💾 Smart Caching & Logging</h4>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>30-Day Persistence:</strong> To reduce API overhead and provide a stable reference, audit results are cached for <strong>30 days</strong>. You can bypass this cache at any time by clicking "Run Audit" to force a fresh test.</li>
+    <li style="margin-bottom: 8px;"><strong>Activity Logging:</strong> Every successful audit is automatically recorded in the Activity Log (Section 8) using the format: <code>Performance Audit Updated (Score% - Strategy)</code>. For example: <code>⚡ Performance Audit Updated (98% - Desktop)</code>.</li>
+</ul>
+<h2 id="ch-8" class="h2title">🎯 8. Optimization Strategies: Putting It All Together</h2>
+<p style="margin-bottom: 15px;">Here are a few "recipes" for common scenarios.</p>
+
+<h3 id="ch-8-1" class="h3title">🚀 8.1. Strategy 1: The First-Time Setup (5-Minute Tune-Up)</h3>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>💾 Backup:</strong> Go to <strong>Section 1</strong> -&gt; Click <strong>Create Backup Now</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔍 Diagnose:</strong> Go to <strong>Section 3</strong> -&gt; Click <strong>Refresh Analysis</strong> to see your starting Health Score.</li>
+ 	<li style="margin-bottom: 8px;"><strong>✨ Optimize:</strong> Go to <strong>Section 2</strong> -&gt; Click <strong>🚀 Optimize Now</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>⏰ Automate:</strong> Go to <strong>Section 7</strong> -&gt; Set "Run Tasks" to <strong>7 days</strong> and your preferred time. Check <strong>📧 Email Notifications</strong>. Click <strong>Save Settings</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🛡️ Harden:</strong> Go to <strong>Section 8</strong> -&gt; Activate all the "WordPress Core Optimizations" (Emoji Scripts, XML-RPC, etc.). Click <strong>Save Performance Settings</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>✅ Done.</strong> Your database is now clean and will stay clean automatically.</li>
+</ol>
+<h3 id="ch-8-2" class="h3title">🆘 8.2. Strategy 2: The "My Site is Slow" Emergency Plan</h3>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>💾 Backup:</strong> Go to <strong>Section 1</strong> -&gt; Click <strong>Create Backup Now</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔍 Diagnose:</strong> Go to <strong>Section 4</strong>. Look at <strong>Autoload Data Size</strong>. If this is high (e.g., &gt; 1 MB), this is your problem.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔧 Fix Autoload:</strong> Go to <strong>Section 6</strong> -&gt; Click <strong>⚙️ Optimize Autoloaded Options</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔧 Fix Overhead:</strong> Go to <strong>Section 6</strong> -&gt; Click <strong>⚡ Optimize All Tables</strong>.</li>
+ 	<li style="margin-bottom: 8px;"><strong>💨 Enable Caching:</strong> (If you have no other cache plugin) Go to <strong>Section 8</strong>.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">Enable <strong>Server-Side Page Caching</strong>. Use the "Include Safe" query mode.</li>
+ 	<li style="margin-bottom: 5px;">Enable <strong>Browser Caching (.htaccess)</strong>.</li>
+ 	<li style="margin-bottom: 5px;">Click <strong>Save Performance Settings</strong>.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 8px;"><strong>🗑️ Purge &amp; Preload:</strong> Go to <strong>Section 8</strong> -&gt; Click <strong>🗑️ Purge All Cache</strong>. If you enabled "Automatic Preload," this will start the cache warming process.</li>
+ 	<li style="margin-bottom: 8px;"><strong>✅ Done.</strong> Your site should now be significantly faster.</li>
+</ol>
+<h3 id="ch-8-3" class="h3title">📅 8.3. Strategy 3: The Monthly Maintenance Tune-Up</h3>
+<p style="margin-bottom: 15px;">(Assuming you already have the automatic schedule running).</p>
+
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 8px;"><strong>🔍 Check Backups:</strong> Go to <strong>Section 1</strong>. Make sure your automated backups are being created.</li>
+ 	<li style="margin-bottom: 8px;"><strong>❤️ Review Health:</strong> Go to <strong>Section 3</strong>. Check your Health Score.</li>
+ 	<li style="margin-bottom: 8px;"><strong>🔪 Manual Cleanup:</strong> Go to <strong>Section 5</strong>. Manually clean the "unsafe" items if you wish:
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">Click "Clean Now" for <strong>🗑️ Trashed Posts</strong>.</li>
+ 	<li style="margin-bottom: 5px;">Click "Clean Now" for <strong>⏳ Unapproved Comments</strong> (if you've already moderated them).</li>
+</ul>
+</li>
+</ol>
+<h2 id="ch-9" class="h2title">📥 9. Settings Export/Import & User Access (Section 9)</h2>
+<p style="margin-bottom: 15px;">This utility allows you to save all your plugin configurations (from Section 1, 7, 8) to a single <code>.json</code> file. You can use this to create a backup of your settings or to quickly migrate your exact setup to another website. You can also restrict plugin access to specific administrator accounts.</p>
+            
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 IMPORTANT: What is NOT Exported</strong>
+    <p style="margin-bottom: 15px; margin-top: 5px;">This feature <strong>ONLY</strong> exports the plugin's settings, such as your configurations for scheduled tasks, performance features, and user access restrictions. It does <strong>NOT</strong> export your database backups, cached pages, or activity logs. Always download your database backups separately from Section 1.</p>
+</blockquote>
+
+<h3 id="ch-9-1" class="h3title">📤 9.1. Exporting Settings</h3>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;">Navigate to <strong>Section 9: Settings Export & Import</strong> in the plugin dashboard and expand it.</li>
+    <li style="margin-bottom: 8px;">Click the <strong>"Export Settings"</strong> button.</li>
+    <li style="margin-bottom: 8px;">Your browser will download a file named <code>optistate-settings-YYYY-MM-DD-His.json</code>.</li>
+    <li style="margin-bottom: 8px;">Keep this file in a safe place.</li>
+</ol>
+
+<h3 id="ch-9-2" class="h3title">📥 9.2. Importing Settings</h3>
+<p style="margin-bottom: 15px;">This will completely overwrite all your current plugin settings. This is useful for restoring your configuration after an update (as described in Section 2.7) or for setting up a new site.</p>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;">Click the <strong>"Choose JSON File"</strong> button and select the <code>json</code> file you previously exported.</li>
+    <li style="margin-bottom: 8px;">The plugin validates the file. It must be a valid <code>.json</code> file, under 1MB, and contain the "WP Optimal State" signature.</li>
+    <li style="margin-bottom: 8px;">Once validated, click the <strong>"Import Settings"</strong> button.</li>
+    <li style="margin-bottom: 8px;">A confirmation pop-up will appear warning you that your current settings will be overwritten. Click "OK" to proceed.</li>
+    <li style="margin-bottom: 8px;">After a successful import, you will be prompted to reload the page to see the new settings take effect.</li>
+</ol>
+<div class="optistate-user-access">
+    <h3 id="ch-9-3" class="h3title">
+        🔒 9.3. User Access Control
+    </h3>
+    <p style="margin-bottom: 15px;">
+        Restrict plugin access to specific administrator accounts. If no users are selected, all administrators can use the plugin.
+    </p>
+    <blockquote class="niceblock">
+        <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">⚠️ WARNING: Lockout Risk</strong>
+        <p style="margin-bottom: 0; margin-top: 5px;">Do not lock yourself out! Always include your own account in the allowed users list. If you save without selecting your account, you will be immediately locked out of the plugin.</p>
+    </blockquote>
+    <p style="margin-bottom: 15px;"><strong>How it works:</strong></p>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;"><strong>Default behavior:</strong> All administrators can access the plugin.</li>
+        <li style="margin-bottom: 8px;"><strong>Restricted access:</strong> Select specific admin accounts to limit access. Only selected administrators can use the plugin.</li>
+        <li style="margin-bottom: 8px;"><strong>Visual indicator:</strong> Your current account is highlighted with a blue border in the user list.</li>
+        <li style="margin-bottom: 8px;"><strong>Empty selection:</strong> If no users are selected, all administrators regain access.</li>
+    </ul>
+    <p style="margin-bottom: 15px;"><strong>Configuration steps:</strong></p>
+    <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;">Navigate to <strong>Section 9</strong> in the plugin dashboard.</li>
+        <li style="margin-bottom: 8px;">Expand <strong>"Settings Export/Import & User Access"</strong>.</li>
+        <li style="margin-bottom: 8px;">Check the boxes next to administrators you want to allow access.</li>
+        <li style="margin-bottom: 8px;">Make sure <strong>YOUR account is checked</strong> (it will be highlighted with a blue border).</li>
+        <li style="margin-bottom: 8px;">Click <strong>"✓ Save User Access Settings"</strong>.</li>
+    </ol>
+    <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; margin-bottom: 15px; border-radius: 4px;">
+        <strong>💡 Use Case:</strong> In a multi-admin environment, you can limit who can perform database operations and change plugin settings. This prevents accidental changes by less experienced administrators or limits sensitive operations to specific team members.
+    </div>
+    <p style="margin-bottom: 15px;"><strong>To restore full access:</strong></p>
+    <p style="margin-bottom: 15px;">Simply uncheck all user checkboxes and save. This removes all restrictions and allows all administrators to access the plugin again.</p>
+    <p style="margin-bottom: 15px;"><strong>If you get locked out:</strong></p>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;">Another administrator who is in the allowed users list can add you back.</li>
+        <li style="margin-bottom: 8px;">A super administrator can always access the plugin regardless of restrictions.</li>
+        <li style="margin-bottom: 8px;">Contact your site administrator or hosting provider for database-level access to remove the restriction.</li>
+    </ul>
+</div>
+    <h2 id="ch-10" class="h2title">🔧 10. Troubleshooting &amp; Advanced FAQ</h2>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px; list-style-type: none;">
+        <li id="ch-10-1" style="margin-bottom: 25px;">
+            <strong style="font-size: 1.1em; color: #1e40af;">🚧 Q: I'm stuck in maintenance mode!</strong>
+            <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+                <li style="margin-bottom: 5px;">
+                    <strong>A:</strong> This is a very rare but possible scenario in which the server crashes during the final stage of the recovery process (Phase 4).
+                    <ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+                        <li style="margin-bottom: 5px;">
+                            <strong>⏳ Wait a couple of hours.</strong> The system is designed to remove maintenance mode automatically approximately every 2 hours.
+                        </li>
+                        <li style="margin-bottom: 5px;">
+                            <strong>🔧 Manually delete the maintenance option.</strong> Go to your WordPress database via a tool like <strong>phpMyAdmin</strong>.
+                            <ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" type="a">
+                                <li style="margin-bottom: 5px;">Open the <code>wp_options</code> table.</li>
+                                <li style="margin-bottom: 5px;">Find the row where <code>option_name</code> is <code>optistate_maintenance_mode_active</code>.</li>
+                                <li style="margin-bottom: 5px;">Delete that single row. Your site will be live again.</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
+        </li>
+ 	<li id="ch-10-2" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">🔄 Q: My restore failed, and the rollback <em>also</em> failed! What do I do?</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A:</strong> This is a critical but recoverable error. Your site is likely broken and showing a database error.
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;">Find the <strong>💾 Safety Backup</strong> file. Use FTP or your host's File Manager to navigate to <code>wp-content/uploads/optistate/db-backups/</code>.</li>
+</ol>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" start="2">
+ 	<li style="margin-bottom: 5px;">Find the file named <code>SAFETY-RESTORE-....sql.gz</code> that was just created. Download it.</li>
+</ol>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" start="3">
+ 	<li style="margin-bottom: 5px;">Go to <strong>phpMyAdmin</strong> (or your database tool).</li>
+</ol>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" start="4">
+ 	<li style="margin-bottom: 5px;">Select your WordPress database.</li>
+</ol>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" start="5">
+ 	<li style="margin-bottom: 5px;">Click the <strong>"Import"</strong> tab.</li>
+</ol>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" start="6">
+ 	<li style="margin-bottom: 5px;">Choose the <code>SAFETY-RESTORE-....sql.gz</code> file you just downloaded and run the import.</li>
+</ol>
+<ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;" start="7">
+ 	<li style="margin-bottom: 5px;">This will manually complete the rollback and fix your site.</li>
+</ol>
+</li>
+</ul>
+</li>
+ 	<li id="ch-10-3" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">🎨 Q: I enabled caching, but my site looks broken (e.g., CSS is missing).</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A:</strong> This is a common issue and is almost always caused by a conflict with another plugin's "minification" or "combination" feature (e.g., from an optimization plugin or a page builder).</li>
+ 	<li style="margin-bottom: 5px;"><strong>✅ Solution:</strong> 1. Purge <em>all</em> caches: Click <strong>🗑️ Purge All Cache</strong> in Section 8. 2. Purge your page builder's cache (e.g., Elementor -&gt; Tools -&gt; Regenerate Files). 3. Purge your CDN cache (e.g., Cloudflare). 4. Clear your browser cache.</li>
+</ul>
+</li>
+ 	<li id="ch-10-4" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">🌐 Q: I enabled "Browser Caching" and now my site is broken.</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A:</strong> This is very rare, but if it happens, you need to manually edit your <code>.htaccess</code> file.</li>
+ 	<li style="margin-bottom: 5px;"><strong>✅ Solution:</strong> 1. Use FTP or your host's File Manager. 2. Find the <code>.htaccess</code> file in the root of your WordPress site. 3. Open and edit the file. 4. Find the block of text that starts with <code># BEGIN WP Optimal State Caching</code> and ends with <code># END WP Optimal State Caching</code>. 5. Delete that <em>entire</em> block of text and save the file. Your site will be back to normal.</li>
+</ul>
+</li>
+ 	<li id="ch-10-5" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">⏳ Q: The "Automatic Preload" gets stuck or times out.</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A:</strong> This is common on shared hosting or on sites with thousands of pages. Preloading is a "nice to have," not a "must-have." The cache will still build "organically" as visitors hit your pages. You can safely click "Stop" and ignore the preload feature.</li>
+</ul>
+</li>
+ 	<li id="ch-10-6" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">❌ Q: The plugin shows a "Critical Error: Cannot initialize WP_Filesystem."</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A:</strong> This is a server configuration problem, not a plugin bug. It means your <code>wp-content/uploads/</code> directory is not writable by WordPress. You must contact your hosting provider and ask them to fix the file/directory permissions for your <code>uploads</code> folder.</li>
+</ul>
+</li>
+ 	<li id="ch-10-7" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">☁️ Q: I'm using a CDN (like Cloudflare). Will this work?</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A:</strong> Yes! The Caching features work perfectly with CDNs.
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>💨 Server-Side Caching (Section 7.2):</strong> This makes your <em>server</em> (origin) fast.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🌐 Browser Caching (Section 7.3):</strong> This tells the <em>CDN</em> (e.g., Cloudflare) how long to cache your static files, in addition to telling the user's browser.</li>
+ 	<li style="margin-bottom: 5px;">They are a perfect combination. Just remember: if you make a change, you may need to purge <em>both</em> the WP Optimal State cache <em>and</em> your CDN cache.</li>
+</ul>
+</li>
+</ul>
+</li>
+ 	<li id="ch-10-8" style="margin-bottom: 25px;">
+        <strong style="font-size: 1.1em; color: #1e40af;">🖥 Q: Does this plugin work on Nginx servers?</strong>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+ 	<li style="margin-bottom: 5px;"><strong>A: Yes, absolutely.</strong> All core features—including database backup, restore, cleanup, optimization, and server-side page caching—work perfectly on Nginx servers right out of the box.</li>
+ 	<li style="margin-bottom: 5px;">However, for features that rely on the Apache <code>.htaccess</code> file, manual configuration is required:
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+ 	<li style="margin-bottom: 5px;"><strong>🚨 Directory Protection:</strong> This is essential for security and prevents direct, public access to your database backups and other plugin data. You must configure this manually.</li>
+ 	<li style="margin-bottom: 5px;"><strong>💨 Browser Caching:</strong> This is optional and is a performance enhancement that speeds up asset loading for repeat visitors. It does not affect the security of the plugin.</li>
+</ul>
+</li>
+ 	<li style="margin-bottom: 5px;">The manual provides the Nginx configuration needed for security and caching, ready to copy and paste. Please see <strong><a href="#ch-7-3-1" style="color: #16358a; text-decoration: underline;">Section 7.3.1</a></strong> for the required instructions.</li>
+</ul>
+</li>
+<li id="ch-10-9" style="margin-bottom: 25px;">
+    <strong style="font-size: 1.1em; color: #1e40af;">🚦 Q: My PageSpeed Audit is showing an "API Error" or failing to load.</strong>
+    <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+        <li style="margin-bottom: 5px;"><strong>A:</strong> This is typically caused by one of three things:
+            <ol style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+                <li style="margin-bottom: 5px;"><strong>Invalid Key:</strong> Ensure your Google API key is correct and has the "PageSpeed Insights API" enabled in the Google Cloud Console.</li>
+                <li style="margin-bottom: 5px;"><strong>Server Firewall:</strong> Your web server must allow outgoing requests to <code>googleapis.com</code>.</li>
+                <li style="margin-bottom: 5px;"><strong>Rate Limiting:</strong> If you run audits too frequently, Google may temporarily throttle your requests.</li>
+            </ol>
+        </li>
+    </ul>
+</li>
+</ul>
+<h2 id="ch-11" class="h2title">🏗️ 11. Technical Architecture</h2> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li id="ch-11-1" style="margin-bottom: 8px;"><strong>🔒 11.1. Security-First Principles</strong> <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;"> <li style="margin-bottom: 5px;"><strong>🔐 Data Integrity:</strong> All backups are verified with SHA-256 checksums stored in a dedicated database table. Restores are aborted immediately if validation fails.</li> <li style="margin-bottom: 5px;"><strong>📁 Filesystem Protection:</strong> All plugin-created directories are secured with <code>.htaccess</code> and <code>index.php</code> files to block direct web access and PHP execution.</li> <li style="margin-bottom: 5px;"><strong>📤 Secure Uploads:</strong> Uploaded SQL files are aggressively scanned for malicious content (PHP tags, <code>eval()</code>, <code>system()</code>) before processing.</li> <li style="margin-bottom: 5px;"><strong>🛡️ Rate Limiting:</strong> Critical actions (Restore, Backup, Delete) are rate-limited per user session to prevent abuse.</li> </ul> </li> <li id="ch-11-2" style="margin-bottom: 8px;"><strong>🧩 11.2. Key PHP Classes &amp; JavaScript Objects</strong> <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;"> <li style="margin-bottom: 5px;"><strong><code>OPTISTATE</code> (PHP):</strong> The main controller. Handles hooks, AJAX routing, and the Performance Manager.</li> <li style="margin-bottom: 5px;"><strong><code>OPTISTATE_Backup_Manager</code> (PHP):</strong> Handles chunked backup/restore logic, file streaming, compression (GZIP/PIGZ), and integrity verification.</li> <li style="margin-bottom: 5px;"><strong><code>OPTISTATE_Process_Store</code> (PHP):</strong> Manages the <code>wp_optistate_processes</code> table. It persists the state of long-running asynchronous tasks (offsets, file pointers) to ensure processes survive server timeouts.</li> <li style="margin-bottom: 5px;"><strong><code>OPTISTATE_DB_Wrapper</code> (PHP):</strong> A singleton wrapper for <code>mysqli</code> that handles raw database connections for restore operations, ensuring separation from the global WordPress <code>$wpdb</code> object for safety.</li> <li style="margin-bottom: 5px;"><strong><code>admin.js</code> (JS):</strong> Handles the client-side logic, polling intervals for progress bars, and chunked file uploads.</li> </ul> </li> </ul>
+<h2 id="ch-12" class="h2title">📝 12. Disclaimer</h2>
+<p style="margin-bottom: 15px;">This plugin provides powerful, low-level access to your WordPress database and server configuration. It is designed to be safe, secure, and effective. However, all servers and WordPress installations are different.</p>
+<p style="margin-bottom: 15px;">By using WP Optimal State PRO, you agree that you are doing so at your own risk. The author is not responsible for any data loss, site downtime, or other issues that may arise from the use or misuse of this software.</p>
+<p style="margin-bottom: 15px;"><strong>💾 Always create a backup before performing any optimization.</strong></p>
+<h2 id="ch-13" class="h2title">🧩 13. Developer API (Hooks & Filters)</h2>
+    <p style="margin-bottom: 15px;">WP Optimal State PRO provides hooks for developers to extend functionality or integrate with other systems.</p>
+
+    <h3 style="font-size: 1.4em; color: #1e40af; margin-top: 30px; margin-bottom: 10px;">Filters</h3>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+        <li style="margin-bottom: 15px;">
+            <strong><code>optistate_safe_query_params</code></strong> (array)<br>
+            Modify the whitelist of query parameters that trigger a unique cache file (when using "Include Safe Query Strings" mode).
+            <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.9em; margin-top: 5px; border: 1px solid #ddd;">
+add_filter('optistate_safe_query_params', function($params) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$params[] = 'my_custom_tracking_id';<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return $params;<br>
+});
+            </div>
+        </li>
+    </ul>
+
+    <h3 style="font-size: 1.4em; color: #1e40af; margin-top: 30px; margin-bottom: 10px;">Actions</h3>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;">
+            <strong><code>optistate_optimization_complete</code></strong><br>
+            Fires after a "One-Click Optimization" is successfully finished. Useful for triggering third-party cache clearing (e.g., Cloudflare/CDN).
+        </li>
+        <li style="margin-bottom: 8px;">
+            <strong><code>optistate_async_backup_complete</code></strong><br>
+            Fires after a scheduled backup completes. Passes <code>$backup_filename</code> as an argument.
+        </li>
+    </ul>
+<h2 id="ch-14" class="h2title">🆘 14. Technical Support</h2>
+<p style="margin-bottom: 15px;">As a lifetime licence holder, you are entitled to priority support.</p>
+<p style="margin-bottom: 15px;">Before using the support form, please get <strong>your license key</strong> and be sure to include it in your request along with your website URL.</p>
+<p style="margin-bottom: 15px;">Also, check the FAQs, as you may find the answer to your question there.</p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+ 	<li style="margin-bottom: 10px;"><a href="https://payhip.com/optistate/faq" target="_blank" rel="noopener" style="color: #16358a; text-decoration: underline;"><strong>❓ Frequently Asked Questions</strong></a></li>
+ 	<li style="margin-bottom: 10px;"><a href="https://payhip.com/optistate/contact" target="_blank" rel="noopener" style="color: #16358a; text-decoration: underline;"><strong>📩 Support Form</strong></a></li>
+</ul>
+</div>
+<div style="height: 100px;"></div>
+<div class="gtranslate_wrapper"></div>
+<script>window.gtranslateSettings = {"default_language":"en","native_language_names":true,"detect_browser_language":true,"languages":["en","fr","es","de","ja","pt","it","zh-CN","ru","ko","tr","id","hi","ar"],"wrapper_selector":".gtranslate_wrapper","flag_size":24,"horizontal_position":"right","vertical_position":"bottom"}</script>
+<script src="https://cdn.gtranslate.net/widgets/latest/popup.js" defer></script>
+
+<button id="back-to-toc" aria-label="Back to Table of Contents">
+    <span class="toc-icon">
+        <span class="middle-line"></span>
+        <span class="bottom-line"></span>
+    </span>
+    <span>Table of Contents</span>
+</button>
+
+<script>
+    window.copyNginxCode = function(button, type) {
+        const codeId = type === 'security' ? 'nginx-security-code' : 'nginx-caching-code';
+        const codeElement = document.getElementById(codeId);
+        
+        if (!codeElement) {
+            console.error('Code element not found:', codeId);
+            return;
+        }
+        const code = codeElement.textContent;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(code).then(triggerAnim).catch(fallbackCopy);
+        } else {
+            fallbackCopy();
+        }
+        function fallbackCopy() {
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { 
+                document.execCommand('copy'); 
+                triggerAnim(); 
+            } catch (err) { 
+                alert('Failed to copy. Please select the text manually.'); 
+            }
+            document.body.removeChild(textarea);
+        }
+        function triggerAnim() {
+            const btnText = button.querySelector('.btn-text');
+            const icon = button.querySelector('.icon');
+            if (!btnText || !icon) return;
+            const originalText = btnText.textContent;
+            const originalIcon = icon.textContent;
+            button.classList.add('copied');
+            btnText.textContent = 'Copied!';
+            icon.textContent = '✓';
+            setTimeout(() => {
+                button.classList.remove('copied');
+                btnText.textContent = originalText;
+                icon.textContent = originalIcon;
+            }, 2500);
+        }
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const backToTocButton = document.getElementById('back-to-toc');
+        const tocHeading = Array.from(document.querySelectorAll('h2')).find(h2 => 
+            h2.textContent.includes('Table of Contents') || 
+            h2.textContent.includes('📑')
+        );
+        if (tocHeading && backToTocButton) {
+            function toggleBackToTocButton() {
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const showButton = (scrollPosition > 300) && 
+                                  (documentHeight - (scrollPosition + windowHeight) > 100);
+                                  
+                if (showButton) backToTocButton.classList.add('show');
+                else backToTocButton.classList.remove('show');
+            }
+            backToTocButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                const offset = 20;
+                const elementPosition = tocHeading.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                setTimeout(() => {
+                    tocHeading.setAttribute('tabindex', '-1');
+                    tocHeading.focus();
+                    setTimeout(() => tocHeading.removeAttribute('tabindex'), 1000);
+                }, 500);
+            });
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                if (!scrollTimeout) {
+                    scrollTimeout = setTimeout(() => {
+                        toggleBackToTocButton();
+                        scrollTimeout = null;
+                    }, 100);
+                }
+            });
+            function checkIfAtTOC() {
+                const tocRect = tocHeading.getBoundingClientRect();
+                if (tocRect.top >= 0 && tocRect.top <= window.innerHeight * 0.5) {
+                    backToTocButton.classList.remove('show');
+                }
+            }
+            window.addEventListener('scroll', checkIfAtTOC);
+        }
+        class ManualSearch {
+            constructor() {
+                this.dom = {
+                    input: document.getElementById('optistate-search-input'),
+                    results: document.getElementById('optistate-search-results'),
+                    stats: document.getElementById('optistate-search-stats'),
+                    count: document.getElementById('optistate-search-count'),
+                    container: document.getElementById('optistate-search-container')
+                };
+                if (!this.dom.input || !this.dom.results) return;
+                this.index = [];
+                this.selectedIndex = -1;
+                this.debounceTimer = null;
+                this.init();
+            }
+            init() {
+                try {
+                    this.buildIndex();
+                    this.bindEvents();
+                    this.injectStyles();
+                } catch (e) {
+                    console.error("Search initialization failed:", e);
+                }
+            }
+            injectStyles() {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    @keyframes highlight-pulse {
+                        0% { background-color: rgba(254, 240, 138, 0); }
+                        10% { background-color: rgba(254, 240, 138, 1); }
+                        100% { background-color: rgba(254, 240, 138, 0); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            buildIndex() {
+                const sections = document.querySelectorAll('h2[id], h3[id]');
+                sections.forEach(section => {
+                    let content = '';
+                    let nextNode = section.nextSibling;
+                    while (nextNode) {
+                        if (nextNode.nodeType === 1 && ['H2', 'H3'].includes(nextNode.nodeName)) {
+                            break;
+                        }
+                        if (nextNode.nodeType === 3) {
+                            content += nextNode.textContent + ' ';
+                        } else if (nextNode.nodeType === 1) {
+                            if (!['SCRIPT', 'STYLE'].includes(nextNode.nodeName)) {
+                                content += (nextNode.innerText || nextNode.textContent) + ' ';
+                            }
+                        }
+                        nextNode = nextNode.nextSibling;
+                    }
+                    this.index.push({
+                        id: section.id,
+                        title: section.innerText.trim(),
+                        content: content.replace(/\s+/g, ' ').trim(),
+                        path: this.buildPath(section)
+                    });
+                });
+            }
+            buildPath(element) {
+                let path = [];
+                if (element.tagName === 'H3') {
+                    let prev = element.previousElementSibling;
+                    while(prev) {
+                        if (prev.tagName === 'H2') {
+                            path.push(prev.innerText.replace(/^[0-9\.]+\s*/, ''));
+                            break;
+                        }
+                        prev = prev.previousElementSibling;
+                    }
+                }
+                return path.join(' › ');
+            }
+            bindEvents() {
+                this.dom.input.addEventListener('input', (e) => {
+                    clearTimeout(this.debounceTimer);
+                    this.debounceTimer = setTimeout(() => {
+                        this.performSearch(e.target.value);
+                    }, 250);
+                });
+                this.dom.input.addEventListener('keydown', (e) => {
+                    const items = this.dom.results.querySelectorAll('.search-result-item');
+                    if (items.length === 0) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.selectedIndex = Math.min(this.selectedIndex + 1, items.length - 1);
+                        this.updateSelection(items);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.selectedIndex = Math.max(this.selectedIndex - 1, 0);
+                        this.updateSelection(items);
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (this.selectedIndex >= 0 && items[this.selectedIndex]) {
+                            items[this.selectedIndex].click();
+                        }
+                    } else if (e.key === 'Escape') {
+                        this.closeSearch();
+                        this.dom.input.blur();
+                    }
+                });
+                document.addEventListener('keydown', (e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                        e.preventDefault();
+                        this.dom.input.focus();
+                    }
+                });
+                document.addEventListener('click', (e) => {
+                    if (this.dom.container && !this.dom.container.contains(e.target)) {
+                        this.closeSearch();
+                    }
+                });
+                this.dom.input.addEventListener('focus', () => {
+                    if (this.dom.input.value.trim().length > 0) {
+                        this.dom.results.classList.add('show');
+                    }
+                });
+            }
+            updateSelection(items) {
+                items.forEach(item => item.classList.remove('selected'));
+                if (this.selectedIndex >= 0) {
+                    const selected = items[this.selectedIndex];
+                    selected.classList.add('selected');
+                    selected.scrollIntoView({ block: 'nearest' });
+                }
+            }
+            performSearch(query) {
+                query = query.toLowerCase().trim();
+                this.selectedIndex = -1;
+                if (query.length < 2) {
+                    this.closeSearch();
+                    return;
+                }
+                const terms = query.split(/\s+/).filter(t => t.length > 0);
+                const results = this.index.map(item => {
+                    let score = 0;
+                    const titleLower = item.title.toLowerCase();
+                    const contentLower = item.content.toLowerCase();
+                    if (contentLower.includes(query)) score += 50;
+                    if (titleLower.includes(query)) score += 100;
+                    terms.forEach(term => {
+                        const safeTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        if (titleLower.startsWith(term)) score += 20;
+                        else if (titleLower.includes(term)) score += 10;
+                        const regex = new RegExp(safeTerm, 'g');
+                        const matches = contentLower.match(regex);
+                        if (matches) {
+                            score += Math.min(matches.length, 5) * 2;
+                        }
+                    });
+                    return { ...item, score };
+                })
+                .filter(item => item.score > 0)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 15);
+                this.renderResults(results, query);
+            }
+            renderResults(results, query) {
+                this.dom.results.innerHTML = '';
+                if (results.length === 0) {
+                    this.dom.results.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #64748b;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">🤔</div>
+                            No results found for "<strong>${this.escapeHtml(query)}</strong>"
+                        </div>`;
+                    this.dom.stats.style.display = 'none';
+                } else {
+                    results.forEach((item, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'search-result-item';
+                        const highlightedTitle = this.highlightText(item.title, query);
+                        const excerpt = this.getSmartExcerpt(item.content, query);
+                        const breadcrumb = item.path ? `<span class="path">${item.path}</span>` : '';
+                        div.innerHTML = `
+                            <div class="result-breadcrumbs">${breadcrumb}</div>
+                            <div class="result-title">${highlightedTitle}</div>
+                            <div class="result-excerpt">${excerpt}</div>
+                        `;
+                        div.addEventListener('click', () => this.goToSection(item.id));
+                        div.addEventListener('mouseenter', () => {
+                            this.selectedIndex = index;
+                            const allItems = this.dom.results.querySelectorAll('.search-result-item');
+                            allItems.forEach(i => i.classList.remove('selected'));
+                            div.classList.add('selected');
+                        });
+                        this.dom.results.appendChild(div);
+                    });
+                    this.dom.count.innerText = results.length;
+                    this.dom.stats.classList.add('show');
+                    this.dom.stats.style.display = 'block';
+                }
+                this.dom.results.classList.add('show');
+            }
+            getSmartExcerpt(content, query) {
+                const lowerContent = content.toLowerCase();
+                const lowerQuery = query.toLowerCase();
+                let start = 0;
+                const phraseIndex = lowerContent.indexOf(lowerQuery);
+                if (phraseIndex !== -1) {
+                    start = phraseIndex;
+                } else {
+                    const terms = query.split(/\s+/).filter(t => t.length > 2);
+                    if (terms.length > 0) {
+                        const termIndex = lowerContent.indexOf(terms[0].toLowerCase());
+                        if (termIndex !== -1) start = termIndex;
+                    }
+                }
+                let end = start + 150;
+                let prefix = '';
+                if (start > 20) {
+                    start -= 20;
+                    const space = content.indexOf(' ', start);
+                    if (space !== -1 && space < start + 10) start = space + 1;
+                    prefix = '...';
+                }
+                let text = content.substring(start, end);
+                if (content.length > end) text += '...';
+                
+                return prefix + this.highlightText(text, query);
+            }
+            highlightText(text, query) {
+                const terms = query.split(/\s+/).filter(t => t.length > 0);
+                let html = this.escapeHtml(text);
+                terms.forEach(term => {
+                    if (term.length < 2) return;
+                    const safeTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${safeTerm})`, 'gi');
+                    html = html.replace(regex, '<mark class="highlight">$1</mark>');
+                });
+                return html;
+            }
+            goToSection(id) {
+                const element = document.getElementById(id);
+                if (element) {
+                    const offset = 20;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - offset;
+                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                    element.style.animation = "none";
+                    element.offsetHeight;
+                    element.style.animation = "highlight-pulse 3.5s";
+                    element.setAttribute('tabindex', '-1');
+                    element.focus({preventScroll: true});
+
+                    this.closeSearch();
+                }
+            }
+            closeSearch() {
+                if (this.dom.results) this.dom.results.classList.remove('show');
+                if (this.dom.stats) this.dom.stats.classList.remove('show');
+                this.selectedIndex = -1;
+            }
+            escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+        }
+        new ManualSearch();
+    });
+</script>
+</body>
+</html>

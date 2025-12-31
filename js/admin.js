@@ -1596,7 +1596,7 @@ jQuery(document).ready(function($) {
         `;
       });
     }
-    html += '</div></div>';
+    html += '</div><div style="margin-top: 18px; color: #666;">ℹ️ This log displays 150 most recent events.</div></div>';
     $settingsLogContainer.html(html).hide().fadeIn(300);
   }
 

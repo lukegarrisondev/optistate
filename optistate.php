@@ -2038,7 +2038,7 @@ class OPTISTATE {
 </div>
 <?php
     }
-    private function log_optimization($type = "scheduled", $operation = null, $backup_filename = "") {
+    public function log_optimization($type = "manual", $operation = null, $backup_filename = "") {
         if (null === $operation) {
             $operation = '🚀 ' . __("One-Click Optimization", "optistate") . ' + 💾 ' . __("Backup Created", "optistate");
         }
@@ -7836,12 +7836,19 @@ function optistate_activate() {
             $secure_file_write($log_file, $json_data);
         }
     }
+    $instance = optistate_init();
+    if (method_exists($instance, 'log_optimization')) {
+        $instance->log_optimization('manual', '🔌 ' . esc_html__('Plugin Activated', 'optistate'), '');
+    }
 }
 register_deactivation_hook(__FILE__, "optistate_deactivate");
 function optistate_deactivate() {
+    $instance = optistate_init();
+    if (method_exists($instance, 'log_optimization')) {
+        $instance->log_optimization('manual', '🔌 ' . esc_html__('Plugin Deactivated', 'optistate'), '');
+    }
     wp_clear_scheduled_hook('optistate_daily_cleanup');
     wp_clear_scheduled_hook('optistate_run_rollback_cron');
-    $instance = optistate_init();
     if (method_exists($instance, '_performance_remove_caching')) {
         $instance->_performance_remove_caching();
     }

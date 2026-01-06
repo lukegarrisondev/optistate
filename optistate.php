@@ -3,7 +3,7 @@
  * Plugin Name: WP Optimal State (Free)
  * Plugin URI: https://payhip.com/optistate
  * Description: Advanced WordPress optimization suite featuring integrated database cleanup and backup tools, page caching, and diagnostic tools.
- * Version: 1.1.7
+ * Version: 1.2.0
  * Author: Luke Garrison
  * Text Domain: optistate
  * Domain Path: /languages
@@ -93,7 +93,7 @@ class OPTISTATE_Process_Store {
 }
 class OPTISTATE {
     const PLUGIN_NAME = "WP Optimal State (Free)";
-    const VERSION = "1.1.7";
+    const VERSION = "1.2.0";
     const OPTION_NAME = "optistate_settings";
     const NONCE_ACTION = "optistate_nonce";
     const STATS_TRANSIENT = 'optistate_db_metrics_cache_v2';
@@ -379,9 +379,9 @@ class OPTISTATE {
                 <?php echo esc_html(sprintf(__('Less than %s ago', 'optistate'), $time_ago)); ?>
             </p>
             <p style="margin: 5px 0;">
-                <?php echo '</> '; ?>
+                <?php echo '🔢 '; ?>
                 <strong><?php echo esc_html__('Queries executed:', 'optistate'); ?></strong> 
-                <?php echo number_format_i18n($restore_completed['queries']); ?>
+                <?php echo esc_html(number_format_i18n($restore_completed['queries'])); ?>
             </p>
             <p style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd; color: #666;">
                 <?php echo 'ℹ️ '; ?>
@@ -781,7 +781,7 @@ class OPTISTATE {
                         header('Content-Type: text/html; charset=UTF-8');
                         $mobile_cache = !empty($server_settings['mobile_cache']);
                         header('Vary: ' . ($mobile_cache ? 'User-Agent, Accept-Encoding' : 'Accept-Encoding'));
-                        echo $header_buff;
+                        echo $header_buff; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Content is pre-rendered HTML cache
                         fpassthru($handle);
                         $cache_type = $is_mobile ? 'Mobile' : 'Desktop';
                         echo "\n<!-- Cached by WP Optimal State ({$cache_type}) -->";
@@ -804,7 +804,7 @@ class OPTISTATE {
                         $mobile_cache = !empty($server_settings['mobile_cache']);
                         header('Vary: ' . ($mobile_cache ? 'User-Agent, Accept-Encoding' : 'Accept-Encoding'));
                         $cache_type = $is_mobile ? 'Mobile' : 'Desktop';
-                        echo $content . "\n<!-- Cached by WP Optimal State ({$cache_type}) -->";
+                        echo $content . "\n<!-- Cached by WP Optimal State ({$cache_type}) -->"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         exit;
                     } else {
                         $this->wp_filesystem->delete($cache_file);
@@ -1325,7 +1325,7 @@ class OPTISTATE {
                 <strong><?php echo 'ℹ️ ';
         echo esc_html__("Need Help?", "optistate"); ?></strong>
                 <?php echo esc_html__("Check out the full plugin manual for detailed instructions and best practices.", "optistate"); ?>
-                <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-1-7.html'); ?>" target="_blank" rel="noopener noreferrer">
+                <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html'); ?>" target="_blank" rel="noopener noreferrer">
                     <?php echo esc_html__("READ THE MANUAL", "optistate");
         echo ' 📕'; ?>
                 </a>
@@ -1340,7 +1340,7 @@ class OPTISTATE {
                 </p>
                 <p style="margin-bottom: 0;">
                     <?php echo esc_html__('Please follow our', 'optistate'); ?>
-                    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-1-7.html#ch-7-3-1'); ?>" target="_blank" rel="noopener noreferrer">
+                    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-7-3-1'); ?>" target="_blank" rel="noopener noreferrer">
                         <strong><?php echo esc_html__('Nginx Configuration Guide ⚙️', 'optistate'); ?></strong>
                     </a>
                 </p>
@@ -2489,13 +2489,18 @@ class OPTISTATE {
         $args = [
             'url' => $target_url,
             'strategy' => $strategy,
-            'category' => 'performance'
+            'category' => ['performance']
         ];
         if (!empty($api_key)) {
             $args['key'] = $api_key;
         }
         $endpoint = add_query_arg($args, $endpoint);
-        $response = wp_remote_get($endpoint, ['timeout' => 120]);
+        $response = wp_remote_get($endpoint, [
+            'timeout' => 120,
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ]);
         if (is_wp_error($response)) {
             wp_send_json_error(['message' => __('API Connection Failed: ', 'optistate') . $response->get_error_message()]);
         }
@@ -2542,7 +2547,7 @@ class OPTISTATE {
         $this->log_optimization("manual", $log_message, "");
         wp_send_json_success($results);
     }
-   public function ajax_save_pagespeed_settings() {
+    public function ajax_save_pagespeed_settings() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $this->check_user_access();
         if (!$this->check_rate_limit("save_pagespeed", 3)) {
@@ -2551,8 +2556,8 @@ class OPTISTATE {
         $api_key = isset($_POST['api_key']) ? sanitize_text_field(wp_unslash($_POST['api_key'])) : '';
         $this->save_persistent_settings(['pagespeed_api_key' => $api_key]);
         wp_send_json_success(['message' => __('API Key saved successfully.', 'optistate')]);
-    }
-    public function ajax_clean_item() {
+    } 
+   public function ajax_clean_item() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $this->check_user_access();
         $item_type = isset($_POST["item_type"]) ? sanitize_key(wp_unslash($_POST["item_type"])) : '';
@@ -2816,14 +2821,19 @@ class OPTISTATE {
             wp_send_json_error(['message' => esc_html__('Failed to calculate health score', 'optistate'), 'error' => esc_html($e->getMessage()) ]);
         }
     }
-    public function ajax_one_click_optimize() {
+   public function ajax_one_click_optimize() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
+        $this->check_user_access();
         if (!$this->check_rate_limit("one_click", 30)) {
             wp_send_json_error(['message' => __('🕔 Please wait 30 seconds before running a full optimization again.', 'optistate') ], 429);
             return;
         }
         $cleaned = $this->perform_optimizations(true);
-        $this->log_optimization("manual", "🧹 " . __("One-Click Optimization Completed", "optistate"));
+        $total_cleaned = 0;
+        if (is_array($cleaned)) {
+            $total_cleaned = array_sum($cleaned);
+        }
+        $this->log_optimization("manual", "🧹 " . sprintf(__("One-Click Optimization Completed (%d items cleaned)", "optistate"), $total_cleaned));
         delete_transient(self::STATS_TRANSIENT);
         delete_transient('optistate_health_score');
         delete_transient('optistate_db_size_cache');
@@ -2832,7 +2842,7 @@ class OPTISTATE {
         $cleaned['health_score'] = $health_score;
         wp_send_json_success($cleaned);
     }
-    public function ajax_get_optimization_log() {
+   public function ajax_get_optimization_log() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $log = $this->get_optimization_log();
         wp_send_json_success($log);
@@ -2936,7 +2946,7 @@ class OPTISTATE {
                 $wpdb->query("SET SESSION foreign_key_checks = 1");
                 $wpdb->query("SET SESSION unique_checks = 1");
                 $wpdb->query("SET SESSION autocommit = 1");
-                if (method_exists($this->main_plugin, 'log_optimization')) {
+                    if (method_exists($this, 'log_optimization')) {
                     $this->log_optimization("error", "❌ " . __("WP-CLI Optimization Failed", "optistate"), $e->getMessage());
                 }
             }
@@ -4074,7 +4084,7 @@ class OPTISTATE {
         if (ob_get_level()) {
             ob_end_clean();
         }
-        echo $json_content;
+        echo $json_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON content
         exit;
     }
     public function ajax_export_settings() {
@@ -4956,7 +4966,7 @@ class OPTISTATE_Backup_Manager {
             if ($data === false) {
                 break;
             }
-            echo $data;
+            echo $data; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Binary/SQL file content
             if (ob_get_length() > 0) {
                 ob_flush();
             }
@@ -5379,6 +5389,7 @@ class OPTISTATE_Backup_Manager {
         return $transient_key;
     }
     private function _perform_restore_core($state) {
+        global $wpdb;
         $db = null;
         $handle = null;
         $chunk_start_time = time();
@@ -6377,7 +6388,7 @@ class OPTISTATE_Backup_Manager {
             return;
         }
         $status = (isset($state['status']) && $state['status'] === 'compressing') ? 'compressing' : 'running';
-        $message = ($status === 'compressing') ? sprintf(__('COMPRESSING ....', 'optistate')) : sprintf(__('BACKING UP ....'));
+        $message = ($status === 'compressing') ? sprintf(__('COMPRESSING ....', 'optistate')) : sprintf(__('BACKING UP ....', 'optistate'));
         wp_send_json_success(['status' => $status, 'message' => $message]);
     }
     public function ajax_check_restore_status() {
@@ -6610,12 +6621,14 @@ class OPTISTATE_Backup_Manager {
         $this->clear_all_integrity_caches();
         if (!$this->wp_filesystem) {
             wp_send_json_error(["message" => esc_html__("Failed to initialize filesystem.", "optistate") ]);
+            return;
         }
         $step = isset($_POST['step']) ? sanitize_key($_POST['step']) : 'init';
         if ($step !== 'init') {
             wp_send_json_error(["message" => esc_html__("Invalid request step.", "optistate") ]);
             return;
         }
+        $temp_decompressed_path = null;
         $class_instance = $this;
         register_shutdown_function(function () use ($class_instance) {
             if ($class_instance->get_process_state('optistate_restore_in_progress')) {
@@ -6630,7 +6643,6 @@ class OPTISTATE_Backup_Manager {
                     } else {
                         $class_instance->deactivate_maintenance_mode();
                         $class_instance->delete_process_state('optistate_restore_in_progress');
-                        $class_instance->cleanup_all_temp_sql_files();
                     }
                 }
             }
@@ -6642,7 +6654,7 @@ class OPTISTATE_Backup_Manager {
         $filename = isset($_POST["filename"]) ? basename(sanitize_text_field(wp_unslash($_POST["filename"]))) : '';
         $filepath = trailingslashit($this->backup_dir) . $filename;
         if (!$this->wp_filesystem->exists($filepath)) {
-            wp_send_json_error(["message" => esc_html__("Backup file not found: ", "optistate") . $filename]);
+            wp_send_json_error(["message" => esc_html__("Backup file not found: ", "optistate") . esc_html($filename) ]);
             return;
         }
         $file_size = $this->wp_filesystem->size($filepath);
@@ -6652,13 +6664,13 @@ class OPTISTATE_Backup_Manager {
         }
         $verification = $this->verify_backup_file($filepath, false);
         if ($verification['valid'] === false) {
-            $error_message = sprintf(__('Restore Aborted: %s', 'optistate'), $verification['message']);
+            $error_message = sprintf(esc_html__('Restore Aborted: %s', 'optistate'), $verification['message']);
             $this->log_failed_restore_operation($filename, "Restore blocked. " . $verification['message']);
             wp_send_json_error(["message" => $error_message]);
             return;
         }
         if (!$this->main_plugin->check_rate_limit("restore_backup", 60)) {
-            wp_send_json_error(["message" => esc_html__("Please wait before restoring again.", "optistate") ]);
+            wp_send_json_error(["message" => esc_html__("🕔 Please wait a few seconds before restoring again.", "optistate") ]);
             return;
         }
         $normalized_path = wp_normalize_path($filepath);
@@ -6668,61 +6680,52 @@ class OPTISTATE_Backup_Manager {
             return;
         }
         $button_selector = '.restore-backup[data-file="' . esc_attr($filename) . '"]';
-        if (preg_match('/\.sql\.gz$/i', $filepath)) {
-            $upload_dir = wp_upload_dir();
-            $temp_dir = trailingslashit($upload_dir['basedir']) . 'optistate/db-restore-temp/';
-            if (!$this->wp_filesystem->is_dir($temp_dir)) {
-                if (!$this->wp_filesystem->mkdir($temp_dir, FS_CHMOD_DIR, true)) {
-                    wp_send_json_error(["message" => esc_html__("Failed to create temp directory for decompression.", "optistate") ]);
+        try {
+            if (preg_match('/\.sql\.gz$/i', $filepath)) {
+                $upload_dir = wp_upload_dir();
+                $temp_dir = trailingslashit($upload_dir['basedir']) . 'optistate/db-restore-temp/';
+                if (!$this->wp_filesystem->is_dir($temp_dir)) {
+                    if (!$this->wp_filesystem->mkdir($temp_dir, FS_CHMOD_DIR, true)) {
+                        wp_send_json_error(["message" => esc_html__("Failed to create temp directory for decompression.", "optistate") ]);
+                        return;
+                    }
+                }
+                $temp_decompressed_path = $temp_dir . 'decompressed-' . bin2hex(random_bytes(14)) . '.sql';
+                try {
+                    $decompression_key = 'optistate_decompress_task_' . bin2hex(random_bytes(14));
+                    $task_data = ['status' => 'pending', 'source_path' => $filepath, 'dest_path' => $temp_decompressed_path, 'log_filename' => $filename, 'button_selector' => $button_selector, 'source_size' => $this->wp_filesystem->size($filepath), 'master_restore_key' => null, 'uploaded_file_info' => ['temp_filepath_to_delete' => $temp_decompressed_path], 'is_upload' => false];
+                    $this->set_process_state($decompression_key, $task_data, 2 * HOUR_IN_SECONDS);
+                    wp_schedule_single_event(time(), "optistate_run_decompression_chunk", [$decompression_key]);
+                    wp_send_json_success(['status' => 'decompressing', 'decompression_key' => $decompression_key, 'message' => esc_html__('Decompression started...', 'optistate') ]);
+                }
+                catch(Exception $e) {
+                    if ($temp_decompressed_path && $this->wp_filesystem->exists($temp_decompressed_path)) {
+                        $this->wp_filesystem->delete($temp_decompressed_path);
+                    }
+                    throw $e;
+                }
+                return;
+            }
+            $final_sql_path = $filepath;
+            $settings = $this->main_plugin->get_persistent_settings();
+            $security_active = empty($settings['disable_restore_security']);
+            if ($security_active) {
+                $handle = @fopen($final_sql_path, 'r');
+                if (!$handle) {
+                    wp_send_json_error(["message" => esc_html__("Failed to open file for security scan.", "optistate") ]);
+                    return;
+                }
+                $sample = fread($handle, 32768);
+                fclose($handle);
+                if ($sample === false) {
+                    wp_send_json_error(["message" => esc_html__("Failed to read file for security scan.", "optistate") ]);
+                    return;
+                }
+                if (preg_match('/<\?php|<\?=|<\s*\?|script\s*language\s*=\s*["\']?php["\']?|eval\s*\(|exec\s*\(|system\s*\(|passthru\s*\(|shell_exec\s*\(|base64_decode/i', $sample)) {
+                    wp_send_json_error(["message" => esc_html__("Security risk detected. The backup file contains suspicious code.", "optistate") ]);
                     return;
                 }
             }
-            $temp_decompressed_path = $temp_dir . 'decompressed-' . bin2hex(random_bytes(14)) . '.sql';
-            try {
-                $decompression_key = 'optistate_decompress_task_' . bin2hex(random_bytes(14));
-                $task_data = ['status' => 'pending', 'source_path' => $filepath, 'dest_path' => $temp_decompressed_path, 'log_filename' => $filename, 'button_selector' => $button_selector, 'source_size' => $this->wp_filesystem->size($filepath), 'master_restore_key' => null, 'uploaded_file_info' => ['temp_filepath_to_delete' => $temp_decompressed_path], 'is_upload' => false];
-                $this->set_process_state($decompression_key, $task_data, 2 * HOUR_IN_SECONDS);
-                wp_schedule_single_event(time(), "optistate_run_decompression_chunk", [$decompression_key]);
-                wp_send_json_success(['status' => 'decompressing', 'decompression_key' => $decompression_key, 'message' => esc_html__('Decompression started...', 'optistate') ]);
-            }
-            catch(Exception $e) {
-                if ($temp_decompressed_path && $this->wp_filesystem->exists($temp_decompressed_path)) {
-                    $this->wp_filesystem->delete($temp_decompressed_path);
-                }
-                wp_send_json_error(["message" => esc_html__("Failed to start decompression: ", "optistate") . $e->getMessage() ]);
-            }
-            return;
-        }
-        $final_sql_path = $filepath;
-        $settings = $this->main_plugin->get_persistent_settings();
-        $security_active = empty($settings['disable_restore_security']);
-        if ($security_active) {
-            $handle = @fopen($final_sql_path, 'r');
-            if (!$handle) {
-                if ($temp_decompressed_path && $this->wp_filesystem->exists($temp_decompressed_path)) {
-                    $this->wp_filesystem->delete($temp_decompressed_path);
-                }
-                wp_send_json_error(["message" => esc_html__("Failed to open file for security scan.", "optistate") ]);
-                return;
-            }
-            $sample = fread($handle, 32768);
-            fclose($handle);
-            if ($sample === false) {
-                if ($temp_decompressed_path && $this->wp_filesystem->exists($temp_decompressed_path)) {
-                    $this->wp_filesystem->delete($temp_decompressed_path);
-                }
-                wp_send_json_error(["message" => esc_html__("Failed to read file for security scan.", "optistate") ]);
-                return;
-            }
-            if (preg_match('/<\?php|<\?=|<\s*\?|script\s*language\s*=\s*["\']?php["\']?|eval\s*\(|exec\s*\(|system\s*\(|passthru\s*\(|shell_exec\s*\(|base64_decode/i', $sample)) {
-                if ($temp_decompressed_path && $this->wp_filesystem->exists($temp_decompressed_path)) {
-                    $this->wp_filesystem->delete($temp_decompressed_path);
-                }
-                wp_send_json_error(["message" => esc_html__("Security risk detected. The backup file contains suspicious code.", "optistate") ]);
-                return;
-            }
-        }
-        try {
             $response = $this->_initiate_master_restore_process($final_sql_path, $filename, $button_selector, []);
             wp_send_json_success($response);
         }
@@ -6733,7 +6736,7 @@ class OPTISTATE_Backup_Manager {
             $this->deactivate_maintenance_mode();
             $this->delete_process_state('optistate_restore_in_progress');
             $this->delete_process_state('optistate_last_restore_filename');
-            wp_send_json_error(["message" => esc_html__("Failed to initiate restore: ", "optistate") . $e->getMessage() ]);
+            wp_send_json_error(["message" => esc_html__("Failed to initiate restore: ", "optistate") . esc_html($e->getMessage()) ]);
         }
     }
     private function log_restore_operation($backup_filename, $queries_executed) {
@@ -7453,7 +7456,7 @@ class OPTISTATE_Backup_Manager {
                 }
                 $restore_key = $this->_initiate_chunked_restore($filepath, $log_filename, $uploaded_file_info);
                 $master_state['status'] = 'restore_running';
-                $master_state['message'] = esc_html__('RESTORING DATABASE ....');
+                $master_state['message'] = esc_html__('RESTORING DATABASE ....', 'optistate');
                 $master_state['restore_key'] = $restore_key;
                 $this->set_process_state($master_restore_key, $master_state, 2 * HOUR_IN_SECONDS);
                 $this->set_process_state('optistate_current_restore_key', $restore_key, 90 * MINUTE_IN_SECONDS);
@@ -7566,7 +7569,7 @@ class OPTISTATE_Backup_Manager {
         }
         $status = $task_data['status'];
         if ($status === 'pending' || $status === 'decompressing') {
-            wp_send_json_success(['status' => 'decompressing', 'message' => sprintf(__('DECOMPRESSING BACKUP ....')) ]);
+            wp_send_json_success(['status' => 'decompressing', 'message' => sprintf(__('DECOMPRESSING BACKUP ....', 'optistate'))]);
         } elseif ($status === 'restore_starting') {
             $this->delete_process_state($decompression_key);
             wp_send_json_success(['status' => 'restore_starting', 'message' => esc_html__('Decompression complete! Initiating restore...', 'optistate'), 'master_restore_key' => $task_data['master_restore_key']]);
@@ -7650,7 +7653,7 @@ class OPTISTATE_Backup_Manager {
                 if ($result['status'] === 'running') {
                     $this->set_process_state($restore_key, $state, DAY_IN_SECONDS);
                     $master_state['status'] = 'restore_running';
-                    $master_state['message'] = sprintf(__('RESTORING DATABASE ....'));
+                    $master_state['message'] = sprintf(__('RESTORING DATABASE ....', 'optistate'));
                     $this->set_process_state($master_restore_key, $master_state, 2 * HOUR_IN_SECONDS);
                     wp_schedule_single_event(time() + $this->get_reschedule_delay(), "optistate_run_restore_chunk", [$master_restore_key]);
                 } elseif ($result['status'] === 'done') {
@@ -7838,14 +7841,18 @@ function optistate_activate() {
     }
     $instance = optistate_init();
     if (method_exists($instance, 'log_optimization')) {
-        $instance->log_optimization('manual', '🔌 ' . esc_html__('Plugin Activated', 'optistate'), '');
+        $current_user = wp_get_current_user();
+        $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'System';
+        $instance->log_optimization('manual', '🔌 ' . sprintf(esc_html__('Plugin Activated by %s', 'optistate'), $username), '');
     }
 }
 register_deactivation_hook(__FILE__, "optistate_deactivate");
 function optistate_deactivate() {
     $instance = optistate_init();
     if (method_exists($instance, 'log_optimization')) {
-        $instance->log_optimization('manual', '🔌 ' . esc_html__('Plugin Deactivated', 'optistate'), '');
+        $current_user = wp_get_current_user();
+        $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'System';
+        $instance->log_optimization('manual', '🔌 ' . sprintf(esc_html__('Plugin Deactivated by %s', 'optistate'), $username), '');
     }
     wp_clear_scheduled_hook('optistate_daily_cleanup');
     wp_clear_scheduled_hook('optistate_run_rollback_cron');

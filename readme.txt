@@ -1,4 +1,4 @@
-WP Optimal State Free/Pro - v1.1.7
+WP Optimal State Free/Pro - v1.2.0
 
 Transform your WordPress site into a lean, high-performance machine with WP Optimal State Pro. This all-in-one optimization suite combines professional-grade database maintenance, intelligent backup management, and advanced caching systems into a single powerful plugin.
 
@@ -121,7 +121,7 @@ File System: Writable `wp-content/uploads/` directory for backups, settings, and
 HOW TO INSTALL
 
 Manual Installation:
-1. Download the plugin ZIP file (optistate-main.zip)
+1. Download the plugin ZIP file (WP_Optimal_State_FREE_1-2-0.zip)
 2. Log in to your WordPress admin dashboard
 3. Navigate to Plugins → Add New
 4. Click Upload Plugin at the top
@@ -131,8 +131,8 @@ Manual Installation:
 8. Look for “Optimal State” in your admin menu
 
 Installation via FTP:
-1. Download and extract the plugin ZIP file (optistate-main.zip)
-2. Upload the extracted plugin folder 'optistate-main' to /wp-content/plugins/
+1. Download and extract the plugin ZIP file (WP_Optimal_State_FREE_1-2-0.zip)
+2. Upload the extracted plugin folder 'optistate' to /wp-content/plugins/
 3. Log in to your WordPress admin dashboard
 4. Navigate to Plugins
 5. Find “WP Optimal State” and click Activate
@@ -140,15 +140,17 @@ Installation via FTP:
 
 --------------------------------------------------------------------------
 
-Release Notes:
-New feature: Database search & replace. Ideal for updating the database after a migration.
-New feature: Database Query Caching.
-New feature: Lazy Load Images & Iframes.
-New user interface split into separate tabs for a smooth and easy browsing experience.
-In the Database Structure Analysis, added an option to delete database tables that haven’t been used for over a month.
-Added four additional cleanup options (Action Scheduler, Embed Cache, WooCommerce Cleanup, Unused Terms).
-Added new descriptions and recommendations to the admin interface to improve user experience.
-Expanded and updated the user manual, added an advanced search functionality and other minor improvements.
+Release Notes v1.2.0:
+1. Smart Polling Intervals: Updated admin.js to dynamically adjust the polling interval in pollRestoreStatus based on the server's response time, reducing admin-ajax.php load during long restores. 
+2. Resilient Rate Limiting: Improved check_rate_limit to handle rapid concurrent requests more gracefully by utilizing set_transient with a shorter expiration buffer. 
+3. Database Size Caching: Modified get_total_database_size to force a cache refresh ($force_refresh = true) immediately after a "One-Click Optimization" to ensure the dashboard reflects accurate gains. 
+4. Memory Management: Enhanced _backup_table_data_chunked to call gc_collect_cycles() more frequently during the export of large tables like wp_posts, preventing memory exhaustion errors. 
+5. Regex Pattern Caching: Cached the compilation of exclude patterns in get_compiled_exclude_patterns to a static property, improving page load performance when "Server-Side Caching" is enabled.
+6. Fixed: Addressed an issue in clean_orphaned_postmeta where the DELETE query could time out on extremely large databases by implementing stricter LIMIT batching. 
+7. Fixed: Corrected a logic error in is_safe_restore_query that occasionally flagged valid INSERT statements containing the word "DROP" within the content string as security risks.
+8. Fixed: get_trusted_host now correctly sanitizes the HTTP_HOST header to prevent potential cache poisoning when generating cache file paths. 
+9. Fixed: Ensured restore_backup properly resets the optistate_maintenance_mode_active option if a fatal error occurs during the restoration process.
+10. Code Hardening: Applied stricter sanitize_text_field input validation in ajax_save_auto_settings to prevent non-numeric values from being saved for auto_optimize_days.
 
 --------------------------------------------------------------------------
 

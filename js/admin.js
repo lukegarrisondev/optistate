@@ -1,6 +1,6 @@
 /**
  * Main Admin Javascript for Optimal State
- * Version 1.1.7
+ * Version 1.2.0
  */
 jQuery(document).ready(function($) {
   'use strict';
@@ -3366,11 +3366,20 @@ jQuery(document).ready(function($) {
     const $tipsContainer = $('#optistate-psi-tips');
     const score = parseInt(data.score, 10);
     $score.text(score);
-    let color = '#dc3545';
-    if (score >= 90) color = '#28a745';
-    else if (score >= 60) color = '#ffa400';
-    $circle.css('border-color', color);
-    $circle.css('color', '#333');
+    let borderColor = '#dc3545';
+    let bgColor = '#fce8e8';
+    if (score >= 90) {
+        borderColor = '#28a745';
+        bgColor = '#e8f5e9';
+    } else if (score >= 60) {
+        borderColor = '#ffa400';
+        bgColor = '#fff8e1';
+    }
+    $circle.css({
+        'border-color': borderColor,
+        'background-color': bgColor,
+        'color': '#333'
+    });
     const updateMetricCard = (id, metricData, thresholds) => {
         const $el = $(id);
         const $card = $el.closest('.optistate-targeted-card');
@@ -3432,6 +3441,14 @@ jQuery(document).ready(function($) {
             __('Enable Lazy Loading', 'optistate'),
             __('Images loading all at once slow down the Largest Contentful Paint (LCP). Enable <strong>Lazy Load Images</strong> in the <strong>Performance</strong> tab to defer off-screen images.', 'optistate'),
             '#tab-performance'
+        );
+    }
+    if (status.cls !== 'good') {
+        addTip(
+            'dashicons-align-pull-left',
+            __('Reduce Layout Shifts', 'optistate'),
+            __('Your Cumulative Layout Shift (CLS) score indicates visual instability. Ensure images and ads have explicit width/height attributes, reserve space for dynamic content, and avoid inserting content above existing content.', 'optistate'),
+            null
         );
     }
     if (status.tbt !== 'good') {

@@ -2,9 +2,10 @@
 /**
  * Plugin Name: WP Optimal State (Free)
  * Plugin URI: https://payhip.com/optistate
- * Description: Advanced WordPress optimization suite featuring integrated database cleanup and backup tools, page caching, and diagnostic tools.
+ * Description: Advanced WordPress optimization suite featuring integrated database cleanup and backup tools, page caching, and diagnostic tools. To check for updates, visit this page: https://payhip.com/optistate/blog/news
  * Version: 1.2.0
  * Author: Luke Garrison
+ * Author URI: https://payhip.com/optistate
  * Text Domain: optistate
  * Domain Path: /languages
  * License: GPL v2 or later
@@ -1422,14 +1423,18 @@ class OPTISTATE {
                                <?php foreach ($backups as $backup): ?>
                                     <tr data-file="<?php echo esc_attr($backup["filename"]); ?>" data-bytes="<?php echo esc_attr($backup["size_bytes"]); ?>">
                                         <td>
-                                            <strong><?php echo esc_html($backup["filename"]); ?></strong>
-                                            <div style="margin-top: 5px; font-size: 12px;">
-                                                <?php if ($backup["verified"]) {
-                    echo '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' . esc_html__("File integrity", "optistate") . "</span>";
-                } else {
-                    echo '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' . esc_html__("File integrity", "optistate") . "</span>";
-                } ?>
-                                            </div>
+                                    <strong><?php echo esc_html($backup["filename"]); ?></strong>
+                                    <div style="margin-top: 5px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+                                    <?php if ($backup["verified"]) { echo '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' . esc_html__("Integrity", "optistate") . "</span>";
+                                        } else {
+                                        echo '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' . esc_html__("Integrity", "optistate") . "</span>";
+                                        } 
+                                    $b_type = isset($backup['type']) ? $backup['type'] : 'MANUAL';
+                                    $b_class = ($b_type === 'SCHEDULED') ? 'optistate-type-scheduled' : 'optistate-type-manual';
+                                    $b_icon = ($b_type === 'SCHEDULED') ? '⏰' : '👤'; ?>
+                                <span class="optistate-backup-type" title="<?php echo esc_attr($b_type === 'MANUAL' ? 'Created manually by user' : 'Created automatically by the system'); ?>">
+                                <?php echo $b_icon . ' ' . esc_html($b_type); ?></span>
+                                </div>
                                         </td>
                                         <td><?php echo esc_html($backup["date"]); ?></td>
                                         <td><?php echo esc_html($backup["size"]); ?></td>
@@ -3411,7 +3416,7 @@ class OPTISTATE {
             ],
             'browser_caching' => [
                 'title' => __('💻 Browser Caching (.htaccess)', 'optistate'),
-                'description' => __('Enables browser caching by adding optimized caching and security rules to your .htaccess file. This improves page load times for returning visitors by storing static assets in their browser. Requires Apache server with writable .htaccess file. For Nginx servers, manual configuration is required - see user manual (section 7.3.1) for details. Combine this with server-side caching for ultimate performance. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc.', 'optistate'),
+                'description' => __('Enables browser caching by adding optimized caching and security rules to your .htaccess file. This improves page load times for returning visitors by storing static assets in their browser.<br>Requires Apache server with writable .htaccess file. For Nginx servers, manual configuration is required - see user manual (section 7.3.1) for details. Combine this with server-side caching for ultimate performance. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc.', 'optistate'),
                 'impact' => 'medium',
                 'type' => 'toggle',
                 'default' => false,
@@ -3421,7 +3426,7 @@ class OPTISTATE {
                 'title'       => __('🗄️ Database Query Caching', 'optistate'),
                 'description' => $has_persistent_cache 
                     ? __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached. Do not activate if you use another plugin for this purpose.', 'optistate')
-                    : __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached. ⚠️ Requirement Missing: A persistent object cache (Redis or Memcached) is not detected. This feature cannot be activated.', 'optistate'),
+                    : __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached.<br>⚠️ Requirement Missing: A persistent object cache (Redis or Memcached) is not detected. This feature cannot be activated.', 'optistate'),
                 'impact'      => 'high',
                 'type'        => 'custom_db_caching',
                 'default'     => [
@@ -3438,7 +3443,7 @@ class OPTISTATE {
             ],
             'lazy_load' => [
                 'title'       => __('⏲ Lazy Load Images & Iframes', 'optistate'),
-                'description' => __('Enforces native browser lazy loading by injecting loading="lazy" and decoding="async" attributes into images and iframes. This improves Core Web Vitals by deferring off-screen media until needed.', 'optistate'),
+                'description' => __('Enforces native browser lazy loading by injecting loading="lazy" and decoding="async" attributes into images and iframes.<br>This improves Core Web Vitals by deferring off-screen media until needed.', 'optistate'),
                 'impact'      => 'medium',
                 'type'        => 'toggle',
                 'default'     => false,
@@ -3460,7 +3465,7 @@ class OPTISTATE {
             ],
             'trash_auto_empty' => [
                 'title' => __('🗑️ Automatic Trash Emptying', 'optistate'),
-                'description' => __('By default, WordPress automatically purges trashed posts and pages older than 30 days. However, you can customize this period or completely disable automatic emptying. Warning: Once emptied, deleted content cannot be recovered.', 'optistate'),
+                'description' => __('By default, WordPress automatically purges trashed posts and pages older than 30 days. However, you can customize this period or completely disable automatic emptying.<br>⚠ Warning: Once emptied, deleted content cannot be recovered.', 'optistate'),
                 'impact' => 'medium',
                 'options' => [
                     'default' => __('WordPress Default (30 days)', 'optistate'),
@@ -4242,6 +4247,14 @@ class OPTISTATE {
         }
         return $validated;
     }
+    private function matches_with_word_boundary($text, $search, $case_sensitive = false) {
+        $pattern = '/(?:^|[^\p{L}\p{N}_])' . preg_quote($search, '/') . '(?:[^\p{L}\p{N}_]|$)/u';
+        if ($case_sensitive) {
+            return preg_match($pattern, $text) === 1;
+        } else {
+            return preg_match($pattern . 'i', $text) === 1;
+        }
+    }
     private function _get_sr_snippet($text, $search, $length = 100) {
         $pos = mb_stripos($text, $search);
         if ($pos === false) {
@@ -4254,7 +4267,7 @@ class OPTISTATE {
             $snippet = '...' . $snippet;
         }
         if (($start + $length) < mb_strlen($text)) {
-            $snippet .= '...';
+            $snippet.= '...';
         }
         return $snippet;
     }
@@ -4266,7 +4279,7 @@ class OPTISTATE {
         $reset = isset($_POST['reset']) && $_POST['reset'] === 'true';
         $case_sensitive = isset($_POST['case_sensitive']) && $_POST['case_sensitive'] == '1';
         if (empty($search)) {
-            wp_send_json_error(['message' => __('Please enter a search term.', 'optistate')]);
+            wp_send_json_error(['message' => __('Please enter a search term.', 'optistate') ]);
         }
         $user_id = get_current_user_id();
         $transient_key = 'optistate_sr_dry_' . $user_id;
@@ -4276,27 +4289,16 @@ class OPTISTATE {
             $tables = ('all' === $tables_input[0]) ? $wpdb->get_col("SHOW TABLES") : array_map('sanitize_text_field', $tables_input);
             $protected = [$this->process_store->get_table_name(), $wpdb->prefix . 'optistate_backup_metadata'];
             $tables = array_diff($tables, $protected);
-            $state = [
-                'tables' => array_values($tables),
-                'current_idx' => 0,
-                'total_matches' => 0,
-                'tables_affected' => 0,
-                'preview' => [],
-                'status' => 'running'
-            ];
+            $state = ['tables' => array_values($tables), 'current_idx' => 0, 'total_matches' => 0, 'tables_affected' => 0, 'preview' => [], 'status' => 'running'];
         }
         $start_time = time();
-        $max_exec_time = 15;
+        $max_exec_time = 20;
         global $wpdb;
         while ($state['current_idx'] < count($state['tables'])) {
             if ((time() - $start_time) > $max_exec_time) {
                 set_transient($transient_key, $state, 10 * MINUTE_IN_SECONDS);
                 $percent = round(($state['current_idx'] / count($state['tables'])) * 100);
-                wp_send_json_success([
-                    'status' => 'running',
-                    'percent' => $percent,
-                    'message' => sprintf(__('Scanning table %d of %d...', 'optistate'), $state['current_idx'] + 1, count($state['tables']))
-                ]);
+                wp_send_json_success(['status' => 'running', 'percent' => $percent, 'message' => sprintf(__('Scanning table %d of %d...', 'optistate'), $state['current_idx'] + 1, count($state['tables'])) ]);
                 return;
             }
             $table = $state['tables'][$state['current_idx']];
@@ -4306,41 +4308,49 @@ class OPTISTATE {
             $primary_key = '';
             foreach ($columns as $col) {
                 if ($col['Key'] === 'PRI') $primary_key = $col['Field'];
-                if (preg_match('/char|text|blob/i', $col['Type'])) {
+                if (preg_match('/binary|blob/i', $col['Type']) && !preg_match('/text/i', $col['Type'])) {
+                    continue;
+                }
+                if (preg_match('/char|text/i', $col['Type'])) {
                     $text_columns[] = $col['Field'];
                 }
             }
             if (!empty($text_columns)) {
                 foreach ($text_columns as $col) {
-                    $like_operator = $case_sensitive ? 'LIKE BINARY' : 'LIKE';
-                    $sql = $wpdb->prepare("SELECT COUNT(*) FROM `$table` WHERE `$col` $like_operator %s", '%' . $wpdb->esc_like($search) . '%');
+                    if ($case_sensitive) {
+                        $sql = $wpdb->prepare("SELECT COUNT(*) FROM `$table` WHERE BINARY `$col` LIKE BINARY %s", '%' . $wpdb->esc_like($search) . '%');
+                    } else {
+                        $sql = $wpdb->prepare("SELECT COUNT(*) FROM `$table` WHERE `$col` LIKE %s", '%' . $wpdb->esc_like($search) . '%');
+                    }
                     $count = (int)$wpdb->get_var($sql);
                     if ($count > 0) {
-                        $found_in_table += $count;
-                        $state['total_matches'] += $count;
-                        $preview_sql = $wpdb->prepare("SELECT `$primary_key`, `$col` FROM `$table` WHERE `$col` $like_operator %s LIMIT 100", '%' . $wpdb->esc_like($search) . '%');
+                        if ($case_sensitive) {
+                            $preview_sql = $wpdb->prepare("SELECT `$primary_key`, `$col` FROM `$table` WHERE BINARY `$col` LIKE BINARY %s LIMIT 200", '%' . $wpdb->esc_like($search) . '%');
+                        } else {
+                            $preview_sql = $wpdb->prepare("SELECT `$primary_key`, `$col` FROM `$table` WHERE `$col` LIKE %s LIMIT 200", '%' . $wpdb->esc_like($search) . '%');
+                        }
                         $rows = $wpdb->get_results($preview_sql, ARRAY_A);
+                        $actual_matches = 0;
                         foreach ($rows as $row) {
                             if (count($state['preview']) >= 500) break;
                             $original = $row[$col];
+                            if (!$this->matches_with_word_boundary($original, $search, $case_sensitive)) {
+                                continue;
+                            }
+                            $actual_matches++;
                             if (is_serialized($original)) {
                                 $preview_text = __('(Serialized Data)', 'optistate');
                             } else {
                                 $snippet = $this->_get_sr_snippet($original, $search, 140);
                                 $preview_text = esc_html($snippet);
-                                $modifier = $case_sensitive ? '' : 'i'; 
-                                $preview_text = preg_replace(
-                                    '/' . preg_quote(esc_html($search), '/') . '/' . $modifier, 
-                                    '<strong style="background:#ffeb3b;">$0</strong>', 
-                                    $preview_text
-                                );
+                                $modifier = $case_sensitive ? '' : 'i';
+                                $preview_text = preg_replace('/' . preg_quote(esc_html($search), '/') . '/' . $modifier . 'u', '<strong style="background:#ffeb3b;">$0</strong>', $preview_text);
                             }
-                            $state['preview'][] = [
-                                'table' => $table,
-                                'column' => $col,
-                                'id' => $row[$primary_key] ?? 'N/A',
-                                'content' => $preview_text
-                            ];
+                            $state['preview'][] = ['table' => $table, 'column' => $col, 'id' => $row[$primary_key]??'N/A', 'content' => $preview_text];
+                        }
+                        if ($actual_matches > 0) {
+                            $found_in_table+= $actual_matches;
+                            $state['total_matches']+= $actual_matches;
                         }
                     }
                 }
@@ -4351,16 +4361,9 @@ class OPTISTATE {
             $state['current_idx']++;
         }
         delete_transient($transient_key);
-        wp_send_json_success([
-            'status' => 'done',
-            'data' => [
-                'total_matches' => $state['total_matches'],
-                'tables_affected' => $state['tables_affected'],
-                'preview' => $state['preview']
-            ]
-        ]);
+        wp_send_json_success(['status' => 'done', 'data' => ['total_matches' => $state['total_matches'], 'tables_affected' => $state['tables_affected'], 'preview' => $state['preview']]]);
     }
-}
+}   
 class OPTISTATE_DB_Wrapper {
     private static $instance = null;
     private $connection = null;
@@ -6148,6 +6151,17 @@ class OPTISTATE_Backup_Manager {
         $rules = ['# WP Optimal State - Secure Backup Directory', '# Prevent directory listing', 'Options -Indexes', '', '# Block all direct web access. Downloads are handled by PHP.', '<IfModule mod_authz_core.c>', '    Require all denied', '</IfModule>', '<IfModule !mod_authz_core.c>', '    Order deny,allow', '    Deny from all', '</IfModule>', ];
         $this->main_plugin->secure_directory($this->backup_dir, $rules);
     }
+    private function ensure_required_tables_exist() {
+        global $wpdb;
+        $meta_table = $wpdb->prefix . 'optistate_backup_metadata';
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $meta_table)) !== $meta_table) {
+            $this->create_backup_metadata_table();
+        }
+        $process_table = $this->process_store->get_table_name();
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $process_table)) !== $process_table) {
+            $this->process_store->create_table();
+        }
+    }
     private function log_manual_backup_operation($backup_filename, $start_timestamp_utc = null, $type = "manual") {
         if (empty($this->log_file_path)) {
             $upload_dir = wp_upload_dir();
@@ -6322,6 +6336,20 @@ class OPTISTATE_Backup_Manager {
         global $wpdb;
         $table_name = $wpdb->prefix . 'optistate_backup_metadata';
         $all_metadata = $wpdb->get_results($wpdb->prepare("SELECT filename, created_timestamp FROM {$table_name} WHERE database_name = %s", DB_NAME), OBJECT_K);
+        $backup_types = [];
+        if ($this->wp_filesystem->exists($this->log_file_path)) {
+            $log_content = $this->wp_filesystem->get_contents($this->log_file_path);
+            if ($log_content !== false) {
+                $log_entries = json_decode($log_content, true);
+                if (is_array($log_entries)) {
+                    foreach ($log_entries as $entry) {
+                        if (!empty($entry['backup_filename']) && !empty($entry['type'])) {
+                            $backup_types[$entry['backup_filename']] = strtoupper($entry['type']);
+                        }
+                    }
+                }
+            }
+        }
         $backup_list = [];
         $download_nonce = wp_create_nonce("optistate_backup_nonce");
         foreach ($dirlist as $filename => $fileinfo) {
@@ -6334,7 +6362,22 @@ class OPTISTATE_Backup_Manager {
             $download_url = add_query_arg(["action" => "optistate_backup_download", "file" => rawurlencode($filename), "_wpnonce" => $download_nonce, ], admin_url());
             $file_size = $fileinfo['size']??0;
             $verification = $this->quick_verify_backup_status($file);
-            $backup_list[] = ["filename" => $filename, "date" => $formatted_date, "size" => size_format($file_size, 2), "size_bytes" => $file_size, "timestamp" => $file_timestamp, "filepath" => $file, "download_url" => $download_url, "verified" => $verification["valid"], "verification_message" => $verification["message"], ];
+            $type = isset($backup_types[$filename]) ? $backup_types[$filename] : 'MANUAL';
+            if (strpos($filename, 'SAFETY-RESTORE-') === 0) {
+                $type = 'SCHEDULED';
+            }
+            $backup_list[] = [
+                "filename" => $filename, 
+                "date" => $formatted_date, 
+                "size" => size_format($file_size, 2), 
+                "size_bytes" => $file_size, 
+                "timestamp" => $file_timestamp, 
+                "filepath" => $file, 
+                "download_url" => $download_url, 
+                "verified" => $verification["valid"], 
+                "verification_message" => $verification["message"],
+                "type" => $type
+            ];
         }
         usort($backup_list, function ($a, $b) {
             return $b["timestamp"] - $a["timestamp"];
@@ -6343,6 +6386,7 @@ class OPTISTATE_Backup_Manager {
     }
     public function ajax_create_backup() {
         check_ajax_referer("optistate_backup_nonce", "nonce");
+        $this->ensure_required_tables_exist();
         $this->clear_all_integrity_caches();
         if (!$this->check_backup_directory_permissions()) {
             wp_send_json_error(["message" => esc_html__("Backup directory is not writable. Please check file permissions.", "optistate") ]);
@@ -6417,6 +6461,7 @@ class OPTISTATE_Backup_Manager {
                 return false;
             }
         }
+        $this->ensure_required_tables_exist();
         if (!$this->wp_filesystem) {
             return false;
         }
@@ -6572,6 +6617,7 @@ class OPTISTATE_Backup_Manager {
     }
     public function ajax_delete_backup() {
         check_ajax_referer("optistate_backup_nonce", "nonce");
+        $this->main_plugin->check_user_access();
         if (!$this->main_plugin->check_rate_limit("delete_backup", 2)) {
             wp_send_json_error(['message' => esc_html__('🕐 Please wait a few seconds before deleting again.', 'optistate') ], 429);
             return;
@@ -6606,7 +6652,34 @@ class OPTISTATE_Backup_Manager {
             }
         }
         if ($success) {
-            wp_send_json_success(["message" => esc_html__("Backup and all associated files deleted successfully!", "optistate"), ]);
+            if ($this->wp_filesystem && $this->log_file_path) {
+                $log_entries = [];
+                if ($this->wp_filesystem->exists($this->log_file_path)) {
+                    $content = $this->wp_filesystem->get_contents($this->log_file_path);
+                    if ($content) {
+                        $log_entries = json_decode($content, true);
+                        if (!is_array($log_entries)) {
+                            $log_entries = [];
+                        }
+                    }
+                }
+                $log_entry = [
+                    "timestamp" => time(),
+                    "type"      => "manual",
+                    "date"      => wp_date(get_option('date_format') . ' ' . get_option('time_format'), time()),
+                    "operation" => "🗑️ " . sprintf(__("Backup Deleted (%s)", "optistate"), $filename),
+                    "backup_filename" => "",
+                    "timezone"  => get_option("timezone_string"),
+                    "gmt_offset"=> get_option("gmt_offset")
+                ];
+                array_unshift($log_entries, $log_entry);
+                $log_entries = array_slice($log_entries, 0, 150);
+                $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
+                if ($json_data) {
+                    $this->wp_filesystem->put_contents($this->log_file_path, $json_data, FS_CHMOD_FILE);
+                }
+            }
+            wp_send_json_success(["message" => esc_html__("Backup and all associated data deleted successfully!", "optistate"), ]);
         } else {
             wp_send_json_error(["message" => esc_html__("Failed to delete some files.", "optistate") ]);
         }
@@ -6614,6 +6687,7 @@ class OPTISTATE_Backup_Manager {
     public function ajax_restore_backup() {
         check_ajax_referer("optistate_backup_nonce", "nonce");
         $this->main_plugin->check_user_access();
+        $this->ensure_required_tables_exist();
         if (is_multisite()) {
             wp_send_json_error(["message" => esc_html__("🛑 Safety Stop! Database restore is not supported on Multisite installations to prevent network-wide data loss.", "optistate") ]);
             return;

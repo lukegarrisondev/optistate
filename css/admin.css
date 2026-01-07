@@ -8,7 +8,7 @@
 .optistate-notice-warning{border-left-color:#ffb900;background:linear-gradient(to right,#fff9e6 0,#fff 100%)}
 .optistate-notice a{color:#0073aa;text-decoration:none;font-weight:500;transition:color .2s}
 .optistate-notice a:hover{color:#005177;text-decoration:underline}
-.optistate-title{font-size:1.6em!important;font-weight:600!important;color:#0042B5!important;text-shadow:1px 2px #C6C6C6}
+.optistate-title{font-size:1.6em!important;font-weight:600!important;color:#23775f!important;text-shadow:1px 2px #C6C6C6}
 .optistate-title .dashicons{font-size:29px!important;width:31px!important;height:29px!important;margin-left:5px;text-shadow:1px 2px #C6C6C6}
 .optistate-grid{gap:20px;margin-bottom:20px}
 .optistate-grid-2{gap:20px;margin-bottom:0}
@@ -130,13 +130,14 @@
 .optistate-section-title{font-size:1.3em;font-weight:600;color:#1d2327;border-bottom:1px solid #dcdcde;padding-bottom:10px}
 .optistate-score-circle{box-shadow:0px 0px 8px 4px rgba(0,0,0,0.2);width:120px;height:120px;border-radius:50%;border:8px solid #eee;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:bold;color:#ccc;text-shadow:1px 2px rgba(0,0,0,0.2);}
 .optistate-psi-score-wrapper{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.optistate-psi-controls{background:#f9f9f9;padding:15px 15px 5px 15px;border:1px solid #e5e5e5;border-radius:4px;margin-bottom:12px;}
+.optistate-psi-controls{background:#f9f9f9;padding:15px 15px 5px 15px;border:1px solid #e5e5e5;border-radius:4px;margin-bottom:12px}
+.optistate-backup-type{border:1px solid #46b450;border-radius:3px;margin-left:2px;padding:1px 7px;background:#f0f9f0;cursor:help}
 @media (max-width:1300px) {
 .optistate-wrap{margin:10px;max-width:100%;width:auto}
-.nav-tab-wrapper.optistate-nav-tabs{display:flex!important;flex-wrap:wrap;gap:8px;border-bottom:none!important;padding-bottom:15px;background:transparent}
-.nav-tab-wrapper.optistate-nav-tabs .nav-tab{flex:1 1 calc(50% - 10px);margin:0!important;padding:12px 8px;display:flex;flex-direction:row;align-items:center;justify-content:center;border:1px solid #ccd0d4!important;border-radius:6px;background:#f6f7f7;font-size:13px;line-height:1;height:auto}
-.nav-tab-wrapper.optistate-nav-tabs .nav-tab .dashicons{margin-right:8px;margin-bottom:0;font-size:18px;width:18px;height:18px}
-.nav-tab-wrapper.optistate-nav-tabs .nav-tab-active{background:#fff!important;border-color:#2271b1!important;color:#2271b1!important;box-shadow:0 2px 5px #2271b11a}
+.nav-tab-wrapper.optistate-nav-tabs{display:flex!important;flex-wrap:wrap!important;gap:6px;border-bottom:1px solid #c3c4c7!important;padding-bottom:0!important;margin-bottom:20px!important;background:transparent;justify-content:flex-start!important}
+.nav-tab-wrapper.optistate-nav-tabs .nav-tab{flex:0 1 auto!important;margin:0 0 -1px!important;padding:10px 14px!important;display:inline-flex;align-items:center;justify-content:center;border:1px solid #c3c4c7!important;border-bottom-color:#c3c4c7!important;border-radius:4px 4px 0 0!important;background:#e5e5e5;font-size:13px;line-height:1.4;height:auto;white-space:nowrap;min-width:auto!important}
+.nav-tab-wrapper.optistate-nav-tabs .nav-tab-active{background:#f0f0f1!important;border-color:#0056E2!important;border-bottom:none!important;color:#0043AF!important;font-weight:600}
+.nav-tab-wrapper.optistate-nav-tabs .nav-tab .dashicons{margin-right:6px;margin-bottom:0;font-size:18px;width:18px;height:18px}
 }
 @media (max-width:768px) {
 .optistate-cleanup-grid,.optistate-grid,.optistate-grid-2,.optistate-stats{grid-template-columns:1fr}
@@ -222,7 +223,7 @@ to{opacity:1;transform:translateY(0)}
 .optistate-log-type.scheduled{background:#d63638}
 .optistate-log-empty{text-align:center;color:#646970;font-style:italic;padding:15px}
 .optistate-details{background:#f9f9f9;border:1px solid #e1e1e1;border-radius:4px;padding:12px;margin-top:10px;font-size:1em;max-height:200px;overflow-y:auto}
-.db-backup-unverified,.db-backup-verified{cursor:help;padding:2px 6px;display:inline-block;font-size:11px}
+.db-backup-unverified,.db-backup-verified{cursor:help;padding:1px 7px;display:inline-block;font-size:11px}
 .optistate-details ul{margin:8px 0;padding-left:20px}
 .optistate-details li{margin:3px 0;line-height:1.4}
 .optistate-success{color:#2e8b57;font-weight:600}
@@ -435,4 +436,53 @@ to{opacity:1;transform:scale(1)}
 .wp-list-table .button{display:flex;width:100%;margin-bottom:8px;margin-right:0;justify-content:center}
 .optistate-preload-header{flex-direction:column;align-items:flex-start;gap:8px}
 .optistate-auto-preload-section{padding-top:10px}
+}
+@media (max-width: 1300px) {
+.optistate-wrap {
+    margin: 10px;
+    max-width: 100%;
+    width: auto;
+}
+/* Improved Tabbed Menu */
+.nav-tab-wrapper.optistate-nav-tabs {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px;
+    border-bottom: 1px solid #c3c4c7 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 20px !important;
+    background: transparent;
+    justify-content: flex-start !important;
+}
+.nav-tab-wrapper.optistate-nav-tabs .nav-tab {
+    flex: 0 1 auto !important;
+    margin: 0 0 -1px 0 !important;
+    padding: 10px 14px !important;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #c3c4c7 !important;
+    border-bottom-color: #c3c4c7 !important;
+    border-radius: 4px 4px 0 0 !important;
+    background: #e5e5e5;
+    font-size: 13px;
+    line-height: 1.4;
+    height: auto;
+    white-space: nowrap;
+}
+.nav-tab-wrapper.optistate-nav-tabs .nav-tab-active {
+    background: #f0f0f1 !important;
+    border-color: #0094FF !important;
+    border-bottom: none !important;
+    color: #0043AF !important;
+    font-weight: 600;
+}
+.nav-tab-wrapper.optistate-nav-tabs .nav-tab .dashicons {
+    margin-right: 6px;
+    margin-bottom: 0;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
 }

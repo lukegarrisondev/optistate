@@ -310,16 +310,25 @@ jQuery(document).ready(function($) {
       const verificationStatus = backup.verified ?
         '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' + esc_attr(__('File integrity', 'optistate')) + '</span>' :
         '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' + esc_html(__('File integrity', 'optistate')) + '</span>';
+      const backupType = backup.type || 'MANUAL';
+      let typeBadgeClass = 'optistate-type-manual';
+      let typeIcon = '👤';
+      if (backupType === 'SCHEDULED') {
+          typeBadgeClass = 'optistate-type-scheduled';
+          typeIcon = '⏰';
+      }
+      const typeBadge = `<span class="optistate-backup-type ${typeBadgeClass}" title="${backupType === 'MANUAL' ? 'Created manually by user' : 'Created automatically by the system'}">${typeIcon} ${backupType}</span>`;
       const row = document.createElement('tr');
       row.setAttribute('data-file', esc_attr(backup.filename));
-      if (backup.size_bytes) {
+      if(backup.size_bytes) {
         row.setAttribute('data-bytes', esc_attr(backup.size_bytes));
       }
       row.innerHTML = `
         <td>
           <strong>${esc_html(backup.filename)}</strong>
-          <div style="margin-top: 5px; font-size: 12px;">
+          <div style="margin-top: 5px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
             ${verificationStatus}
+            ${typeBadge}
           </div>
         </td>
         <td><span style="white-space: nowrap;">${esc_html(backup.date)}</span></td>
@@ -2790,9 +2799,9 @@ jQuery(document).ready(function($) {
                 </div>
                 <span class="optistate-feature-impact ${impactClass}">${impactLabel}</span>
             </div>
-            <div class="optistate-feature-description">
-                ${esc_html(featureDescription)}
-            </div>
+                 <div class="optistate-feature-description">
+                      ${esc_html(featureDescription).replace(/&lt;br&gt;/gi, '<br>')}
+                 </div>
             ${controlHTML}
         `;
       fragment.appendChild(div);

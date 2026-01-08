@@ -1429,10 +1429,10 @@ class OPTISTATE {
                                         } else {
                                         echo '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' . esc_html__("Integrity", "optistate") . "</span>";
                                         } 
-                                    $b_type = isset($backup['type']) ? $backup['type'] : 'MANUAL';
-                                    $b_class = ($b_type === 'SCHEDULED') ? 'optistate-type-scheduled' : 'optistate-type-manual';
-                                    $b_icon = ($b_type === 'SCHEDULED') ? '⏰' : '👤'; ?>
-                                <span class="optistate-backup-type" title="<?php echo esc_attr($b_type === 'MANUAL' ? 'Created manually by user' : 'Created automatically by the system'); ?>">
+                                    $b_type = isset($backup['type']) ? $backup['type'] : 'Manual';
+                                    $b_class = ($b_type === 'Scheduled') ? 'optistate-type-scheduled' : 'optistate-type-manual';
+                                    $b_icon = ($b_type === 'Scheduled') ? '⏰' : '👤'; ?>
+                                <span class="optistate-backup-type" title="<?php echo esc_attr($b_type === 'Manual' ? 'Created manually by user' : 'Created automatically by the system'); ?>">
                                 <?php echo $b_icon . ' ' . esc_html($b_type); ?></span>
                                 </div>
                                         </td>
@@ -1744,20 +1744,30 @@ class OPTISTATE {
     <div style="display: flex; gap: 20px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 300px;">
             <label for="optistate-sr-search" class="sr-search"><?php esc_html_e('Search For:', 'optistate'); ?></label>
-            <input type="text" id="optistate-sr-search" class="sr-search-2" placeholder="e.g. http://old-domain.com">
+            <input type="text" id="optistate-sr-search" class="sr-search-2" placeholder="e.g. http://old-domain.com" maxlength="600">
         </div>
         <div style="flex: 1; min-width: 300px;">
             <label for="optistate-sr-replace" class="sr-search"><?php esc_html_e('Replace With:', 'optistate'); ?></label>
-            <input type="text" id="optistate-sr-replace" class="sr-search-2" placeholder="e.g. https://new-domain.com">
+            <input type="text" id="optistate-sr-replace" class="sr-search-2" placeholder="e.g. https://new-domain.com" maxlength="600">
         </div>
     </div>
     <div style="margin-top: 10px;">
         <label style="cursor: pointer;">
             <input type="checkbox" id="optistate-sr-case-sensitive" style="margin-right: 4px;">
-            <span style="font-weight: 600;"><?php esc_html_e('🔠 Case Sensitive', 'optistate'); ?></span>
+            <span style="font-weight: 600;"><?php esc_html_e('🔎 Case Sensitive', 'optistate'); ?></span>
         </label>
         <p class="description" style="margin-top: 5px; margin-left: 24px;">
             <?php esc_html_e('If checked, "Apple" will not match "apple". Recommended for specific code replacements.', 'optistate'); ?>
+        </p>
+    </div>
+    <div style="margin-top: 10px;">
+        <label style="cursor: pointer;">
+            <input type="checkbox" id="optistate-sr-partial-match" style="margin-right: 4px;">
+            <span style="font-weight: 600;"><?php esc_html_e('🧩 Partial Match', 'optistate'); ?></span>
+        </label>
+        <p class="description" style="margin-top: 5px; margin-left: 24px;">
+            <?php esc_html_e('If checked, searches for partial text anywhere in strings (e.g., "http://" in URLs). If unchecked, only matches complete words with boundaries.', 'optistate'); ?><br>
+            <?php esc_html_e('ⓘ Usage example: "http://" ⮕ "https://".', 'optistate'); ?>
         </p>
     </div>
     <div style="margin-top: 15px;">
@@ -1765,12 +1775,12 @@ class OPTISTATE {
         <select id="optistate-sr-tables" multiple class="sr-tables-list">
             <option value="all" selected><?php esc_html_e('-- All Tables --', 'optistate'); ?></option>
             <?php
-            global $wpdb;
-            $tables = $wpdb->get_col("SHOW TABLES");
-            foreach ($tables as $table) {
-                echo '<option value="' . esc_attr($table) . '">' . esc_html($table) . '</option>';
-            }
-            ?>
+        global $wpdb;
+        $tables = $wpdb->get_col("SHOW TABLES");
+        foreach ($tables as $table) {
+            echo '<option value="' . esc_attr($table) . '">' . esc_html($table) . '</option>';
+        }
+?>
         </select>
         <p class="description"><?php esc_html_e('Hold Ctrl/Cmd to select multiple specific tables. Leave as "All Tables" for a full site update.', 'optistate'); ?></p>
     </div>
@@ -4247,12 +4257,20 @@ class OPTISTATE {
         }
         return $validated;
     }
-    private function matches_with_word_boundary($text, $search, $case_sensitive = false) {
-        $pattern = '/(?:^|[^\p{L}\p{N}_])' . preg_quote($search, '/') . '(?:[^\p{L}\p{N}_]|$)/u';
-        if ($case_sensitive) {
-            return preg_match($pattern, $text) === 1;
+    private function matches_with_word_boundary($text, $search, $case_sensitive = false, $partial_match = false) {
+        if ($partial_match) {
+            if ($case_sensitive) {
+                return mb_strpos($text, $search) !== false;
+            } else {
+                return mb_stripos($text, $search) !== false;
+            }
         } else {
-            return preg_match($pattern . 'i', $text) === 1;
+            $pattern = '/(?:^|[^\p{L}\p{N}_])' . preg_quote($search, '/') . '(?:[^\p{L}\p{N}_]|$)/u';
+            if ($case_sensitive) {
+                return preg_match($pattern, $text) === 1;
+            } else {
+                return preg_match($pattern . 'i', $text) === 1;
+            }
         }
     }
     private function _get_sr_snippet($text, $search, $length = 100) {
@@ -4272,12 +4290,21 @@ class OPTISTATE {
         return $snippet;
     }
     public function ajax_search_replace_dry_run() {
-        check_ajax_referer(OPTISTATE::NONCE_ACTION, 'nonce');
+        check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $this->check_user_access();
+        $reset = isset($_POST['reset']) && $_POST['reset'] === 'true';
+        if ($reset && !$this->check_rate_limit("search_replace_dry_run", 5)) {
+            wp_send_json_error(['message' => __('🕐 Please wait a few seconds before searching again.', 'optistate') ], 429);
+            return;
+        }
         $search = isset($_POST['search']) ? stripslashes($_POST['search']) : '';
         $tables_input = isset($_POST['tables']) ? (array)$_POST['tables'] : ['all'];
-        $reset = isset($_POST['reset']) && $_POST['reset'] === 'true';
         $case_sensitive = isset($_POST['case_sensitive']) && $_POST['case_sensitive'] == '1';
+        $partial_match = isset($_POST['partial_match']) && $_POST['partial_match'] == '1';
+        if (strlen($search) > 600) {
+            wp_send_json_error(['message' => __('Search term is too long. Maximum length is 600 characters.', 'optistate') ]);
+            return;
+        }
         if (empty($search)) {
             wp_send_json_error(['message' => __('Please enter a search term.', 'optistate') ]);
         }
@@ -4286,7 +4313,13 @@ class OPTISTATE {
         $state = get_transient($transient_key);
         if ($reset || !$state) {
             global $wpdb;
-            $tables = ('all' === $tables_input[0]) ? $wpdb->get_col("SHOW TABLES") : array_map('sanitize_text_field', $tables_input);
+            $valid_db_tables = $wpdb->get_col("SHOW TABLES");
+            $tables = [];
+            if (!empty($tables_input) && $tables_input[0] === 'all') {
+                $tables = $valid_db_tables;
+            } else {
+                $tables = array_intersect(array_map('sanitize_text_field', $tables_input), $valid_db_tables);
+            }
             $protected = [$this->process_store->get_table_name(), $wpdb->prefix . 'optistate_backup_metadata'];
             $tables = array_diff($tables, $protected);
             $state = ['tables' => array_values($tables), 'current_idx' => 0, 'total_matches' => 0, 'tables_affected' => 0, 'preview' => [], 'status' => 'running'];
@@ -4302,14 +4335,17 @@ class OPTISTATE {
                 return;
             }
             $table = $state['tables'][$state['current_idx']];
+            if (!$this->validate_table_name($table)) {
+                $state['current_idx']++;
+                continue;
+            }
             $found_in_table = 0;
             $columns = $wpdb->get_results("SHOW COLUMNS FROM `$table`", ARRAY_A);
             $text_columns = [];
             $primary_key = '';
             foreach ($columns as $col) {
-                if ($col['Key'] === 'PRI') $primary_key = $col['Field'];
-                if (preg_match('/binary|blob/i', $col['Type']) && !preg_match('/text/i', $col['Type'])) {
-                    continue;
+                if ($col['Key'] === 'PRI') {
+                    $primary_key = $col['Field'];
                 }
                 if (preg_match('/char|text/i', $col['Type'])) {
                     $text_columns[] = $col['Field'];
@@ -4332,21 +4368,28 @@ class OPTISTATE {
                         $rows = $wpdb->get_results($preview_sql, ARRAY_A);
                         $actual_matches = 0;
                         foreach ($rows as $row) {
-                            if (count($state['preview']) >= 500) break;
                             $original = $row[$col];
-                            if (!$this->matches_with_word_boundary($original, $search, $case_sensitive)) {
+                            if (!$this->matches_with_word_boundary($original, $search, $case_sensitive, $partial_match)) {
                                 continue;
                             }
                             $actual_matches++;
-                            if (is_serialized($original)) {
-                                $preview_text = __('(Serialized Data)', 'optistate');
-                            } else {
-                                $snippet = $this->_get_sr_snippet($original, $search, 140);
-                                $preview_text = esc_html($snippet);
-                                $modifier = $case_sensitive ? '' : 'i';
-                                $preview_text = preg_replace('/' . preg_quote(esc_html($search), '/') . '/' . $modifier . 'u', '<strong style="background:#ffeb3b;">$0</strong>', $preview_text);
+                            if (count($state['preview']) < 500) {
+                                if (is_serialized($original)) {
+                                    $preview_text = __('(Serialized Data)', 'optistate');
+                                } else {
+                                    $snippet = $this->_get_sr_snippet($original, $search, 140);
+                                    $preview_text = esc_html($snippet);
+                                    $modifier = $case_sensitive ? '' : 'i';
+                                    if ($partial_match) {
+                                        $highlight_pattern = '/' . preg_quote(esc_html($search), '/') . '/' . $modifier . 'u';
+                                    } else {
+                                        $escaped_search = preg_quote(esc_html($search), '/');
+                                        $highlight_pattern = '/(?:^|(?<=[^\p{L}\p{N}_]))(' . $escaped_search . ')(?=[^\p{L}\p{N}_]|$)/' . $modifier . 'u';
+                                    }
+                                    $preview_text = preg_replace($highlight_pattern, '<strong style="background:#ffeb3b;">$0</strong>', $preview_text);
+                                }
+                                $state['preview'][] = ['table' => $table, 'column' => $col, 'id' => $row[$primary_key]??'N/A', 'content' => $preview_text];
                             }
-                            $state['preview'][] = ['table' => $table, 'column' => $col, 'id' => $row[$primary_key]??'N/A', 'content' => $preview_text];
                         }
                         if ($actual_matches > 0) {
                             $found_in_table+= $actual_matches;
@@ -4363,7 +4406,7 @@ class OPTISTATE {
         delete_transient($transient_key);
         wp_send_json_success(['status' => 'done', 'data' => ['total_matches' => $state['total_matches'], 'tables_affected' => $state['tables_affected'], 'preview' => $state['preview']]]);
     }
-}   
+}
 class OPTISTATE_DB_Wrapper {
     private static $instance = null;
     private $connection = null;
@@ -4839,10 +4882,11 @@ class OPTISTATE_Backup_Manager {
         if ($current_db_size <= 0) {
             $current_db_size = $this->main_plugin->get_total_database_size(false);
         }
-        if ($current_db_size <= 0) {
-            $current_db_size = 50 * 1024 * 1024;
-        }
-        $required_space = $current_db_size * 2.5;
+        $backup_file_size = $this->wp_filesystem->size($backup_filepath);
+        $is_compressed = preg_match('/\.gz$/i', $backup_filepath);
+        $estimated_backup_size = $is_compressed ? ($backup_file_size * 5) : ($backup_file_size * 1.1);
+        $base_size = max($current_db_size, $estimated_backup_size);
+        $required_space = $base_size * 2.5;
         $safety_buffer = 100 * 1024 * 1024;
         if ($free_space < ($required_space + $safety_buffer)) {
             $message = sprintf(esc_html__('Insufficient Disk Space. Restore Aborted!', 'optistate') . '<br>' . esc_html__('Available: %s', 'optistate') . '<br>' . esc_html__('Required (Est): %s', 'optistate'), size_format($free_space, 2), size_format($required_space + $safety_buffer, 2));

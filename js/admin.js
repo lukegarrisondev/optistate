@@ -310,14 +310,14 @@ jQuery(document).ready(function($) {
       const verificationStatus = backup.verified ?
         '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' + esc_attr(__('File integrity', 'optistate')) + '</span>' :
         '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' + esc_html(__('File integrity', 'optistate')) + '</span>';
-      const backupType = backup.type || 'MANUAL';
+      const backupType = backup.type || 'Manual';
       let typeBadgeClass = 'optistate-type-manual';
       let typeIcon = '👤';
-      if (backupType === 'SCHEDULED') {
+      if (backupType === 'Scheduled') {
           typeBadgeClass = 'optistate-type-scheduled';
           typeIcon = '⏰';
       }
-      const typeBadge = `<span class="optistate-backup-type ${typeBadgeClass}" title="${backupType === 'MANUAL' ? 'Created manually by user' : 'Created automatically by the system'}">${typeIcon} ${backupType}</span>`;
+      const typeBadge = `<span class="optistate-backup-type ${typeBadgeClass}" title="${backupType === 'Manual' ? 'Created manually by user' : 'Created automatically by the system'}">${typeIcon} ${backupType}</span>`;
       const row = document.createElement('tr');
       row.setAttribute('data-file', esc_attr(backup.filename));
       if(backup.size_bytes) {
@@ -2702,7 +2702,6 @@ jQuery(document).ready(function($) {
         </div>
     </div>`;
       } else if(feature.type === 'custom_db_caching' && key === 'db_query_caching') {
-        // Free version: Always disabled, no settings panel
         const checked = '';
         const status = __('✗ Inactive', 'optistate');
         const isDisabled = 'disabled';
@@ -3237,115 +3236,102 @@ jQuery(document).ready(function($) {
   checkRestoreStatusOnLoad();
   checkBackupStatusOnLoad();
   
-    function processSearchReplaceChunk(action, params, $btn, $loading, $results, $statusText) {
+  function processSearchReplaceChunk(action, params, $btn, $loading, $results, $statusText) {
     $.ajax({
-        url: optistate_Ajax.ajaxurl,
-        type: 'POST',
-        data: Object.assign({
-            action: action,
-            nonce: optistate_Ajax.nonce
-        }, params),
-        success: function(response) {
-            if (response.success) {
-                if (response.data.status === 'running') {
-                    if ($statusText.length && response.data.message) {
-                        $statusText.text(response.data.message);
-                    }
-                    params.reset = false;
-                    processSearchReplaceChunk(action, params, $btn, $loading, $results, $statusText);
-                } 
-                else if (action === 'optistate_search_replace_dry_run') {
-                    const data = response.data.data || response.data;
-                    renderDryRunResults(data, $results);
-                    $loading.hide();
-                    $btn.prop('disabled', false);
-                    if ($('#optistate-sr-replace').val()) {
-                        $('#optistate-sr-execute').prop('disabled', true);
-                    }
-                } 
-                else if (action === 'optistate_search_replace_execute') {
-                    const msg = response.data.message;
-                    showToast(msg, 'success');
-                    $results.html('<div class="optistate-success">✅ ' + msg + '</div>');
-                    if(typeof loadCacheStats === 'function') loadCacheStats();
-                    
-                    $loading.hide();
-                    $btn.prop('disabled', false);
-                    $('#optistate-sr-dry-run').prop('disabled', false);
-                }
-            } else {
-                showToast(response.data.message || 'Operation failed.', 'error');
-                $loading.hide();
-                $btn.prop('disabled', false);
-                if (action === 'optistate_search_replace_execute') {
-                    $('#optistate-sr-dry-run').prop('disabled', false);
-                }
+      url: optistate_Ajax.ajaxurl,
+      type: 'POST',
+      data: Object.assign({
+        action: action,
+        nonce: optistate_Ajax.nonce
+      }, params),
+      success: function(response) {
+        if(response.success) {
+          if(response.data.status === 'running') {
+            if($statusText.length && response.data.message) {
+              $statusText.text(response.data.message);
             }
-        },
-        error: function(xhr) {
-            showToast('Network error during operation.', 'error');
+            params.reset = false;
+            processSearchReplaceChunk(action, params, $btn, $loading, $results, $statusText);
+          } else if(action === 'optistate_search_replace_dry_run') {
+            const data = response.data.data || response.data;
+            renderDryRunResults(data, $results);
             $loading.hide();
             $btn.prop('disabled', false);
-            if (action === 'optistate_search_replace_execute') {
-                $('#optistate-sr-dry-run').prop('disabled', false);
-            }
+          }
+        } else {
+          showToast(response.data.message || 'Operation failed.', 'error');
+          $loading.hide();
+          $btn.prop('disabled', false);
         }
+      },
+      error: function(xhr) {
+        if(xhr.status === 429) {
+           showToast(wp.i18n.__('🕔 Please wait a few seconds before trying again.', 'optistate'), 'warning');
+        } else {
+           const errorMsg = (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) ?
+             xhr.responseJSON.data.message : 'Network error during operation.';
+           showToast(errorMsg, 'error');
+        }
+        $loading.hide();
+        $btn.prop('disabled', false);
+      }
     });
   }
-
-  function renderDryRunResults(data, $results) {
-    let html = '';
-    if (data.total_matches === 0) {
-        html = '<div class="notice notice-info inline"><p>' + __('No matches found for this search term.', 'optistate') + '</p></div>';
-    } else {
-        html += '<div class="optistate-success" style="margin-bottom: 15px;">';
-        html += '<strong>' + sprintf(__('Found %d matches across %d tables.', 'optistate'), data.total_matches, data.tables_affected) + '</strong>';
-        html += '</div>';
-        html += '<div style="max-height: 360px; overflow-y: auto; border: 1px solid #ddd;">';
-        html += '<table class="widefat striped" style="border: 0;"><thead><tr><th>Table</th><th>Column</th><th>ID</th><th>Content Preview</th></tr></thead><tbody>';
-        if (data.preview && data.preview.length > 0) {
-            data.preview.forEach(function(item) {
-                html += `<tr>
-                    <td>${esc_html(item.table)}</td>
-                    <td>${esc_html(item.column)}</td>
-                    <td>${esc_html(item.id)}</td>
-                    <td style="font-family: monospace; font-size: 12px;">${item.content}</td> 
-                </tr>`; 
-            });
-        }
-        if (data.total_matches > data.preview.length) {
-            html += '<tr><td colspan="4" style="text-align: center; color: #666;"><em>' + sprintf(__('%d more matches...', 'optistate'), data.total_matches - data.preview.length) + '</em></td></tr>';
-        }
-        html += '</tbody></table></div>';
-    }
-    $results.html(html).slideDown(300);
-  }
-
   $('#optistate-sr-dry-run').on('click', function() {
     const search = $('#optistate-sr-search').val();
     const tables = $('#optistate-sr-tables').val();
-    const caseSensitive = $('#optistate-sr-case-sensitive').is(':checked'); 
+    const caseSensitive = $('#optistate-sr-case-sensitive').is(':checked');
+    const partialMatch = $('#optistate-sr-partial-match').is(':checked');
     const $btn = $(this);
     const $loading = $('#optistate-sr-loading');
     const $results = $('#optistate-sr-results');
     const $execBtn = $('#optistate-sr-execute');
-    if (!search) {
-        showToast(__('Please enter a search term.', 'optistate'), 'error');
-        return;
+    $execBtn.prop('disabled', true);
+    if(!search) {
+      showToast(__('Please enter a search term.', 'optistate'), 'error');
+      return;
     }
     $btn.prop('disabled', true);
-    $execBtn.prop('disabled', true);
     $loading.show();
     const $statusText = $loading.find('.sr-status-text');
     $statusText.text(wp.i18n.__('Initializing scan...', 'optistate'));
     $results.slideUp(200).empty();
     processSearchReplaceChunk('optistate_search_replace_dry_run', {
-        search: search,
-        tables: tables,
-        case_sensitive: caseSensitive ? 1 : 0,
-        reset: true
+      search: search,
+      tables: tables,
+      case_sensitive: caseSensitive ? 1 : 0,
+      partial_match: partialMatch ? 1 : 0,
+      reset: true
     }, $btn, $loading, $results, $statusText);
   });
+
+  function renderDryRunResults(data, $results) {
+    let html = '';
+    if(data.total_matches === 0) {
+      html = '<div class="notice notice-info inline"><p>' + __('No matches found for this search term.', 'optistate') + '</p></div>';
+    } else {
+      html += '<div class="optistate-success" style="margin-bottom: 15px;">';
+      html += '<strong>' + sprintf(__('Found %d matches across %d tables.', 'optistate'), data.total_matches, data.tables_affected) + '</strong>';
+      html += '</div>';
+      html += '<div style="max-height: 360px; overflow-y: auto; border: 1px solid #ddd;">';
+      html += '<table class="widefat striped" style="border: 0;"><thead><tr><th>Table</th><th>Column</th><th>ID</th><th>Content Preview</th></tr></thead><tbody>';
+      if(data.preview && data.preview.length > 0) {
+        data.preview.forEach(function(item) {
+          html += `<tr>
+                    <td>${esc_html(item.table)}</td>
+                    <td>${esc_html(item.column)}</td>
+                    <td>${esc_html(item.id)}</td>
+                    <td style="font-family: monospace; font-size: 12px;">${item.content}</td> 
+                </tr>`;
+        });
+      }
+      if(data.total_matches > data.preview.length) {
+        html += '<tr><td colspan="4" style="text-align: center; color: #666;"><em>' + sprintf(__('%d more matches...', 'optistate'), data.total_matches - data.preview.length) + '</em></td></tr>';
+      }
+      html += '</tbody></table></div>';
+    }
+    $results.html(html).slideDown(300);
+  }
 
   let activeTab = localStorage.getItem('optistate_active_tab') || '#tab-backups';
   $('.optistate-tab-content').hide();

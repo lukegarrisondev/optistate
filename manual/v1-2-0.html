@@ -554,18 +554,219 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
     <li style="margin-bottom: 8px;"><strong>📦 Serialized Data Support:</strong> Unlike standard SQL queries, this tool safely handles WordPress "serialized data" (PHP arrays stored as text strings). It deserializes the data, performs the replacement, and reserializes it, ensuring your widgets and plugin settings don't break.</li>
     <li style="margin-bottom: 8px;"><strong>👁️ Dry Run (Preview):</strong> Scan your database without changing anything. See exactly how many matches are found and preview the changes in context.</li>
     <li style="margin-bottom: 8px;"><strong>🎯 Target Specific Tables:</strong> Choose to run on "All Tables" or select specific ones (e.g., just <code>wp_posts</code>) to limit the scope.</li>
-<li style="margin-bottom: 8px;"><strong>⚡ Binary Matching:</strong> When Case Sensitivity is enabled, the tool uses SQL <code>BINARY</code> operators to ensure maximum performance and 100% accuracy in matching exact character casings.
-</li>
+    <li style="margin-bottom: 8px;"><strong>🔎 Case Sensitivity:</strong> When enabled, the tool uses SQL <code>BINARY</code> operators to ensure maximum performance and 100% accuracy in matching exact character casings (e.g., "Apple" vs "apple").</li>
+    <li style="margin-bottom: 8px;"><strong>🔗 Partial Match:</strong> Choose between two matching modes:
+        <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+            <li><strong>Word Boundary (Default):</strong> Matches complete words only. Searching for "test" will find "This is a test" but NOT "testing" or "latest".</li>
+            <li><strong>Partial Match:</strong> Matches text anywhere within strings. Perfect for URL updates like <code>http://</code> → <code>https://</code>, domain changes, or path updates.</li>
+        </ul>
+    </li>
 </ul>
 <p style="margin-bottom: 15px;"><strong>🛠️ How to Use:</strong></p>
 <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
     <li style="margin-bottom: 8px;"><strong>Input Terms:</strong> Enter the text you want to find (e.g., <code>http://old-site.com</code>) and the text to replace it with (e.g., <code>https://new-site.com</code>).</li>
-    <li style="margin-bottom: 8px;"><strong>🔡 Case Sensitivity:</strong> By default, searches are "Case Insensitive" (searching for <em>'WordPress'</em> will find <em>'wordpress'</em> as well). Check the <strong>"Case Sensitive"</strong> box if you need an exact match (e.g., replacing a specific variable name or brand capitalization).
-</li>
-<li style="margin-bottom: 8px;"><strong>Select Tables:</strong> Leave as "All Tables" for a full site update, or use Ctrl/Cmd+Click to select specific tables.</li>
+    <li style="margin-bottom: 8px;"><strong>🔡 Case Sensitivity:</strong> By default, searches are "Case Insensitive" (searching for <em>'WordPress'</em> will find <em>'wordpress'</em> as well). Check the <strong>"Case Sensitive"</strong> box if you need an exact match (e.g., replacing a specific variable name or brand capitalization).</li>
+    <li style="margin-bottom: 8px;"><strong>🔗 Partial Match:</strong> 
+        <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+            <li><strong>Unchecked:</strong> Matches complete words with boundaries. Use this for most text replacements.</li>
+            <li><strong>Checked:</strong> Matches text anywhere in strings. <strong>Essential for URL updates, domain changes, and partial text replacements.</strong></li>
+        </ul>
+    </li>
+    <li style="margin-bottom: 8px;"><strong>Select Tables:</strong> Leave as "All Tables" for a full site update, or use Ctrl/Cmd+Click to select specific tables.</li>
     <li style="margin-bottom: 8px;"><strong>🔎 Step 1: Perform Dry Run:</strong> Click this button first. The plugin will scan your database and show you a table of results, including the Column, ID, and a highlighted preview of the found text.</li>
     <li style="margin-bottom: 8px;"><strong>↳↰ Step 2: Execute Replacement:</strong> Once you have verified the Dry Run results, click this button to perform the actual replacement.</li>
 </ol>
+
+<h4 class="h4title">📋 Common Use Cases & Examples</h4>
+
+<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 24px;">🔒</span>
+        <strong style="font-size: 1.1em; color: #1e293b;">Example 1: HTTP to HTTPS Migration</strong>
+    </div>
+    <p style="margin-bottom: 10px; color: #475569;"><strong>Goal:</strong> Update all URLs from <code>http://</code> to <code>https://</code></p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border: 1px solid #e2e8f0;">
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search For:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>http://yourdomain.com</code></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Replace With:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>https://yourdomain.com</code></td>
+        </tr>
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Case Sensitive:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">❌ Unchecked</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Partial Match:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">✅ <strong>Checked</strong> (Required for URL updates)</td>
+        </tr>
+    </table>
+    <p style="margin-top: 12px; padding: 10px; background: #fef3c7; border-left: 3px solid #f59e0b; color: #78350f; font-size: 0.95em;">
+        ⚠️ <strong>Important:</strong> Partial Match Mode is essential here. Without it, the tool would only match "http://yourdomain.com" as a standalone word, missing occurrences like "Visit http://yourdomain.com/page" or links embedded in content.
+    </p>
+</div>
+
+<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 24px;">🌐</span>
+        <strong style="font-size: 1.1em; color: #1e293b;">Example 2: Domain Name Change</strong>
+    </div>
+    <p style="margin-bottom: 10px; color: #475569;"><strong>Goal:</strong> Change all references from old domain to new domain</p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border: 1px solid #e2e8f0;">
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search For:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>oldsite.com</code></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Replace With:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>newsite.com</code></td>
+        </tr>
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Case Sensitive:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">❌ Unchecked</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Partial Match:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">✅ <strong>Checked</strong></td>
+        </tr>
+    </table>
+</div>
+
+<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 24px;">📝</span>
+        <strong style="font-size: 1.1em; color: #1e293b;">Example 3: Word-Only Replacement</strong>
+    </div>
+    <p style="margin-bottom: 10px; color: #475569;"><strong>Goal:</strong> Replace a specific word across all posts without affecting similar words</p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border: 1px solid #e2e8f0;">
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search For:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>test</code></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Replace With:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>exam</code></td>
+        </tr>
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Case Sensitive:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">❌ Unchecked</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Partial Match:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">❌ Unchecked</td>
+        </tr>
+    </table>
+    <p style="margin-top: 12px; padding: 10px; background: #dbeafe; border-left: 3px solid #2563eb; color: #1e3a8a; font-size: 0.95em;">
+        ℹ️ <strong>Result:</strong> With Partial Match unchecked, "This is a test." will become "This is an exam." but "testing" and "latest" will remain unchanged.
+    </p>
+</div>
+
+<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 24px;">🔤</span>
+        <strong style="font-size: 1.1em; color: #1e293b;">Example 4: Case-Sensitive Brand Name</strong>
+    </div>
+    <p style="margin-bottom: 10px; color: #475569;"><strong>Goal:</strong> Fix incorrect capitalization of a brand name</p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border: 1px solid #e2e8f0;">
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search For:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>iPhone</code></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Replace With:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;"><code>iPhone Pro</code></td>
+        </tr>
+        <tr style="background: #f1f5f9;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Case Sensitive:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">✅ <strong>Checked</strong></td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Partial Match:</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">❌ Unchecked</td>
+        </tr>
+    </table>
+    <p style="margin-top: 12px; padding: 10px; background: #dbeafe; border-left: 3px solid #2563eb; color: #1e3a8a; font-size: 0.95em;">
+        ℹ️ <strong>Result:</strong> Only "iPhone" (exact case) will be replaced. "iphone" or "IPHONE" will be ignored.
+    </p>
+</div>
+
+<h4 class="h4title">🎯 Understanding Match Modes</h4>
+
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border: 1px solid #e2e8f0;">
+    <thead>
+        <tr style="background: #1e40af; color: white;">
+            <th style="padding: 12px; border: 1px solid #1e40af; text-align: left;">Scenario</th>
+            <th style="padding: 12px; border: 1px solid #1e40af; text-align: left;">Partial Match OFF</th>
+            <th style="padding: 12px; border: 1px solid #1e40af; text-align: left;">Partial Match ON</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search: "test"</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">
+                ✅ "This is a test."<br>
+                ❌ "testing"<br>
+                ❌ "latest"
+            </td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">
+                ✅ "This is a test."<br>
+                ✅ "testing"<br>
+                ✅ "latest"
+            </td>
+        </tr>
+        <tr style="background: #f9fafb;">
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search: "http://"</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">
+                ❌ "http://example.com"<br>
+                <span style="color: #dc2626; font-size: 0.9em;">(No matches - needs word boundaries)</span>
+            </td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">
+                ✅ "http://example.com"<br>
+                ✅ "Visit http://site.com"<br>
+                ✅ All URL occurrences
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600;">Search: "Apple"<br>(Case Sensitive ON)</td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">
+                ✅ "I like Apple."<br>
+                ❌ "apple" (wrong case)<br>
+                ❌ "Appleton" (not a word)
+            </td>
+            <td style="padding: 10px; border: 1px solid #e2e8f0;">
+                ✅ "I like Apple."<br>
+                ❌ "apple" (wrong case)<br>
+                ✅ "Appleton" (partial match)
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 class="h4title">⚙️ Best Practices</h4>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 10px;"><strong>💾 Always backup first:</strong> Create a fresh database backup immediately before running any search and replace operation.</li>
+    <li style="margin-bottom: 10px;"><strong>🔎 Run dry run first:</strong> Always preview results with a dry run before executing the replacement.</li>
+    <li style="margin-bottom: 10px;"><strong>🎯 Start specific:</strong> For domain changes, include the full URL (e.g., <code>http://oldsite.com</code>) rather than just <code>oldsite</code> to avoid unintended matches.</li>
+    <li style="margin-bottom: 10px;"><strong>🔗 Use Partial Match for URLs:</strong> Any URL-related updates require Partial Match mode to be checked.</li>
+    <li style="margin-bottom: 10px;"><strong>📝 Use Word Boundary for text:</strong> When replacing actual words in content, leave Partial Match unchecked to avoid replacing parts of other words.</li>
+    <li style="margin-bottom: 10px;"><strong>🧪 Test on staging first:</strong> If possible, test your search and replace on a staging/development site before running it on production.</li>
+</ul>
+
+<div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span style="font-size: 20px;">⚠️</span>
+        <strong style="color: #991b1b;">Common Mistakes to Avoid</strong>
+    </div>
+    <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 0; color: #7f1d1d;">
+        <li style="margin-bottom: 8px;"><strong>Forgetting Partial Match for URLs:</strong> If updating URLs without enabling Partial Match, you'll get zero results.</li>
+        <li style="margin-bottom: 8px;"><strong>Using Partial Match unnecessarily:</strong> Searching for "test" with Partial Match ON will also modify "testing", "latest", "contestant", etc.</li>
+        <li style="margin-bottom: 8px;"><strong>Not testing first:</strong> Skipping the dry run can lead to unintended replacements that break your site.</li>
+        <li style="margin-bottom: 0;"><strong>No backup:</strong> Without a backup, you cannot undo destructive changes.</li>
+    </ul>
+</div>
 <h2 id="ch-6" class="h2title">⏰ 6. Automatic Backup &amp; Cleanup (Section 7)</h2>
 <p style="margin-bottom: 15px;">This section provides a "set it and forget it" scheduler for all the tools you just learned about.</p>
 <h3 id="ch-6-1" class="h3title">⚙️ 6.1. Configuring the Scheduler</h3>

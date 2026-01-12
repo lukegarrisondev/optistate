@@ -325,24 +325,23 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 <p style="margin-bottom: 15px;">This is the plugin's most critical feature. It allows you to create, manage, download, and restore your database with a focus on security and integrity.</p>
 
 <h3 id="ch-4-1" class="h3title">📥 4.1. Creating a Database Backup</h3>
+<p style="margin-bottom: 15px;">The backup process in WP Optimal State PRO relies on a specialized "Chunked Processing Engine." This allows it to back up large databases without timing out or crashing your server.</p>
 <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
- 	<li style="margin-bottom: 8px;"><strong>📊 Maximum Backups to Keep:</strong> This setting (a number from 1 to 10) controls how many backups are stored on your server. When you create a new backup that exceeds this limit, the <em>oldest</em> backup will be automatically deleted.
+ 	<li style="margin-bottom: 8px;"><strong>📊 Maximum Backups to Keep:</strong> This setting (1-10) works as a rolling limit. When a new backup is created that exceeds this limit, the system automatically deletes the <em>oldest</em> file to save disk space.
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
  	<li style="margin-bottom: 5px;">
         <div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 15px; margin-top: 10px; border-radius: 4px;">
-            <strong>💡 Recommendation:</strong> Set this to <code style="font-weight: bold;">3</code>. This provides a good balance between having recent restore points and saving server disk space.
+            <strong>💡 Recommendation:</strong> Set this to <code style="font-weight: bold;">3</code>. This keeps recent restore points available while minimizing server storage usage.
         </div>
     </li>
 </ul>
 </li>
- 	<li style="margin-bottom: 8px;"><strong>🔄 Create Backup Now Button:</strong> Clicking this button will:
+ 	<li style="margin-bottom: 8px;"><strong>🔄 Create Backup Now Button:</strong> Clicking this starts a secure background process:
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
- 	<li style="margin-bottom: 5px;">Instantly begin backing up your <em>entire</em> WordPress database.</li>
- 	<li style="margin-bottom: 5px;">Package it into a compressed <code>.sql.gz</code> file.</li>
- 	<li style="margin-bottom: 5px;">Generate a <code>.checksum</code> file (a unique SHA-256 "fingerprint") to verify the file is not corrupted.</li>
- 	<li style="margin-bottom: 5px;">Generate a <code>.meta</code> file containing information about the backup (date, WP version, etc.).</li>
- 	<li style="margin-bottom: 5px;">Store all three files in your <code>wp-content/uploads/optistate/db-backups/</code> directory.</li>
- 	<li style="margin-bottom: 5px;">Refresh the "Manage Existing Backups" list.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🚀 Initialization:</strong> The plugin locks the backup directory and calculates the optimal "chunk size" based on your server's available resources.</li>
+ 	<li style="margin-bottom: 5px;"><strong>📦 Streamed Compression:</strong> Data is read from the database and streamed directly into a compressed <code>.sql.gz</code> file. This method is faster and uses less memory than traditional zip archiving.</li>
+ 	<li style="margin-bottom: 5px;"><strong>🔒 Metadata Locking:</strong> Instead of creating vulnerable sidecar files (like .meta or .txt), the plugin records the backup's precise <strong>file size</strong> and <strong>creation timestamp</strong> directly into a protected internal database table (<code>wp_optistate_backup_metadata</code>).</li>
+ 	<li style="margin-bottom: 5px;"><strong>✅ Integrity Verification:</strong> Finally, the system performs a "Gzip Consistency Check" to ensure the file is valid and readable, confirming that the physical file matches the locked metadata record.</li>
 </ul>
 </li>
 </ol>
@@ -478,7 +477,7 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
  	<li style="margin-bottom: 8px;"><strong>💾 Database Overhead:</strong> "Empty" space in your tables, similar to file fragmentation. This space can be reclaimed.</li>
  	<li style="margin-bottom: 8px;"><strong>📚 Total Indexes Size:</strong> The size of the database "phone book" used for fast lookups.</li>
  	<li style="margin-bottom: 8px;"><strong>📊 Number of Tables:</strong> The total count of tables in your database.</li>
-    <li style="margin-bottom: 8px;"><strong>⚡ Autoloaded Options:</strong> The number of settings set to load on <em>every single page</em>.</li>
+          <li style="margin-bottom: 8px;"><strong>⚡ Autoloaded Options:</strong> The number of settings set to load on <em>every single page</em>.</li>
  	<li style="margin-bottom: 8px;"><strong>💽 Autoload Data Size:</strong> The total size of all autoloaded settings. This is a <em>critical</em> performance metric. A high number (e.g., &gt; 1MB) can significantly slow down your site.</li>
     <li style="margin-bottom: 8px;"><strong>🗓️ Action Logs:</strong> Background task records (completed, failed, or canceled) created by plugins like WooCommerce to handle scheduled events.</li>
     <li style="margin-bottom: 8px;"><strong>🎥 Embed Cache:</strong> Cached data for external content (like YouTube videos or Tweets) embedded in your posts. Cleaning this forces WordPress to refresh the content.</li>
@@ -486,15 +485,53 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
     <li style="margin-bottom: 8px;"><strong>🏷️ Empty Taxonomies:</strong> Categories, tags, or custom terms that currently have zero posts assigned to them.</li>
 </ul>
 <h3 id="ch-5-3" class="h3title">🚀 5.3. One-Click Optimization (The "Easy Button")</h3>
-<p style="margin-bottom: 15px;">This is the simplest and safest way to clean your database. Clicking the <strong>"🚀 Optimize Now"</strong> button will:</p>
+<p style="margin-bottom: 15px;">The "One-Click Optimization" is the heart of the plugin's ease-of-use philosophy. It is designed to be a <strong>"safe-by-default"</strong> maintenance routine that you can run without fear of breaking your site or losing important data.</p>
 
+<h4 class="h4title">🛡️ What is "Safe Cleaning"?</h4>
+<p style="margin-bottom: 15px;">Unlike aggressive cleaners that might empty your trash bin or delete comments you haven't reviewed yet, this process selectively targets only <strong>useless data</strong> that has no effect on your live content.</p>
+
+<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+            <strong style="color: #15803d; font-size: 1.1em; display: block; margin-bottom: 10px;">✅ What It CLEANS (Safe Junk)</strong>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 6px;">🔹 <strong>Post Revisions:</strong> Excessive history of old edits.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Auto Drafts:</strong> Abandoned, unsaved posts generated by WP.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Trashed Comments:</strong> Comments explicitly moved to trash.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Expired Transients:</strong> Temporary cache data that is no longer valid.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Duplicate Post Meta:</strong> Redundant database entries for posts.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Duplicate Comment Meta:</strong> Redundant database entries for comments.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Orphaned Data:</strong> Metadata left behind after deleting posts, comments, users, or terms.</li>
+                <li style="margin-bottom: 6px;">🔹 <strong>Pingbacks & Trackbacks:</strong> Automated link notifications from other blogs.</li>
+            </ul>
+        </div>
+        <div style="flex: 1; min-width: 250px; border-left: 1px solid #e5e7eb; padding-left: 20px;">
+            <strong style="color: #b45309; font-size: 1.1em; display: block; margin-bottom: 10px;">🛡️ What It PROTECTS (Untouched)</strong>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 6px;">🔸 <strong>Trashed Posts/Pages:</strong> Items in your main Trash bin.</li>
+                <li style="margin-bottom: 6px;">🔸 <strong>Spam Comments:</strong> Comments marked as spam.</li>
+                <li style="margin-bottom: 6px;">🔸 <strong>Unapproved Comments:</strong> Comments awaiting moderation.</li>
+                <li style="margin-bottom: 6px;">🔸 <strong>Active Transients:</strong> Valid cache data currently in use.</li>
+            </ul>
+            <p style="font-size: 0.9em; color: #666; margin-top: 10px; font-style: italic;">To clean these "Protected" items, use the <strong>Detailed Database Cleanup</strong> (Section 5.5).</p>
+        </div>
+    </div>
+</div>
+
+<h4 class="h4title">🔄 The 2-Stage Process</h4>
+<p style="margin-bottom: 15px;">When you click <strong>"🚀 Optimize Now"</strong>, the plugin executes two distinct operations in sequence:</p>
 <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
- 	<li style="margin-bottom: 8px;">Ask for confirmation.</li>
- 	<li style="margin-bottom: 8px;">Run all <strong>safe</strong> cleanup tasks (it will <em>not</em> touch your trash bins or unapproved comments).</li>
- 	<li style="margin-bottom: 8px;">Perform "Optimize All Tables" (see section 5.5).</li>
- 	<li style="margin-bottom: 8px;">Show you a summary of what was cleaned.</li>
- 	<li style="margin-bottom: 8px;">Refresh your Health Score.</li>
+    <li style="margin-bottom: 10px;">
+        <strong>Stage 1: Garbage Collection</strong><br>
+        It runs the SQL delete commands for all the "Safe Junk" items listed above.
+    </li>
+    <li style="margin-bottom: 10px;">
+        <strong>Stage 2: Table Defragmentation</strong><br>
+        Immediately after cleaning, it runs <code>OPTIMIZE TABLE</code> on your database. This reclaims the empty space ("overhead") left behind by the deleted data, physically shrinking your database size and speeding up read/write operations.
+    </li>
 </ol>
+
+<p style="margin-bottom: 15px;"><strong>💡 Result:</strong> After completion, you will see a summary report of exactly how many items were removed and how much disk space was reclaimed.</p>
 <p style="margin-bottom: 15px;">This is the recommended action for most users after creating a backup.</p>
 <h3 id="ch-5-4" class="h3title">🎯 5.4. Targeted Optimizations (The "Middle Ground")</h3>
 <p style="margin-bottom: 15px;">Located directly under the Database Health Score, this section offers four specialized cleanup tools that target specific areas of database bloat often missed by general cleaners.</p>
@@ -1313,28 +1350,53 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 </li>
 </ul>
 <h3 id="ch-7-5" class="h3title">📊 7.5. Feature: Performance Metrics (PageSpeed)</h3>
-<p style="margin-bottom: 15px;">Located under the 'Statistics' tab in section 4.1, this module integrates the Google PageSpeed Insights API directly into your WordPress dashboard, allowing you to monitor real-world performance metrics without leaving the platform. It focuses on the <strong>Core Web Vitals</strong> that impact your search engine rankings and user experience.</p>
+<p style="margin-bottom: 15px;">Located under the 'Statistics' tab in section 4.1, this module integrates the Google PageSpeed Insights API directly into your WordPress dashboard. It allows you to monitor real-world performance metrics without leaving the platform, focusing on the <strong>Core Web Vitals</strong> that impact your search engine rankings and user experience.</p>
 
 <h4 class="h4title">🔑 API Configuration & Security</h4>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
-    <li style="margin-bottom: 8px;"><strong>API Key Requirement:</strong> To use this feature, you must enter a valid Google PageSpeed Insights API key. This key remains visible in the settings field for easy management and verification.</li>
+    <li style="margin-bottom: 8px;"><strong>API Key Requirement:</strong> To use this feature, you must enter a valid Google PageSpeed Insights API key. This key remains visible in the settings field for easy management and verification.<br><strong>👉 Please note:</strong> the default key is a generic one and isn't unique to your website. You should get your own key for better security and accuracy.</li>
     <li style="margin-bottom: 8px;"><strong>Persistence:</strong> Once saved, the key is stored securely in your <code>settings.json</code> file.</li>
 </ul>
 
-<h4 class="h4title">📈 Understanding the Metrics & Performance Indicators</h4>
-<p style="margin-bottom: 15px;">The results are color-coded based on Google's official performance thresholds. Each metric card features a left border indicator:</p>
+<h4 class="h4title">📈 Understanding the 6 Key Metrics</h4>
+<p style="margin-bottom: 15px;">The plugin retrieves six specific data points. The results are color-coded based on Google's official performance thresholds:</p>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
     <li style="margin-bottom: 8px;"><span style="color: #28a745; font-weight: bold;">● Green (Good):</span> The metric meets the recommended fast threshold.</li>
-    <li style="margin-bottom: 8px;"><span style="color: #ffa400; font-weight: bold;">● Orange (Needs Improvement):</span> Performance is acceptable but should be optimized.</li>
-    <li style="margin-bottom: 8px;"><span style="color: #dc3545; font-weight: bold;">● Red (Poor):</span> The metric is significantly below recommendations and likely hurting UX.</li>
+    <li style="margin-bottom: 8px;"><span style="color: #ffa400; font-weight: bold;">● Orange (Average):</span> Performance is acceptable but needs improvement.</li>
+    <li style="margin-bottom: 8px;"><span style="color: #dc3545; font-weight: bold;">● Red (Poor):</span> The metric is significantly below recommendations and hurting UX.</li>
 </ul>
 
-<p style="margin-bottom: 15px;"><strong>Logged Metrics include:</strong></p>
+<p style="margin-bottom: 15px;"><strong>Logged Metrics Glossary:</strong></p>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
-    <li style="margin-bottom: 5px;"><strong>FCP (First Contentful Paint):</strong> Time until the first text or image is painted.</li>
-    <li style="margin-bottom: 5px;"><strong>LCP (Largest Contentful Paint):</strong> Time until the largest content element is visible.</li>
-    <li style="margin-bottom: 5px;"><strong>CLS (Cumulative Layout Shift):</strong> Measures visual stability.</li>
-    <li style="margin-bottom: 5px;"><strong>TBT (Total Blocking Time):</strong> Measures responsiveness to user input.</li>
+    <li style="margin-bottom: 12px;"><strong>🎨 First Contentful Paint (FCP):</strong>
+        <br><span style="color: #555;">Time until the first text or image is painted.</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: It answers the user's question: "Is it loading?"</span>
+    </li>
+    
+    <li style="margin-bottom: 12px;"><strong>🖼️ Largest Contentful Paint (LCP):</strong>
+        <br><span style="color: #555;">Time until the largest element (hero image, heading, video) becomes visible.</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: This is the most important Core Web Vital for SEO. It tells the user the main content is ready.</span>
+    </li>
+    
+    <li style="margin-bottom: 12px;"><strong>📏 Cumulative Layout Shift (CLS):</strong>
+        <br><span style="color: #555;">Measures visual stability. Do elements jump around while loading?</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: Prevents users from accidentally clicking the wrong button due to a shifting layout.</span>
+    </li>
+
+    <li style="margin-bottom: 12px;"><strong>🚫 Total Blocking Time (TBT):</strong>
+        <br><span style="color: #555;">Measures time the main thread is blocked, preventing input responsiveness.</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: High TBT makes the site feel "frozen" or laggy when a user tries to scroll or click.</span>
+    </li>
+
+    <li style="margin-bottom: 12px;"><strong>⏱️ Speed Index (SI):</strong>
+        <br><span style="color: #555;">Measures how quickly the content is visually displayed during page load.</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: A lower score means the user perceives the page as loading faster.</span>
+    </li>
+
+    <li style="margin-bottom: 12px;"><strong>👆 Time to Interactive (TTI):</strong>
+        <br><span style="color: #555;">Measures how long it takes for the page to become fully interactive.</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: Ensures that when a user clicks a button, the site actually responds immediately.</span>
+    </li>
 </ul>
 
 <h4 class="h4title">💾 Smart Caching & Logging</h4>
@@ -1344,6 +1406,7 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 </ul>
 <h2 id="ch-8" class="h2title">🎯 8. Optimization Strategies: Putting It All Together</h2>
 <p style="margin-bottom: 15px;">Here are a few "recipes" for common scenarios.</p>
+
 <h3 id="ch-8-1" class="h3title">🚀 8.1. Strategy 1: The First-Time Setup (5-Minute Tune-Up)</h3>
 <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
  	<li style="margin-bottom: 8px;"><strong>💾 Backup:</strong> Go to <strong>Section 1</strong> -&gt; Click <strong>Create Backup Now</strong>.</li>
@@ -1392,7 +1455,7 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 
 <h3 id="ch-9-1" class="h3title">📤 9.1. Exporting Settings</h3>
 <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
-    <li style="margin-bottom: 8px;">Navigate to <strong>Section 9: Settings Export & Import</strong> in the plugin dashboard and expand it.</li>
+    <li style="margin-bottom: 8px;">Navigate to <strong>Section 9: Settings Export & Import</strong> in the plugin dashboard.</li>
     <li style="margin-bottom: 8px;">Click the <strong>"Export Settings"</strong> button.</li>
     <li style="margin-bottom: 8px;">Your browser will download a file named <code>optistate-settings-YYYY-MM-DD-His.json</code>.</li>
     <li style="margin-bottom: 8px;">Keep this file in a safe place.</li>
@@ -1428,7 +1491,7 @@ brotli_types text/plain text/html text/css text/xml text/javascript
     <p style="margin-bottom: 15px;"><strong>Configuration steps:</strong></p>
     <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
         <li style="margin-bottom: 8px;">Navigate to <strong>Section 9</strong> in the plugin dashboard.</li>
-        <li style="margin-bottom: 8px;">Expand <strong>"Settings Export/Import & User Access"</strong>.</li>
+	    <li style="margin-bottom: 8px;">Scroll to <strong>"User Access Control"</strong>.</li>
         <li style="margin-bottom: 8px;">Check the boxes next to administrators you want to allow access.</li>
         <li style="margin-bottom: 8px;">Make sure <strong>YOUR account is checked</strong> (it will be highlighted with a blue border).</li>
         <li style="margin-bottom: 8px;">Click <strong>"✓ Save User Access Settings"</strong>.</li>

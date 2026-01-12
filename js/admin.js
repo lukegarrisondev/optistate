@@ -62,6 +62,10 @@ jQuery(document).ready(function($) {
   }
 
   function pollAction(action, data, onResponse, interval) {
+    if (document.hidden) {
+      $(document).one('visibilitychange', () => pollAction(action, data, onResponse, interval));
+      return;
+    }
     $.ajax({
       url: optistate_BackupMgr.ajax_url,
       type: 'POST',
@@ -75,11 +79,22 @@ jQuery(document).ready(function($) {
           setTimeout(() => pollAction(action, data, onResponse, interval), interval);
         }
       },
-      error: function(xhr) {
+      error: function(xhr, status, error) {
+        let errorMessage = __('Connection error.', 'optistate');
+        if (status === 'timeout') {
+          errorMessage = __('The request timed out. The process may still be running on the server.', 'optistate');
+        } else if (xhr.status === 504) {
+          errorMessage = __('Gateway Timeout: The server took too long to respond. Check your database size.', 'optistate');
+        } else if (xhr.status === 500) {
+          errorMessage = __('Server Error (500): The backup process encountered a fatal error. Check PHP logs.', 'optistate');
+        } else {
+          errorMessage = xhr.responseJSON?.data?.message || error || __('An unexpected connection error occurred.', 'optistate');
+        }
         onResponse({
           success: false,
           data: {
-            message: xhr.responseJSON?.data?.message || __('Connection error.', 'optistate')
+            message: errorMessage,
+            status: xhr.status
           }
         });
       }
@@ -310,14 +325,14 @@ jQuery(document).ready(function($) {
       const verificationStatus = backup.verified ?
         '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' + esc_attr(__('File integrity', 'optistate')) + '</span>' :
         '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' + esc_html(__('File integrity', 'optistate')) + '</span>';
-      const backupType = backup.type || 'Manual';
+      const backupType = backup.type || 'MANUAL';
       let typeBadgeClass = 'optistate-type-manual';
       let typeIcon = '👤';
-      if (backupType === 'Scheduled') {
+      if (backupType === 'SCHEDULED') {
           typeBadgeClass = 'optistate-type-scheduled';
           typeIcon = '⏰';
       }
-      const typeBadge = `<span class="optistate-backup-type ${typeBadgeClass}" title="${backupType === 'Manual' ? 'Created manually by user' : 'Created automatically by the system'}">${typeIcon} ${backupType}</span>`;
+      const typeBadge = `<span class="optistate-backup-type ${typeBadgeClass}" title="${backupType === 'MANUAL' ? 'Created manually by user' : 'Created automatically by the system'}">${typeIcon} ${backupType}</span>`;
       const row = document.createElement('tr');
       row.setAttribute('data-file', esc_attr(backup.filename));
       if(backup.size_bytes) {
@@ -354,8 +369,7 @@ jQuery(document).ready(function($) {
     if($btn.prop('disabled')) return;
     showOPTISTATEModal(
       __('💾 Create Backup', 'optistate'),
-      __('Create a new database backup?', 'optistate') + '<br>' +
-      __('The backup will process in the background.', 'optistate'),
+      __('Create a new database backup?<br><br>The process will run in the background.<br>The backup file will be compressed with GZIP.', 'optistate'),
       function() {
         $btn.prop('disabled', true);
         $backupSpinner.show();
@@ -429,7 +443,7 @@ jQuery(document).ready(function($) {
     }
     const message = sprintf(
       __('Are you sure you want to delete this backup?', 'optistate') +
-      '<br>' + __('Backup: %s', 'optistate') +
+      '<br><br>' + __('%s', 'optistate') +
       '<br><br>' + __('This action cannot be undone.', 'optistate'),
       esc_html(filename)
     );
@@ -993,14 +1007,24 @@ jQuery(document).ready(function($) {
   }
 
   function handleAjaxError(xhr) {
-    if(xhr.status === 429) {
-      showToast(__('🕔 Please wait a few seconds before performing this action.', 'optistate'), 'warning');
-    } else {
-      const errorMsg = (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) ?
-        xhr.responseJSON.data.message : __('An error occurred. Please try again.', 'optistate');
+    let errorMsg;
+    if (xhr.status === 429) {
+      errorMsg = __('🕔 Rate limit exceeded. Please wait a few seconds before performing this action.', 'optistate');
+      showToast(errorMsg, 'warning');
+    } 
+    else if (xhr.status === 403) {
+      errorMsg = __('Security session expired. Please refresh the page.', 'optistate');
+      showToast(errorMsg, 'error');
+    }
+    else {
+      errorMsg = (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) ?
+        xhr.responseJSON.data.message : 
+        sprintf(__('An error occurred (Status: %d). Please try again.', 'optistate'), xhr.status);
+      
       showToast(errorMsg, 'error');
     }
     isProcessing = false;
+    $('.optistate-action-btn').prop('disabled', false);
   }
   let statsCache = null;
   let statsCacheTime = 0;
@@ -1366,7 +1390,7 @@ jQuery(document).ready(function($) {
     });
   }
 
-  function displayHealthScore(scoreData) {
+ function displayHealthScore(scoreData) {
     if(!scoreData || typeof scoreData.overall_score === 'undefined') {
       return;
     }
@@ -1378,19 +1402,19 @@ jQuery(document).ready(function($) {
     let color = '';
     if(overallScore >= 90) {
       $scoreValue.addClass('score-excellent');
-      color = '#28a745';
+      color = '#259B2D';
     } else if(overallScore >= 75) {
       $scoreValue.addClass('score-good');
-      color = '#20c997';
+      color = '#16AF7F';
     } else if(overallScore >= 60) {
       $scoreValue.addClass('score-fair');
-      color = '#FFAD07';
+      color = '#EA9A07';
     } else if(overallScore >= 40) {
       $scoreValue.addClass('score-poor');
-      color = '#fd7e14';
+      color = '#F76420';
     } else {
       $scoreValue.addClass('score-critical');
-      color = '#dc3545';
+      color = '#D33434';
     }
     $scoreCircle.css('border-color', color);
     if(scoreData.category_scores) {
@@ -1779,7 +1803,13 @@ jQuery(document).ready(function($) {
       return;
     }
     const itemName = labels[itemType] || itemType;
-    const displayItemName = esc_html(itemName);
+    let itemCount = 0;
+    if(statsCache && statsCache[itemType]) {
+      itemCount = parseInt(statsCache[itemType], 10) || 0;
+    }
+    const displayItemName = itemCount > 0 ?
+      esc_html(itemName) + ' <strong>(' + itemCount.toLocaleString() + ')</strong>' :
+      esc_html(itemName);
     const confirmMsg = '➜ ' + displayItemName + '<br><br>' + (isSafe ?
       __('Clean this item? This action cannot be undone.', 'optistate') :
       __('Make sure you no longer need these items.<br>Are you sure you want to continue?', 'optistate'));
@@ -1976,24 +2006,51 @@ jQuery(document).ready(function($) {
   });
   $oneClickOptimizeBtn.on('click', function() {
     if(isProcessing) return;
-    $('#optistate-one-click-count').fadeOut(200, function() { $(this).remove(); });
     const $btn = $(this);
-    const message = __('This will perform a full database optimization including:', 'optistate') +
-      '<br><br>' + __('• Clean post revisions', 'optistate') +
-      '<br>' + __('• Delete auto-drafts', 'optistate') +
-      '<br>' + __('• Delete trashed comments', 'optistate') +
-      '<br>' + __('• Delete expired transients', 'optistate') +
-      '<br>' + __('• Remove duplicate postmeta', 'optistate') +
-      '<br>' + __('• Remove duplicate commentmeta', 'optistate') +
-      '<br>' + __('• Remove orphaned data', 'optistate') +
-      '<br>' + __('• Clean pingbacks and trackbacks', 'optistate') +
-      '<br>' + __('• Optimize database tables', 'optistate') +
-      '<br><br>' + __('This operation is safe but cannot be undone.', 'optistate');
+    let message = __('This will perform a full database optimization including:', 'optistate') + '<br><br>';
+    if(statsCache) {
+      const postRevisions = parseInt(statsCache['post_revisions'], 10) || 0;
+      const autoDrafts = parseInt(statsCache['auto_drafts'], 10) || 0;
+      const trashedComments = parseInt(statsCache['trashed_comments'], 10) || 0;
+      const expiredTransients = parseInt(statsCache['expired_transients'], 10) || 0;
+      const duplicatePostmeta = parseInt(statsCache['duplicate_postmeta'], 10) || 0;
+      const duplicateCommentmeta = parseInt(statsCache['duplicate_commentmeta'], 10) || 0;
+      const orphanedPostmeta = parseInt(statsCache['orphaned_postmeta'], 10) || 0;
+      const orphanedCommentmeta = parseInt(statsCache['orphaned_commentmeta'], 10) || 0;
+      const orphanedRelationships = parseInt(statsCache['orphaned_relationships'], 10) || 0;
+      const orphanedUsermeta = parseInt(statsCache['orphaned_usermeta'], 10) || 0;
+      const pingbacks = parseInt(statsCache['pingbacks'], 10) || 0;
+      const trackbacks = parseInt(statsCache['trackbacks'], 10) || 0;
+      const totalOrphaned = orphanedPostmeta + orphanedCommentmeta + orphanedRelationships + orphanedUsermeta;
+      const totalPingTrack = pingbacks + trackbacks;
+      message += '• Clean post revisions <strong>(' + postRevisions + ')</strong><br>';
+      message += '• Delete auto-drafts <strong>(' + autoDrafts + ')</strong><br>';
+      message += '• Delete trashed comments <strong>(' + trashedComments + ')</strong><br>';
+      message += '• Delete expired transients <strong>(' + expiredTransients + ')</strong><br>';
+      message += '• Remove duplicate postmeta <strong>(' + duplicatePostmeta + ')</strong><br>';
+      message += '• Remove duplicate commentmeta <strong>(' + duplicateCommentmeta + ')</strong><br>';
+      message += '• Remove orphaned data <strong>(' + totalOrphaned + ')</strong><br>';
+      message += '• Clean pingbacks and trackbacks <strong>(' + totalPingTrack + ')</strong><br>';
+    } else {
+      message += __('• Clean post revisions', 'optistate') + '<br>';
+      message += __('• Delete auto-drafts', 'optistate') + '<br>';
+      message += __('• Delete trashed comments', 'optistate') + '<br>';
+      message += __('• Delete expired transients', 'optistate') + '<br>';
+      message += __('• Remove duplicate postmeta', 'optistate') + '<br>';
+      message += __('• Remove duplicate commentmeta', 'optistate') + '<br>';
+      message += __('• Remove orphaned data', 'optistate') + '<br>';
+      message += __('• Clean pingbacks and trackbacks', 'optistate') + '<br>';
+    }
+    message += __('• Optimize database tables', 'optistate') + '<br><br>';
+    message += __('This operation is safe but cannot be undone.', 'optistate');
     showOPTISTATEModal(
       '🚀 ' + __('Full Optimization', 'optistate'),
       message,
       function() {
         isProcessing = true;
+        $('#optistate-one-click-count').fadeOut(200, function() {
+          $(this).remove();
+        });
         $btn.prop('disabled', true).addClass('loading').text('🧹 ' + __('Cleaning...', 'optistate'));
         $('#optistate-one-click-results').removeClass('show').html('').hide();
         $.post(optistate_Ajax.ajaxurl, {
@@ -2918,9 +2975,7 @@ jQuery(document).ready(function($) {
     if($btn.prop('disabled')) return;
     const cacheFileSize = $('#cache-total-size').text() || __('unknown size', 'optistate');
     const cacheFileCount = $('#cache-file-count').text() || __('an unknown number of', 'optistate');
-    const message = '🗑️ ' + __('WARNING: Purge All Cache', 'optistate') +
-      '<br><br>' +
-      sprintf(
+    const message = sprintf(
         __('You are about to delete all %s cached pages (total size: %s).', 'optistate'),
         esc_html(cacheFileCount),
         esc_html(cacheFileSize)
@@ -2931,7 +2986,7 @@ jQuery(document).ready(function($) {
       '<br><br>' +
       __('Are you sure you want to continue?', 'optistate');
     showOPTISTATEModal(
-      __('Confirm Cache Purge', 'optistate'),
+      __('🗑️ Confirm Cache Purge', 'optistate'),
       message,
       function() {
         $btn.prop('disabled', true).html(
@@ -3031,14 +3086,14 @@ jQuery(document).ready(function($) {
     const $importBtn = $('#optistate-import-settings-btn');
     if(file) {
       if(!file.name.toLowerCase().endsWith('.json')) {
-        alert('Please select a JSON file.');
+        showToast(__('Please select a JSON file.', 'optistate'), 'error');
         this.value = '';
         $info.hide();
         $importBtn.prop('disabled', true);
         return;
       }
       if(file.size > 1048576) {
-        alert('File is too large. Maximum size is 1MB.');
+        showToast(__('File is too large. Maximum size is 1MB.', 'optistate'), 'error');
         this.value = '';
         $info.hide();
         $importBtn.prop('disabled', true);
@@ -3354,191 +3409,211 @@ jQuery(document).ready(function($) {
       return '#dc3545';
   }
   function updatePageSpeedUI(data) {
-    if (!data) return;
+    if(!data) return;
     const $metrics = $('#optistate-psi-metrics');
     const $circle = $('#psi-score-circle');
     const $score = $('#psi-score');
-    const $tipsContainer = $('#optistate-psi-tips');
+    const $recsContainer = $('#optistate-psi-recommendations');
+    const $recsList = $('#optistate-psi-recommendations-list');
     const score = parseInt(data.score, 10);
     $score.text(score);
     let borderColor = '#dc3545';
     let bgColor = '#fce8e8';
-    if (score >= 90) {
-        borderColor = '#28a745';
-        bgColor = '#e8f5e9';
-    } else if (score >= 60) {
-        borderColor = '#ffa400';
-        bgColor = '#fff8e1';
+    if(score >= 90) {
+      borderColor = '#28a745';
+      bgColor = '#e8f5e9';
+    } else if(score >= 60) {
+      borderColor = '#ffa400';
+      bgColor = '#fff8e1';
     }
     $circle.css({
-        'border-color': borderColor,
-        'background-color': bgColor,
-        'color': '#333'
+      'border-color': borderColor,
+      'background-color': bgColor,
+      'color': '#333'
     });
+    const getMetricColor = (value, thresholds) => {
+      if(value <= thresholds.good) return '#28a745';
+      if(value <= thresholds.needsImprovement) return '#ffa400';
+      return '#dc3545';
+    };
     const updateMetricCard = (id, metricData, thresholds) => {
-        const $el = $(id);
-        const $card = $el.closest('.optistate-targeted-card');
-        const display = metricData.display || 'N/A';
-        const value = metricData.value || 0;
-        $el.text(`→ ${display}`);
-        const metricColor = getMetricColor(value, thresholds);
-        $card.css({
-            'border-left': `4px solid ${metricColor}`,
-            'padding-left': '11px'
-        });
-        if (value > thresholds.needsImprovement) return 'poor';
-        if (value > thresholds.good) return 'average';
-        return 'good';
+      const $el = $(id);
+      const $card = $el.closest('.optistate-targeted-card');
+      const display = metricData.display || 'N/A';
+      const value = metricData.value || 0;
+      $el.text(`→ ${display}`);
+      const metricColor = getMetricColor(value, thresholds);
+      $card.css({
+        'border-left': `4px solid ${metricColor}`,
+        'padding-left': '11px'
+      });
+      if(value > thresholds.needsImprovement) return 'poor';
+      if(value > thresholds.good) return 'average';
+      return 'good';
     };
     const status = {
-        fcp: updateMetricCard('#psi-fcp', data.fcp, { good: 1800, needsImprovement: 3000 }),
-        lcp: updateMetricCard('#psi-lcp', data.lcp, { good: 2500, needsImprovement: 4000 }),
-        cls: updateMetricCard('#psi-cls', data.cls, { good: 0.1, needsImprovement: 0.25 }),
-        tbt: updateMetricCard('#psi-tbt', data.tbt, { good: 200, needsImprovement: 600 }),
-        si:  updateMetricCard('#psi-si', data.si, { good: 3400, needsImprovement: 5800 }),
-        tti: updateMetricCard('#psi-tti', data.tti, { good: 3800, needsImprovement: 7300 })
+      fcp: updateMetricCard('#psi-fcp', data.fcp, {
+        good: 1800,
+        needsImprovement: 3000
+      }),
+      lcp: updateMetricCard('#psi-lcp', data.lcp, {
+        good: 2500,
+        needsImprovement: 4000
+      }),
+      cls: updateMetricCard('#psi-cls', data.cls, {
+        good: 0.1,
+        needsImprovement: 0.25
+      }),
+      tbt: updateMetricCard('#psi-tbt', data.tbt, {
+        good: 200,
+        needsImprovement: 600
+      }),
+      si: updateMetricCard('#psi-si', data.si, {
+        good: 3400,
+        needsImprovement: 5800
+      }),
+      tti: updateMetricCard('#psi-tti', data.tti, {
+        good: 3800,
+        needsImprovement: 7300
+      })
     };
     $('#psi-timestamp').text(data.timestamp + ' (' + data.strategy + ')');
-    $metrics.css({ 'opacity': '1', 'pointer-events': 'auto' });
-    let tipsHtml = '';
-    let tipsCount = 0;
-    const addTip = (icon, title, desc, linkTab) => {
-        tipsCount++;
-        tipsHtml += `
-            <div class="optistate-tip-item" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px; padding: 12px; background: #f8f9fa; border: 1px solid #e2e4e7; border-radius: 4px;">
-                <span class="dashicons ${icon}" style="font-size: 24px; width: 24px; height: 24px; color: #2271b1; margin-top: 2px;"></span>
-                <div>
-                    <strong style="display: block; margin-bottom: 4px; color: #333;">${title}</strong>
-                    <span style="color: #666; line-height: 1.5;">${desc}</span>
-                    ${linkTab ? `<br><a href="${linkTab}" class="nav-tab-link" style="display: inline-block; margin-top: 6px; font-size: 13px; font-weight: 500; text-decoration: none;">${__('Go to Settings →', 'optistate')}</a>` : ''}
+    if(data.tested_url) {
+      const urlPath = data.tested_url.replace(/^https?:\/\/[^\/]+/, '') || '/';
+      $('#psi-tested-url').text(__('Tested: ', 'optistate') + urlPath);
+    }
+    $metrics.css({
+      'opacity': '1',
+      'pointer-events': 'auto'
+    });
+    if(data.recommendations && data.recommendations.length > 0) {
+      let recsHtml = '';
+      data.recommendations.forEach(rec => {
+        const priorityColors = {
+          high: '#dc3545',
+          medium: '#ffa400',
+          low: '#666'
+        };
+        const priorityLabels = {
+          high: __('High Priority', 'optistate'),
+          medium: __('Medium Priority', 'optistate'),
+          low: __('Low Priority', 'optistate')
+        };
+        recsHtml += `
+          <div class="optistate-card" style="padding: 15px; margin-bottom: 12px; border-left: 4px solid ${priorityColors[rec.priority]};">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <span class="dashicons ${rec.icon}" style="font-size: 24px; width: 24px; height: 24px; color: #2271b1; margin-top: 2px; flex-shrink: 0;"></span>
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                  <strong style="color: #1d2327; font-size: 14px;">${rec.title}</strong>
+                  <span style="background: ${priorityColors[rec.priority]}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; text-transform: uppercase;">${priorityLabels[rec.priority]}</span>
                 </div>
-            </div>`;
-    };
-    if (status.fcp !== 'good' || status.lcp !== 'good' || status.tti !== 'good') {
-        addTip(
-            'dashicons-superhero',
-            __('Enable Caching Features', 'optistate'),
-            __('Your loading speeds (FCP/LCP) can be improved. Go to the <strong>Performance</strong> tab and enable <strong>Server-Side Page Caching</strong> and <strong>Browser Caching</strong> to serve static HTML and assets instantly.', 'optistate'),
-            '#tab-performance'
-        );
-    }
-    if (status.tbt !== 'good' || status.si !== 'good') {
-        addTip(
-            'dashicons-database',
-            __('Optimize Database & Autoload', 'optistate'),
-            __('High blocking time often means the server is slow to respond. In the <strong>Advanced</strong> tab, run <strong>"Optimize All Tables"</strong> and <strong>"Optimize Autoloaded Options"</strong> to reduce database drag.', 'optistate'),
-            '#tab-advanced'
-        );
-    }
-    if (status.lcp !== 'good') {
-        addTip(
-            'dashicons-images-alt2',
-            __('Enable Lazy Loading', 'optistate'),
-            __('Images loading all at once slow down the Largest Contentful Paint (LCP). Enable <strong>Lazy Load Images</strong> in the <strong>Performance</strong> tab to defer off-screen images.', 'optistate'),
-            '#tab-performance'
-        );
-    }
-    if (status.cls !== 'good') {
-        addTip(
-            'dashicons-align-pull-left',
-            __('Reduce Layout Shifts', 'optistate'),
-            __('Your Cumulative Layout Shift (CLS) score indicates visual instability. Ensure images and ads have explicit width/height attributes, reserve space for dynamic content, and avoid inserting content above existing content.', 'optistate'),
-            null
-        );
-    }
-    if (status.tbt !== 'good') {
-        addTip(
-            'dashicons-heart',
-            __('Control Heartbeat API', 'optistate'),
-            __('Frequent admin-ajax calls can increase blocking time. In the <strong>Performance</strong> tab, try setting the <strong>Heartbeat API Control</strong> to "Slow Down" or "Disable" in non-essential areas.', 'optistate'),
-            '#tab-performance'
-        );
-    }
-    if (tipsCount < 2) {
-        addTip(
-            'dashicons-trash',
-            __('Regular Cleanup', 'optistate'),
-            __('Keep your metrics green by scheduling regular maintenance. Go to the <strong>Automation</strong> tab and ensure "Automatic Backup & Cleanup" is enabled.', 'optistate'),
-            '#tab-automation'
-        );
-    }
-    if (tipsHtml) {
-        $tipsContainer.html(`
-            <h3 style="margin-top: 30px; margin-bottom: 12px; font-size: 1.1em;">
-                <span class="dashicons dashicons-lightbulb"></span> ${__('Performance Tips for Your Site', 'optistate')}
-            </h3>
-            ${tipsHtml}
-        `).fadeIn(300);
-        $tipsContainer.find('.nav-tab-link').on('click', function(e) {
-            e.preventDefault();
-            const target = $(this).attr('href');
-            $('.nav-tab-wrapper a[href="' + target + '"]').trigger('click');
-            window.scrollTo(0, 0);
-        });
+                <p style="margin: 0 0 10px 0; color: #50575e; line-height: 1.5; font-size: 13px;">${rec.description}</p>
+                ${rec.tab ? `<a href="${rec.tab}" class="nav-tab-link button button-small" style="text-decoration: none;">${__('Go to Settings →', 'optistate')}</a>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      $recsList.html(recsHtml);
+      $recsContainer.show();
+      $recsList.find('.nav-tab-link').off('click').on('click', function(e) {
+        e.preventDefault();
+        const target = $(this).attr('href');
+        $('.nav-tab-wrapper a[href="' + target + '"]').trigger('click');
+        window.scrollTo(0, 0);
+      });
     } else {
-        $tipsContainer.hide();
+      const allGood = score >= 90;
+      if(allGood) {
+        $recsList.html(`
+          <div class="optistate-card" style="padding: 20px; text-align: center; background: #e8f5e9; border-left: 4px solid #28a745;">
+            <span class="dashicons dashicons-yes-alt" style="font-size: 48px; color: #28a745; width: 48px; height: 48px;"></span>
+            <h3 style="margin: 15px 0 10px 0; color: #1d2327;">${__('Excellent Performance!', 'optistate')}</h3>
+            <p style="margin: 0; color: #50575e;">${__('Your site is performing well. Keep monitoring regularly to maintain optimal speed.', 'optistate')}</p>
+          </div>
+        `);
+        $recsContainer.show();
+      } else {
+        $recsContainer.hide();
+      }
     }
   }
   function loadPageSpeedStats(forceRefresh = false) {
-    if (isProcessing && forceRefresh) return;
     const $btn = $('#run-pagespeed-btn');
     const $metrics = $('#optistate-psi-metrics');
-    if (forceRefresh) {
-        isProcessing = true;
-        $btn.prop('disabled', true).html('<span class="spinner is-active" style="float:none;"></span> ' + __('Analyzing...', 'optistate'));
-        $metrics.css('opacity', '0.5');
+    const testUrl = $('#optistate-custom-url').val().trim() || $('#optistate-test-url').val() || '';
+    if(forceRefresh) {
+      isProcessing = true;
+      $btn.prop('disabled', true).html('<span class="spinner is-active" style="float:none;"></span> ' + __('Analyzing...', 'optistate'));
+      $metrics.css('opacity', '0.5');
     }
     $.post(optistate_Ajax.ajaxurl, {
-        action: 'optistate_run_pagespeed_audit',
-        nonce: optistate_Ajax.nonce,
-        strategy: $('#optistate-strategy').val(),
-        force_refresh: forceRefresh
+      action: 'optistate_run_pagespeed_audit',
+      nonce: optistate_Ajax.nonce,
+      strategy: $('#optistate-strategy').val(),
+      test_url: testUrl,
+      force_refresh: forceRefresh
     }).done(function(response) {
-        if (response.success) {
-            updatePageSpeedUI(response.data);
-            if (forceRefresh) {
-                showToast(__('Performance audit completed successfully!', 'optistate'), 'success');
-            }
-        } else if (forceRefresh) {
-            showToast(response.data.message || __('Audit failed.', 'optistate'), 'error');
+      if(response.success) {
+        updatePageSpeedUI(response.data);
+        if(forceRefresh) {
+          showToast(__('Performance audit completed successfully!', 'optistate'), 'success');
         }
-    }).fail(function(xhr) {
-        if (forceRefresh) handleAjaxError(xhr);
+      } else if(forceRefresh) {
+        showToast(response.data.message || __('Audit failed.', 'optistate'), 'error');
+      }
+    }).fail(function() {
+      if(forceRefresh) {
+        showToast(__('Connection error during audit.', 'optistate'), 'error');
+      }
     }).always(function() {
-        if (forceRefresh) {
-            isProcessing = false;
-            $btn.prop('disabled', false).text(__('Run Audit', 'optistate'));
-            $metrics.css('opacity', '1');
-        }
+      if(forceRefresh) {
+        isProcessing = false;
+        $btn.prop('disabled', false).html('<span class="dashicons dashicons-performance" style="margin-top: 3px;"></span> ' + __('Run Audit', 'optistate'));
+      }
     });
   }
   $('#save-pagespeed-key-btn').on('click', function() {
-      const $btn = $(this);
-      const key = $('#optistate_pagespeed_key').val().trim();
-      if (!key) {
-          showToast(wp.i18n.__('Please enter an API Key before saving.', 'optistate'), 'error');
-          return;
-      }
-      $btn.prop('disabled', true).text('Saving...');
-      $.post(optistate_Ajax.ajaxurl, {
-          action: 'optistate_save_pagespeed_settings',
-          nonce: optistate_Ajax.nonce,
-          api_key: key
+    const $btn = $(this);
+    const key = $('#optistate_pagespeed_key').val().trim();
+    if(!key) {
+      showToast(wp.i18n.__('Please enter an API Key before saving.', 'optistate'), 'error');
+      return;
+    }
+    $btn.prop('disabled', true).text('Saving...');
+    $.post(optistate_Ajax.ajaxurl, {
+        action: 'optistate_save_pagespeed_settings',
+        nonce: optistate_Ajax.nonce,
+        api_key: key
       }).done(function(response) {
-          if (response.success) {
-              showToast(response.data.message, 'success');
-          } else {
-              showToast(response.data.message, 'error');
-          }
+        if(response.success) {
+          showToast(response.data.message, 'success');
+        } else {
+          showToast(response.data.message, 'error');
+        }
       }).fail(handleAjaxError)
       .always(function() {
-          $btn.prop('disabled', false).text(wp.i18n.__('Save Key', 'optistate'));
+        $btn.prop('disabled', false).text(wp.i18n.__('Save Key', 'optistate'));
       });
   });
   $('#run-pagespeed-btn').on('click', function() {
-      loadPageSpeedStats(true);
+    loadPageSpeedStats(true);
   });
-  if ($('#optistate-psi-metrics').length) {
-      loadPageSpeedStats(false);
+  if($('#optistate-psi-metrics').length) {
+    loadPageSpeedStats(false);
   }
+  $('#optistate-custom-url').on('input', function() {
+    if($(this).val().trim()) {
+      $('#optistate-test-url').val('');
+    }
+  });
+  $('#optistate-test-url').on('change', function() {
+    if($(this).val()) {
+      $('#optistate-custom-url').val('');
+    }
+  });
+  $('#optistate-strategy, #optistate-test-url, #optistate-custom-url').on('change input', function() {
+    $('#psi-timestamp').text(__('Changed - click Run Audit', 'optistate'));
+  });
 });

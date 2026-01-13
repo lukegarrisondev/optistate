@@ -3403,13 +3403,45 @@ jQuery(document).ready(function($) {
     localStorage.setItem('optistate_active_tab', target);
   });
   
+  $('#toggle-api-key-visibility').on('click', function() {
+    const $input = $('#optistate_pagespeed_key');
+    const $icon = $(this);
+    if ($input.attr('type') === 'password') {
+      $input.attr('type', 'text');
+      $icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+    } else {
+      $input.attr('type', 'password');
+      $icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+    }
+  });
+
   function getMetricColor(value, thresholds) {
-      if (value <= thresholds.good) return '#28a745';
-      if (value <= thresholds.needsImprovement) return '#ffa400';
-      return '#dc3545';
+    if(value <= thresholds.good) return '#28a745';
+    if(value <= thresholds.needsImprovement) return '#ffa400';
+    return '#dc3545';
   }
+
   function updatePageSpeedUI(data) {
     if(!data) return;
+    if (data.strategy) {
+      $('#optistate-strategy').val(data.strategy.toLowerCase());
+    }
+    if (data.tested_url) {
+      const $testUrlDropdown = $('#optistate-test-url');
+      const $customUrlInput = $('#optistate-custom-url');
+      if ($testUrlDropdown.find(`option[value="${data.tested_url}"]`).length > 0) {
+        $testUrlDropdown.val(data.tested_url);
+        $customUrlInput.val(''); 
+      } else {
+        if (data.tested_url === $testUrlDropdown.find('option').first().val()) {
+             $testUrlDropdown.val(data.tested_url);
+             $customUrlInput.val('');
+        } else {
+             $testUrlDropdown.val('');
+             $customUrlInput.val(data.tested_url);
+        }
+      }
+    }
     const $metrics = $('#optistate-psi-metrics');
     const $circle = $('#psi-score-circle');
     const $score = $('#psi-score');
@@ -3475,6 +3507,10 @@ jQuery(document).ready(function($) {
       tti: updateMetricCard('#psi-tti', data.tti, {
         good: 3800,
         needsImprovement: 7300
+      }),
+      ttfb: updateMetricCard('#psi-ttfb', data.ttfb, {
+        good: 600,
+        needsImprovement: 1800
       })
     };
     $('#psi-timestamp').text(data.timestamp + ' (' + data.strategy + ')');
@@ -3539,13 +3575,14 @@ jQuery(document).ready(function($) {
       }
     }
   }
+
   function loadPageSpeedStats(forceRefresh = false) {
     const $btn = $('#run-pagespeed-btn');
     const $metrics = $('#optistate-psi-metrics');
     const testUrl = $('#optistate-custom-url').val().trim() || $('#optistate-test-url').val() || '';
     if(forceRefresh) {
       isProcessing = true;
-      $btn.prop('disabled', true).html('<span class="spinner is-active" style="float:none;"></span> ' + __('Analyzing...', 'optistate'));
+      $btn.prop('disabled', true).html('<span class="spinner is-active" style="float:none;"></span> ' + __('Initializing...', 'optistate'));
       $metrics.css('opacity', '0.5');
     }
     $.post(optistate_Ajax.ajaxurl, {
@@ -3556,23 +3593,53 @@ jQuery(document).ready(function($) {
       force_refresh: forceRefresh
     }).done(function(response) {
       if(response.success) {
-        updatePageSpeedUI(response.data);
-        if(forceRefresh) {
-          showToast(__('Performance audit completed successfully!', 'optistate'), 'success');
+        if (response.data.score !== undefined) {
+            updatePageSpeedUI(response.data);
+            if(forceRefresh) showToast(__('Performance audit loaded from cache!', 'optistate'), 'success');
+            resetButton();
+            return;
         }
-      } else if(forceRefresh) {
-        showToast(response.data.message || __('Audit failed.', 'optistate'), 'error');
+        if (response.data.status === 'processing' && response.data.task_id) {
+            $btn.html('<span class="spinner is-active" style="float:none;"></span> ' + __('Auditing...', 'optistate'));
+            pollPageSpeedStatus(response.data.task_id);
+        }
+      } else {
+        showToast(response.data.message || __('Audit failed to start.', 'optistate'), 'error');
+        resetButton();
       }
     }).fail(function() {
-      if(forceRefresh) {
-        showToast(__('Connection error during audit.', 'optistate'), 'error');
-      }
-    }).always(function() {
-      if(forceRefresh) {
+      showToast(__('Connection error.', 'optistate'), 'error');
+      resetButton();
+    });
+    function resetButton() {
         isProcessing = false;
         $btn.prop('disabled', false).html('<span class="dashicons dashicons-performance" style="margin-top: 3px;"></span> ' + __('Run Audit', 'optistate'));
-      }
-    });
+    }
+    function pollPageSpeedStatus(taskId) {
+        setTimeout(function() {
+            $.post(optistate_Ajax.ajaxurl, {
+                action: 'optistate_check_pagespeed_status',
+                nonce: optistate_Ajax.nonce,
+                task_id: taskId
+            }).done(function(pollResponse) {
+                if (pollResponse.success) {
+                    if (pollResponse.data.status === 'done') {
+                        updatePageSpeedUI(pollResponse.data.data);
+                        showToast(__('Performance audit completed successfully!', 'optistate'), 'success');
+                        resetButton();
+                    } else {
+                        pollPageSpeedStatus(taskId);
+                    }
+                } else {
+                    showToast(pollResponse.data.message || __('Audit failed during processing.', 'optistate'), 'error');
+                    resetButton();
+                }
+            }).fail(function() {
+                showToast(__('Network error checking status.', 'optistate'), 'error');
+                resetButton();
+            });
+        }, 2000);
+    }
   }
   $('#save-pagespeed-key-btn').on('click', function() {
     const $btn = $(this);

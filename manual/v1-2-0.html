@@ -161,15 +161,16 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 </li>
  	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-10">🔧 Troubleshooting &amp; Advanced FAQ</a></strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-1">10.1. 🚧 "I'm stuck in maintenance mode!"</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-2">10.2. 🔄 "My restore failed, and the rollback <em>also</em> failed!"</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-3">10.3. 🎨 "I enabled caching and my site looks broken (CSS is missing)."</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-4">10.4. 🌐 "I enabled Browser Caching and my site is broken!"</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-5">10.5. ⏳ "The 'Automatic Preload' gets stuck or times out."</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-6">10.6. ❌ "The plugin shows a 'Critical Error: Cannot initialize WP_Filesystem'."</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-7">10.7. ☁️ "I'm using a CDN (like Cloudflare). Will this work?"</a></li>
-	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-8">10.8. 🖥 "Does this plugin work on Nginx servers?"</a></li>
-	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-9">10.9. 🚦 "My PageSpeed Audit is showing an "API Error" or failing to load."</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-1">10.1. 🔄 "After updating/upgrading the plugin, some functions don't work."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-2">10.2. 🚧 "I'm stuck in maintenance mode!"</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-3">10.3. 🔄 "My restore failed, and the rollback <em>also</em> failed!"</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-4">10.4. 🎨 "I enabled caching and my site looks broken (CSS is missing)."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-5">10.5. 🌐 "I enabled Browser Caching and my site is broken!"</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-6">10.6. ⏳ "The 'Automatic Preload' gets stuck or times out."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-7">10.7. ❌ "The plugin shows a 'Critical Error: Cannot initialize WP_Filesystem'."</a></li>
+ 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-8">10.8. ☁️ "I'm using a CDN (like Cloudflare). Will this work?"</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-9">10.9. 🖥 "Does this plugin work on Nginx servers?"</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-10-10">10.10. 🚦 "My PageSpeed Audit is showing an "API Error" or failing to load."</a></li>
 </ul>
 </li>
  	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-11">🏗️ Technical Architecture</a></strong>
@@ -244,6 +245,17 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 <li style="margin-bottom: 8px;">At this point, you will now be asked to either replace the current version with the uploaded one, or cancel and go back. Click <strong>Replace current with uploaded</strong>.</li>
 <li style="margin-bottom: 8px;"><strong>The update is complete!</strong> Visit the plugin admin panel to confirm that your backups and settings are intact.</li> 
 <li style="margin-bottom: 8px;">If your settings have not been properly preserved, go to section 9 and <strong>import the <code>.json</code> file</strong> you downloaded in step 2.</li> </ol>
+<blockquote style="border-left: 4px solid #3b82f6; padding: 12px 18px; margin-left: 0; margin-right: 0; margin-top: 20px; margin-bottom: 15px; font-style: italic; color: #555; background-color: #eff6ff; border-radius: 4px;">
+    <strong style="color: #1e40af; font-style: normal; font-weight: bold; display: block; margin-bottom: 8px;">💡 TROUBLESHOOTING: Functions Not Working After Upgrade</strong>
+    <p style="margin-bottom: 10px; margin-top: 5px;">If after upgrading some functions don't work properly (e.g., save buttons not responding), this is usually caused by your browser still using cached versions of old JavaScript and CSS files.</p>
+    <p style="margin-bottom: 10px;"><strong>Solution: Clear your browser cache</strong></p>
+    <ul style="padding-left: 25px; margin-top: 8px; margin-bottom: 0;">
+        <li style="margin-bottom: 5px;"><strong>Chrome/Edge:</strong> Press <code>Ctrl+Shift+Delete</code> (Windows) or <code>Cmd+Shift+Delete</code> (Mac), select "Cached images and files", then click "Clear data".</li>
+        <li style="margin-bottom: 5px;"><strong>Firefox:</strong> Press <code>Ctrl+Shift+Delete</code> (Windows) or <code>Cmd+Shift+Delete</code> (Mac), select "Cache", then click "Clear Now".</li>
+        <li style="margin-bottom: 5px;"><strong>Safari:</strong> Go to Safari menu → Settings → Privacy → "Manage Website Data" → "Remove All".</li>
+        <li style="margin-bottom: 5px;"><strong>Quick alternative:</strong> Try a hard refresh by pressing <code>Ctrl+F5</code> (Windows) or <code>Cmd+Shift+R</code> (Mac) while on the plugin page.</li>
+    </ul>
+</blockquote>
 <h3 id="ch-2-6" class="h3title">📊 2.6. Filesystem Footprint (What the Plugin Creates)</h3>
 <p style="margin-bottom: 15px;">On activation, the plugin creates the following directories and database tables to ensure persistent operation and data integrity.</p>
 <h4 class="h4title">📂 Filesystem (wp-content/uploads)</h4> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
@@ -294,6 +306,17 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 <p style="margin-top: 28px;"><strong>👨‍💻 Option 2: Via FTP Client</strong></p> <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">Unzip the new plugin <code>.zip</code> file on your computer to get a folder named <code>optistate</code>.</li> <li style="margin-bottom: 8px;">Open your FTP client or hosting file explorer and navigate to <code>wp-content/plugins/</code>.</li> <li style="margin-bottom: 8px;">Upload the <code>optistate</code> folder from your computer, choosing to <strong>replace or overwrite</strong> all existing files in the <code>/wp-content/plugins/optistate/</code> directory.</li> <li style="margin-bottom: 8px;">Once complete, go to <strong>Plugins &gt; Installed Plugins</strong>, find WP Optimal State and verify that the new version number is displayed.</li> <li style="margin-bottom: 8px;"><strong>The update is complete!</strong> Visit the plugin admin panel to confirm that your backups and settings are intact.</li> </ol>
 <div style="width: 40%; margin: 25px 0; border: 1px dashed #C0C0C0;"></div>
 <p style="margin-bottom: 15px;"><strong>📥 How to Get PRO Updates</strong></p> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;">You will receive an email notification when a new version is released.</li> <li style="margin-bottom: 8px;">Download the update from your account on the purchase site (Payhip.com).</li> <li style="margin-bottom: 8px;">If you did not register at the time of purchase or no longer have access to your account, contact <a href="https://payhip.com/optistate/contact" target="_blank" rel="noopener" style="color: #16358a; text-decoration: underline;"><strong>🆘 Technical Support</strong></a> with your license key and website URL. We will send the update package to you via email.</li> </ul>
+<blockquote style="border-left: 4px solid #3b82f6; padding: 12px 18px; margin-left: 0; margin-right: 0; margin-top: 20px; margin-bottom: 15px; font-style: italic; color: #555; background-color: #eff6ff; border-radius: 4px;">
+    <strong style="color: #1e40af; font-style: normal; font-weight: bold; display: block; margin-bottom: 8px;">💡 TROUBLESHOOTING: Functions Not Working After Update</strong>
+    <p style="margin-bottom: 10px; margin-top: 5px;">If after updating some functions don't work properly (e.g., save buttons not responding), this is usually caused by your browser still using cached versions of old JavaScript and CSS files.</p>
+    <p style="margin-bottom: 10px;"><strong>Solution: Clear your browser cache</strong></p>
+    <ul style="padding-left: 25px; margin-top: 8px; margin-bottom: 0;">
+        <li style="margin-bottom: 5px;"><strong>Chrome/Edge:</strong> Press <code>Ctrl+Shift+Delete</code> (Windows) or <code>Cmd+Shift+Delete</code> (Mac), select "Cached images and files", then click "Clear data".</li>
+        <li style="margin-bottom: 5px;"><strong>Firefox:</strong> Press <code>Ctrl+Shift+Delete</code> (Windows) or <code>Cmd+Shift+Delete</code> (Mac), select "Cache", then click "Clear Now".</li>
+        <li style="margin-bottom: 5px;"><strong>Safari:</strong> Go to Safari menu → Settings → Privacy → "Manage Website Data" → "Remove All".</li>
+        <li style="margin-bottom: 5px;"><strong>Quick alternative:</strong> Try a hard refresh by pressing <code>Ctrl+F5</code> (Windows) or <code>Cmd+Shift+R</code> (Mac) while on the plugin page.</li>
+    </ul>
+</blockquote>
 <h2 id="ch-3" class="h2title">🎯 3. Dashboard Philosophy: The 3-Step Workflow</h2>
 <p style="margin-bottom: 15px;">The plugin dashboard is organized to guide you through a logical and safe workflow.</p>
 
@@ -433,27 +456,147 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 <p style="margin-bottom: 15px;">This is the core optimization suite. These sections work together to help you diagnose and clean your database.</p>
 
 <h3 id="ch-5-1" class="h3title">❤️ 5.1. Database Health Score (The "Why")</h3>
-<p style="margin-bottom: 15px;">This is your central diagnostic hub. It gives you a "grade" from 0-100 based on the current state of your database.</p>
+<p style="margin-bottom: 15px;">The Database Health Score is your central diagnostic hub—a comprehensive analysis that gives you a single number (0-100) representing your database's overall condition. This score is calculated by examining multiple aspects of your database and applying weighted penalties for issues that impact performance, cleanliness, and structural efficiency.</p>
 
-<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
- 	<li style="margin-bottom: 8px;"><strong>📊 Overall Score:</strong> A weighted average of the three categories below (<code>Performance * 40%</code>, <code>Cleanliness * 35%</code>, <code>Efficiency * 25%</code>).
-<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
- 	<li style="margin-bottom: 5px;"><strong>🎉 90-100 (Excellent):</strong> Your database is in optimal condition.</li>
- 	<li style="margin-bottom: 5px;"><strong>👍 75-89 (Good):</strong> A few minor areas for cleanup.</li>
- 	<li style="margin-bottom: 5px;"><strong>😐 60-74 (Fair):</strong> You have some clutter that should be addressed.</li>
- 	<li style="margin-bottom: 5px;"><strong>👎 40-59 (Poor):</strong> Your database is likely bloated and needs optimization.</li>
- 	<li style="margin-bottom: 5px;"><strong>🚨 0-39 (Critical):</strong> Your database health is poor and may be impacting site performance.</li>
+<h4 class="h4title">🎯 How the Score is Calculated</h4>
+<p style="margin-bottom: 15px;">The plugin analyzes your database across three key categories, each with its own sub-score. These are then combined into a single Overall Score using a weighted formula:</p>
+
+<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+    <p style="margin-bottom: 10px; font-family: 'Courier New', monospace; font-size: 0.95em; color: #29313D;">
+        <strong>Overall Score =</strong> (Performance × 40%) + (Cleanliness × 35%) + (Efficiency × 25%)
+    </p>
+    <p style="margin: 0; font-size: 0.9em; color: #6b7280;">
+        A sensitivity factor of 1.3× is then applied to penalties, making the score more responsive to issues that need attention.
+    </p>
+</div>
+
+<h4 class="h4title">📊 Understanding Your Overall Score</h4>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 20px;">
+    <li style="margin-bottom: 8px;"><strong>🎉 90-100 (Excellent):</strong> Your database is in optimal condition. No critical issues detected. Continue with regular maintenance.</li>
+    <li style="margin-bottom: 8px;"><strong>👍 75-89 (Good):</strong> Minor optimization opportunities exist, but nothing urgent. Consider addressing recommendations when convenient.</li>
+    <li style="margin-bottom: 8px;"><strong>😐 60-74 (Fair):</strong> Noticeable database bloat or fragmentation. Performance improvements are possible with cleanup.</li>
+    <li style="margin-bottom: 8px;"><strong>👎 40-59 (Poor):</strong> Significant issues detected. Your database is bloated and likely affecting site speed. Optimization recommended.</li>
+    <li style="margin-bottom: 8px;"><strong>🚨 0-39 (Critical):</strong> Severe database health problems. Immediate optimization required—performance is being significantly impacted.</li>
 </ul>
-</li>
- 	<li style="margin-bottom: 8px;"><strong>📈 Category Scores:</strong>
-<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
- 	<li style="margin-bottom: 5px;"><strong>⚡ Performance:</strong> Graded on factors like database overhead, the size of your autoloaded data, and total database size.</li>
- 	<li style="margin-bottom: 5px;"><strong>🧹 Cleanliness:</strong> Graded on the amount of "junk" data, such as old post revisions, auto-drafts, spam comments, and orphaned data.</li>
- 	<li style="margin-bottom: 5px;"><strong>🎯 Efficiency:</strong> Graded on technical factors like your database's index-to-data ratio and total table count.</li>
+
+<h4 class="h4title">📈 The Three Category Scores Explained</h4>
+
+<div style="margin-bottom: 25px;">
+    <p style="margin-bottom: 10px;"><strong style="color: #2563eb; font-size: 1.05em;">⚡ Performance Score (40% weight)</strong></p>
+    <p style="margin-bottom: 10px;">Measures factors that directly impact your site's speed and response time. This category has the highest weight because performance issues directly affect user experience.</p>
+    <p style="margin-bottom: 10px;"><strong>What's analyzed:</strong></p>
+    <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;"><strong>Autoloaded Options Size:</strong> Data that loads on every page request. This is the single most critical performance metric.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 500 KB: Excellent (no penalty)</li>
+                <li style="margin-bottom: 3px;">500-800 KB: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">800 KB - 1.5 MB: Moderate penalty (-12 points)</li>
+                <li style="margin-bottom: 3px;">1.5-2.5 MB: High penalty (-25 points)</li>
+                <li style="margin-bottom: 3px;">Over 2.5 MB: Critical penalty (-35 points)</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 8px;"><strong>Table Overhead (Fragmentation):</strong> "Empty" space in tables caused by deleted data. Calculated as a percentage of total database size.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 4%: Excellent (no penalty)</li>
+                <li style="margin-bottom: 3px;">4-8%: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">8-12%: Moderate penalty (-12 points)</li>
+                <li style="margin-bottom: 3px;">Over 12%: High penalty (-18 points)</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 8px;"><strong>Expired Transients:</strong> Cached data that has passed its expiration date and serves no purpose.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 100: Excellent (no penalty)</li>
+                <li style="margin-bottom: 3px;">100-500: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">500-1000: Moderate penalty (-8 points)</li>
+                <li style="margin-bottom: 3px;">Over 1000: High penalty (-14 points)</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<div style="margin-bottom: 25px;">
+    <p style="margin-bottom: 10px;"><strong style="color: #7c3aed; font-size: 1.05em;">🧹 Cleanliness Score (35% weight)</strong></p>
+    <p style="margin-bottom: 10px;">Evaluates how much "junk" data is accumulating in your database. Clean databases are faster to query and backup.</p>
+    <p style="margin-bottom: 10px;"><strong>What's analyzed:</strong></p>
+    <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;"><strong>General Junk Count:</strong> Combined total of post revisions, auto-drafts, trashed posts, spam/trashed comments, pingbacks, and trackbacks.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 100: Excellent (no penalty)</li>
+                <li style="margin-bottom: 3px;">100-500: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">500-1000: Moderate penalty (-12 points)</li>
+                <li style="margin-bottom: 3px;">1000-5000: High penalty (-20 points)</li>
+                <li style="margin-bottom: 3px;">Over 5000: Critical penalty (-30 points)</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 8px;"><strong>Orphaned Metadata:</strong> Data left behind from deleted posts, comments, relationships, and users. Also includes duplicate metadata entries.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Zero: Perfect (no penalty)</li>
+                <li style="margin-bottom: 3px;">1-100: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">100-1000: Moderate penalty (-12 points)</li>
+                <li style="margin-bottom: 3px;">Over 1000: High penalty (-25 points)</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 8px;"><strong>Application Bloat:</strong> WooCommerce session data and Action Scheduler completed logs.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 500: Excellent (no penalty)</li>
+                <li style="margin-bottom: 3px;">500-2000: Minor penalty (-3 points)</li>
+                <li style="margin-bottom: 3px;">2000-10000: Moderate penalty (-10 points)</li>
+                <li style="margin-bottom: 3px;">Over 10000: High penalty (-18 points)</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<div style="margin-bottom: 25px;">
+    <p style="margin-bottom: 10px;"><strong style="color: #059669; font-size: 1.05em;">🎯 Efficiency Score (25% weight)</strong></p>
+    <p style="margin-bottom: 10px;">Analyzes your database's structural health and optimization. This includes indexing efficiency and table management.</p>
+    <p style="margin-bottom: 10px;"><strong>What's analyzed:</strong></p>
+    <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 15px;">
+        <li style="margin-bottom: 8px;"><strong>Index-to-Data Ratio:</strong> The proportion of index size to actual data. Proper indexing speeds up queries, but over-indexing wastes space.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 1%: Under-indexed penalty (-20 points)</li>
+                <li style="margin-bottom: 3px;">1-2%: Low indexing penalty (-12 points)</li>
+                <li style="margin-bottom: 3px;">2-120%: Optimal (no penalty)</li>
+                <li style="margin-bottom: 3px;">120-150%: Minor over-indexing (-5 points)</li>
+                <li style="margin-bottom: 3px;">150-200%: Moderate over-indexing (-10 points)</li>
+                <li style="margin-bottom: 3px;">200-300%: High over-indexing (-15 points)</li>
+                <li style="margin-bottom: 3px;">Over 300%: Severe over-indexing (-20 points)</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 8px;"><strong>Total Table Count:</strong> High table counts often indicate leftover tables from uninstalled plugins.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 90: Optimal (no penalty)</li>
+                <li style="margin-bottom: 3px;">90-150: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">150-250: Moderate penalty (-10 points)</li>
+                <li style="margin-bottom: 3px;">Over 250: High penalty (-16 points)</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 8px;"><strong>Empty Taxonomies:</strong> Categories, tags, or custom terms with no posts assigned.
+            <ul style="padding-left: 30px; margin-top: 5px; margin-bottom: 5px;">
+                <li style="margin-bottom: 3px;">Under 100: Excellent (no penalty)</li>
+                <li style="margin-bottom: 3px;">100-250: Minor penalty (-5 points)</li>
+                <li style="margin-bottom: 3px;">Over 250: Moderate penalty (-10 points)</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<h4 class="h4title">💡 Actionable Recommendations</h4>
+<p style="margin-bottom: 15px;">The most valuable part of the Health Score interface is the recommendations section. Based on the specific issues detected, the plugin provides prioritized, actionable suggestions with direct links to the tools you need.</p>
+
+<p style="margin-bottom: 10px;"><strong>Recommendations are prioritized by severity:</strong></p>
+<ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong style="color: #dc2626;">🔴 High Priority (Red):</strong> Critical issues significantly impacting performance. Address immediately.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: #ea580c;">🟠 Medium Priority (Orange):</strong> Notable issues that should be addressed soon to prevent degradation.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: #2563eb;">🔵 Low Priority (Blue):</strong> Minor optimizations that can improve efficiency when convenient.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: #059669;">🟢 Success (Green):</strong> No issues detected. Database is healthy and optimized.</li>
 </ul>
-</li>
- 	<li style="margin-bottom: 8px;"><strong>💡 Details &amp; Recommendations:</strong> This is the most important part. It provides <em>actionable advice</em> based on your score.</li>
-</ul>
+
+<blockquote style="border-left: 4px solid #3b82f6; padding: 12px 18px; margin-left: 0; margin-right: 0; margin-top: 20px; margin-bottom: 15px; font-style: italic; color: #555; background-color: #eff6ff; border-radius: 4px;">
+    <strong style="color: #1e40af; font-style: normal; font-weight: bold; display: block; margin-bottom: 8px;">💡 PRO TIP: Regular Monitoring</strong>
+    <p style="margin-bottom: 5px;">Your Health Score is cached for 12 hours to avoid unnecessary database queries. Click "⟲ Refresh" to force a new calculation after making changes.</p>
+    <p style="margin-bottom: 0;">Check your score weekly or after major content changes (like importing products, publishing many posts, or installing/uninstalling plugins) to catch issues early.</p>
+</blockquote>
 <h3 id="ch-5-2" class="h3title">📈 5.2. Database Statistics (The "What" - A Detailed Glossary)</h3>
 <p style="margin-bottom: 15px;">This is the raw data used to calculate your Health Score. It shows you <em>exactly</em> what was found in your database.</p>
 
@@ -1351,54 +1494,49 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 </ul>
 <h3 id="ch-7-5" class="h3title">📊 7.5. Feature: Performance Metrics (PageSpeed)</h3>
 <p style="margin-bottom: 15px;">Located under the 'Statistics' tab in section 4.1, this module integrates the Google PageSpeed Insights API directly into your WordPress dashboard. It allows you to monitor real-world performance metrics without leaving the platform, focusing on the <strong>Core Web Vitals</strong> that impact your search engine rankings and user experience.</p>
-
 <h4 class="h4title">🔑 API Configuration & Security</h4>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
     <li style="margin-bottom: 8px;"><strong>API Key Requirement:</strong> To use this feature, you must enter a valid Google PageSpeed Insights API key. This key remains visible in the settings field for easy management and verification.<br><strong>👉 Please note:</strong> the default key is a generic one and isn't unique to your website. You should get your own key for better security and accuracy.</li>
     <li style="margin-bottom: 8px;"><strong>Persistence:</strong> Once saved, the key is stored securely in your <code>settings.json</code> file.</li>
 </ul>
-
-<h4 class="h4title">📈 Understanding the 6 Key Metrics</h4>
-<p style="margin-bottom: 15px;">The plugin retrieves six specific data points. The results are color-coded based on Google's official performance thresholds:</p>
+<h4 class="h4title">📈 Understanding the 7 Key Metrics</h4>
+<p style="margin-bottom: 15px;">The plugin retrieves seven specific data points. The results are color-coded based on Google's official performance thresholds:</p>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
     <li style="margin-bottom: 8px;"><span style="color: #28a745; font-weight: bold;">● Green (Good):</span> The metric meets the recommended fast threshold.</li>
     <li style="margin-bottom: 8px;"><span style="color: #ffa400; font-weight: bold;">● Orange (Average):</span> Performance is acceptable but needs improvement.</li>
     <li style="margin-bottom: 8px;"><span style="color: #dc3545; font-weight: bold;">● Red (Poor):</span> The metric is significantly below recommendations and hurting UX.</li>
 </ul>
-
 <p style="margin-bottom: 15px;"><strong>Logged Metrics Glossary:</strong></p>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
     <li style="margin-bottom: 12px;"><strong>🎨 First Contentful Paint (FCP):</strong>
         <br><span style="color: #555;">Time until the first text or image is painted.</span>
         <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: It answers the user's question: "Is it loading?"</span>
     </li>
-    
     <li style="margin-bottom: 12px;"><strong>🖼️ Largest Contentful Paint (LCP):</strong>
         <br><span style="color: #555;">Time until the largest element (hero image, heading, video) becomes visible.</span>
         <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: This is the most important Core Web Vital for SEO. It tells the user the main content is ready.</span>
     </li>
-    
     <li style="margin-bottom: 12px;"><strong>📏 Cumulative Layout Shift (CLS):</strong>
         <br><span style="color: #555;">Measures visual stability. Do elements jump around while loading?</span>
         <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: Prevents users from accidentally clicking the wrong button due to a shifting layout.</span>
     </li>
-
+    <li style="margin-bottom: 12px;"><strong>🚀 Time to First Byte (TTFB):</strong>
+        <br><span style="color: #555;">Measures the time from the user's request until the first byte of the response arrives from the server.</span>
+        <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: A fast TTFB indicates efficient server processing and network response. High TTFB suggests server-side bottlenecks or slow hosting.</span>
+    </li>
     <li style="margin-bottom: 12px;"><strong>🚫 Total Blocking Time (TBT):</strong>
         <br><span style="color: #555;">Measures time the main thread is blocked, preventing input responsiveness.</span>
         <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: High TBT makes the site feel "frozen" or laggy when a user tries to scroll or click.</span>
     </li>
-
     <li style="margin-bottom: 12px;"><strong>⏱️ Speed Index (SI):</strong>
         <br><span style="color: #555;">Measures how quickly the content is visually displayed during page load.</span>
         <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: A lower score means the user perceives the page as loading faster.</span>
     </li>
-
     <li style="margin-bottom: 12px;"><strong>👆 Time to Interactive (TTI):</strong>
         <br><span style="color: #555;">Measures how long it takes for the page to become fully interactive.</span>
         <br><span style="color: #666; font-size: 0.9em; font-style: italic;">Why it matters: Ensures that when a user clicks a button, the site actually responds immediately.</span>
     </li>
 </ul>
-
 <h4 class="h4title">💾 Smart Caching & Logging</h4>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
     <li style="margin-bottom: 8px;"><strong>30-Day Persistence:</strong> To reduce API overhead and provide a stable reference, audit results are cached for <strong>30 days</strong>. You can bypass this cache at any time by clicking "Run Audit" to force a fresh test.</li>
@@ -1510,7 +1648,21 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 </div>
     <h2 id="ch-10" class="h2title">🔧 10. Troubleshooting &amp; Advanced FAQ</h2>
     <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px; list-style-type: none;">
-        <li id="ch-10-1" style="margin-bottom: 25px;">
+	<li id="ch-10-1" style="margin-bottom: 25px;">
+    <strong style="font-size: 1.1em; color: #1e40af;">🔄 Q: After updating/upgrading the plugin, some functions don't work (e.g., buttons don't respond).</strong>
+    <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
+        <li style="margin-bottom: 5px;"><strong>A:</strong> This is almost always a browser caching issue. Your browser is still using old versions of the plugin's JavaScript and CSS files.</li>
+        <li style="margin-bottom: 10px;"><strong>✅ Solution: Clear your browser cache</strong>
+            <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px;">
+                <li style="margin-bottom: 5px;"><strong>Chrome/Edge:</strong> Press <code>Ctrl+Shift+Delete</code> (Windows) or <code>Cmd+Shift+Delete</code> (Mac), select "Cached images and files", then click "Clear data".</li>
+                <li style="margin-bottom: 5px;"><strong>Firefox:</strong> Press <code>Ctrl+Shift+Delete</code> (Windows) or <code>Cmd+Shift+Delete</code> (Mac), select "Cache", then click "Clear Now".</li>
+                <li style="margin-bottom: 5px;"><strong>Safari:</strong> Go to Safari menu → Settings → Privacy → "Manage Website Data" → "Remove All".</li>
+                <li style="margin-bottom: 5px;"><strong>Quick alternative:</strong> Try a hard refresh by pressing <code>Ctrl+F5</code> (Windows) or <code>Cmd+Shift+R</code> (Mac) while on the plugin page.</li>
+            </ul>
+        </li>
+        <li style="margin-bottom: 5px;">After clearing the cache, refresh the plugin page. All functions should work normally.</li>
+    </ul>
+        <li id="ch-10-2" style="margin-bottom: 25px;">
             <strong style="font-size: 1.1em; color: #1e40af;">🚧 Q: I'm stuck in maintenance mode!</strong>
             <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
                 <li style="margin-bottom: 5px;">
@@ -1531,7 +1683,7 @@ brotli_types text/plain text/html text/css text/xml text/javascript
                 </li>
             </ul>
         </li>
- 	<li id="ch-10-2" style="margin-bottom: 25px;">
+ 	<li id="ch-10-3" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">🔄 Q: My restore failed, and the rollback <em>also</em> failed! What do I do?</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A:</strong> This is a critical but recoverable error. Your site is likely broken and showing a database error.
@@ -1559,33 +1711,33 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 </li>
 </ul>
 </li>
- 	<li id="ch-10-3" style="margin-bottom: 25px;">
+ 	<li id="ch-10-4" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">🎨 Q: I enabled caching, but my site looks broken (e.g., CSS is missing).</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A:</strong> This is a common issue and is almost always caused by a conflict with another plugin's "minification" or "combination" feature (e.g., from an optimization plugin or a page builder).</li>
  	<li style="margin-bottom: 5px;"><strong>✅ Solution:</strong> 1. Purge <em>all</em> caches: Click <strong>🗑️ Purge All Cache</strong> in Section 8. 2. Purge your page builder's cache (e.g., Elementor -&gt; Tools -&gt; Regenerate Files). 3. Purge your CDN cache (e.g., Cloudflare). 4. Clear your browser cache.</li>
 </ul>
 </li>
- 	<li id="ch-10-4" style="margin-bottom: 25px;">
+ 	<li id="ch-10-5" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">🌐 Q: I enabled "Browser Caching" and now my site is broken.</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A:</strong> This is very rare, but if it happens, you need to manually edit your <code>.htaccess</code> file.</li>
  	<li style="margin-bottom: 5px;"><strong>✅ Solution:</strong> 1. Use FTP or your host's File Manager. 2. Find the <code>.htaccess</code> file in the root of your WordPress site. 3. Open and edit the file. 4. Find the block of text that starts with <code># BEGIN WP Optimal State Caching</code> and ends with <code># END WP Optimal State Caching</code>. 5. Delete that <em>entire</em> block of text and save the file. Your site will be back to normal.</li>
 </ul>
 </li>
- 	<li id="ch-10-5" style="margin-bottom: 25px;">
+ 	<li id="ch-10-6" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">⏳ Q: The "Automatic Preload" gets stuck or times out.</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A:</strong> This is common on shared hosting or on sites with thousands of pages. Preloading is a "nice to have," not a "must-have." The cache will still build "organically" as visitors hit your pages. You can safely click "Stop" and ignore the preload feature.</li>
 </ul>
 </li>
- 	<li id="ch-10-6" style="margin-bottom: 25px;">
+ 	<li id="ch-10-7" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">❌ Q: The plugin shows a "Critical Error: Cannot initialize WP_Filesystem."</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A:</strong> This is a server configuration problem, not a plugin bug. It means your <code>wp-content/uploads/</code> directory is not writable by WordPress. You must contact your hosting provider and ask them to fix the file/directory permissions for your <code>uploads</code> folder.</li>
 </ul>
 </li>
- 	<li id="ch-10-7" style="margin-bottom: 25px;">
+ 	<li id="ch-10-8" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">☁️ Q: I'm using a CDN (like Cloudflare). Will this work?</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A:</strong> Yes! The Caching features work perfectly with CDNs.
@@ -1597,7 +1749,7 @@ brotli_types text/plain text/html text/css text/xml text/javascript
 </li>
 </ul>
 </li>
- 	<li id="ch-10-8" style="margin-bottom: 25px;">
+ 	<li id="ch-10-9" style="margin-bottom: 25px;">
         <strong style="font-size: 1.1em; color: #1e40af;">🖥 Q: Does this plugin work on Nginx servers?</strong>
 <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
  	<li style="margin-bottom: 5px;"><strong>A: Yes, absolutely.</strong> All core features—including database backup, restore, cleanup, optimization, and server-side page caching—work perfectly on Nginx servers right out of the box.</li>
@@ -1610,7 +1762,7 @@ brotli_types text/plain text/html text/css text/xml text/javascript
  	<li style="margin-bottom: 5px;">The manual provides the Nginx configuration needed for security and caching, ready to copy and paste. Please see <strong><a href="#ch-7-3-1" style="color: #16358a; text-decoration: underline;">Section 7.3.1</a></strong> for the required instructions.</li>
 </ul>
 </li>
-<li id="ch-10-9" style="margin-bottom: 25px;">
+<li id="ch-10-10" style="margin-bottom: 25px;">
     <strong style="font-size: 1.1em; color: #1e40af;">🚦 Q: My PageSpeed Audit is showing an "API Error" or failing to load.</strong>
     <ul style="padding-left: 30px; margin-top: 8px; margin-bottom: 8px; list-style-type: none;">
         <li style="margin-bottom: 5px;"><strong>A:</strong> This is typically caused by one of three things:
@@ -1667,7 +1819,7 @@ add_filter('optistate_safe_query_params', function($params) {<br>
 </div>
 <div style="height: 100px;"></div>
 <div class="gtranslate_wrapper"></div>
-<script>window.gtranslateSettings = {"default_language":"en","native_language_names":true,"detect_browser_language":true,"languages":["en","fr","es","de","ja","pt","it","zh-CN","ru","ko","tr","id","hi","ar"],"wrapper_selector":".gtranslate_wrapper","flag_size":24,"horizontal_position":"right","vertical_position":"bottom"}</script>
+<script>window.gtranslateSettings = {"default_language":"en","native_language_names":true,"languages":["en","fr","es","de","ja","pt","it","zh-CN","ru","ko","tr","id","hi","ar"],"wrapper_selector":".gtranslate_wrapper","flag_size":24,"horizontal_position":"right","vertical_position":"bottom"}</script>
 <script src="https://cdn.gtranslate.net/widgets/latest/popup.js" defer></script>
 
 <button id="back-to-toc" aria-label="Back to Table of Contents">

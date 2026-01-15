@@ -877,7 +877,6 @@ jQuery(document).ready(function($) {
     'pingbacks': __('Pingbacks', 'optistate'),
     'trackbacks': __('Trackbacks', 'optistate'),
     'all_transients': __('All Transients (Non-expired)', 'optistate'),
-    'as_completed': __('Completed Action Logs', 'optistate'),
     'action_scheduler': __('Action Logs', 'optistate'),
     'oembed_cache': __('oEmbed Cache', 'optistate'),
     'woo_bloat': __('WooCommerce Sessions/Logs', 'optistate'),
@@ -3468,11 +3467,12 @@ jQuery(document).ready(function($) {
       if(value <= thresholds.needsImprovement) return '#ffa400';
       return '#dc3545';
     };
-    const updateMetricCard = (id, metricData, thresholds) => {
+      const updateMetricCard = (id, metricData, thresholds) => {
       const $el = $(id);
       const $card = $el.closest('.optistate-targeted-card');
-      const display = metricData.display || 'N/A';
-      const value = metricData.value || 0;
+      const safeData = metricData || {}; 
+      const display = safeData.display || 'N/A';
+      const value = safeData.value || 0;
       $el.text(`→ ${display}`);
       const metricColor = getMetricColor(value, thresholds);
       $card.css({
@@ -3607,9 +3607,11 @@ jQuery(document).ready(function($) {
         showToast(response.data.message || __('Audit failed to start.', 'optistate'), 'error');
         resetButton();
       }
-    }).fail(function() {
-      showToast(__('Connection error.', 'optistate'), 'error');
-      resetButton();
+      }).fail(function(xhr) {
+        if (forceRefresh || xhr.status !== 429) {
+            showToast(__('Connection error.', 'optistate'), 'error');
+        }
+        resetButton();
     });
     function resetButton() {
         isProcessing = false;

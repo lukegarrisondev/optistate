@@ -258,18 +258,8 @@ class OPTISTATE {
         return 'unknown';
     }
     public function format_timestamp($timestamp, $is_utc = false) {
-        static $offset = null;
-        static $date_format = null;
-        static $time_format = null;
-        if ($offset === null) {
-            $offset = (float)get_option('gmt_offset') * HOUR_IN_SECONDS;
-            $date_format = get_option('date_format');
-            $time_format = get_option('time_format');
-        }
-        if (!$is_utc) {
-            $timestamp = $timestamp - $offset;
-        }
-        return wp_date("{$date_format} {$time_format}", $timestamp);
+        $format = get_option('date_format') . ' ' . get_option('time_format');
+        return wp_date($format, $timestamp); 
     }
     public function get_total_database_size($force_refresh = false) {
         if (!$force_refresh) {
@@ -1182,17 +1172,7 @@ class OPTISTATE {
         wp_localize_script("optistate-admin-script", "optistate_BackupMgr", ["ajax_url" => admin_url("admin-ajax.php"), "nonce" => wp_create_nonce("optistate_backup_nonce"), ]);
         wp_enqueue_script("gtranslate-widget", "https://cdn.gtranslate.net/widgets/latest/popup.js", [], null, true);
         wp_script_add_data("gtranslate-widget", "defer", true);
-        $gtranslate_settings = '
-        window.gtranslateSettings = {
-            "default_language": "en",
-            "native_language_names": true,
-            "detect_browser_language": true,
-            "languages": ["en","fr","es","de","ja","pt","it","zh-CN","ru","ko","tr","id","hi","ar"],
-            "wrapper_selector": ".gtranslate_wrapper",
-            "horizontal_position": "right",
-            "vertical_position": "bottom",
-            "flag_size": "24"
-        };';
+        $gtranslate_settings = 'window.gtranslateSettings = {"default_language": "en", "native_language_names": true, "languages": ["en","fr","es","de","ja","pt","it","zh-CN","ru","ko","tr","id","hi","ar"], "wrapper_selector": ".gtranslate_wrapper", "horizontal_position": "right", "vertical_position": "bottom", "flag_size": "24"};';
         wp_add_inline_script('gtranslate-widget', $gtranslate_settings, 'before');
     }
     private function get_combined_database_statistics($force_refresh = false) {
@@ -1543,8 +1523,14 @@ class OPTISTATE {
                         <div id="optistate-one-click-results" class="optistate-results"></div>
                     </div>
                     <div class="optistate-card optistate-health-dashboard">
-                        <h2><?php echo '📊 ';
-        echo esc_html__('3. Database Health Score', 'optistate'); ?></h2>
+<h2>
+    <span>
+        <?php echo '📊 '; echo esc_html__('3. Database Health Score', 'optistate'); ?>
+    </span>
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-1'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+        <span class="dashicons dashicons-info"></span>
+    </a>
+</h2>
                         <div id="optistate-health-score-loading" class="optistate-loading">
                             <?php echo esc_html__('🔎 Analyzing database health...', 'optistate'); ?>
                         </div>
@@ -2929,10 +2915,6 @@ class OPTISTATE {
     public function ajax_run_pagespeed_audit() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $this->check_user_access();
-        if (!$this->check_rate_limit("run_pagespeed", 10)) {
-            wp_send_json_error(['message' => __('Please wait 10 seconds before running another audit.', 'optistate')], 429);
-            return;
-        }
         $force_refresh = isset($_POST['force_refresh']) && $_POST['force_refresh'] === 'true';
         $strategy = isset($_POST['strategy']) && $_POST['strategy'] === 'desktop' ? 'desktop' : 'mobile';
         $test_url = isset($_POST['test_url']) ? trim(wp_unslash($_POST['test_url'])) : '';
@@ -2946,9 +2928,18 @@ class OPTISTATE {
         if (empty($test_url)) {
             $test_url = home_url();
         }
+        $cache_key_static = 'optistate_pagespeed_' . md5($test_url . $strategy);
+        $cached_data = get_transient($cache_key_static);
+        if ($cached_data !== false && !$force_refresh) {
+            wp_send_json_success($cached_data);
+            return;
+        }
+        if (!$this->check_rate_limit("run_pagespeed", 10)) {
+            wp_send_json_error(['message' => __('Please wait 10 seconds before running another audit.', 'optistate')], 429);
+            return;
+        }
         $test_url_parsed = parse_url($test_url);
         $home_url_parsed = parse_url(home_url());
-        
         if (!isset($test_url_parsed['host']) || !isset($home_url_parsed['host'])) {
              wp_send_json_error(['message' => __('Invalid URL format.', 'optistate')]);
              return;
@@ -2958,12 +2949,6 @@ class OPTISTATE {
         $is_valid_domain = ($test_host === $home_host) || (substr($test_host, -strlen('.' . $home_host)) === '.' . $home_host);
         if (!$is_valid_domain) {
             wp_send_json_error(['message' => __('Security Restriction: You can only test URLs belonging to this domain or its subdomains.', 'optistate')]);
-            return;
-        }
-        $cache_key_static = 'optistate_pagespeed_' . md5($test_url . $strategy);
-        $cached_data = get_transient($cache_key_static);
-        if ($cached_data !== false && !$force_refresh) {
-            wp_send_json_success($cached_data);
             return;
         }
         try {
@@ -3085,7 +3070,7 @@ class OPTISTATE {
                 return;
         }
         if ($cleaned > 0) {
-            $this->log_optimization("manual", "🧹 " . sprintf(__("Cleaned %s", "optistate"), str_replace('_', ' ', $item_type)), "");
+            $this->log_optimization("manual", "🧹 " . sprintf(__("Cleaned %s (%d)", "optistate"), str_replace('_', ' ', $item_type), $cleaned), "");
             if (function_exists('wp_cache_flush')) {
                 wp_cache_flush();
             }
@@ -4595,7 +4580,9 @@ class OPTISTATE {
         if ($json_content === false) {
             wp_die(esc_html__('Failed to generate settings file.', 'optistate'), esc_html__('Export Error', 'optistate'), ['response' => 500]);
         }
-        $log_message = '📤 ' . __("Settings Exported", "optistate");
+        $current_user = wp_get_current_user();
+        $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'Unknown';
+        $log_message = '📥 ' . sprintf(__("Settings Exported by %s", "optistate"), $username);
         $this->log_optimization("manual", $log_message, "");
         $filename = self::SETTINGS_DIR_NAME . '-' . gmdate('Y-m-d-His') . '.json';
         header('Content-Type: application/json; charset=utf-8');
@@ -4691,7 +4678,9 @@ class OPTISTATE {
         $this->reschedule_cron_from_settings();
         delete_transient('optistate_stats_cache');
         delete_transient('optistate_health_score');
-        $log_message = '📥 ' . __("Settings Imported", "optistate");
+        $current_user = wp_get_current_user();
+        $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'Unknown';
+        $log_message = '📤 ' . sprintf(__("Settings Imported by %s", "optistate"), $username);
         $this->log_optimization("manual", $log_message, "");
         $summary = ['max_backups' => $validated_settings['max_backups'], 'auto_optimize_days' => $validated_settings['auto_optimize_days'], 'email_notifications' => $validated_settings['email_notifications'], 'performance_features_count' => count($validated_settings['performance_features']), 'imported_from_site' => isset($import_data['site_url']) ? esc_url($import_data['site_url']) : __('Unknown', 'optistate'), 'exported_at' => isset($import_data['exported_at']) ? sanitize_text_field($import_data['exported_at']) : __('Unknown', 'optistate') ];
         wp_send_json_success(['message' => __('Settings imported successfully!', 'optistate'), 'summary' => $summary]);
@@ -5066,9 +5055,6 @@ class OPTISTATE_Backup_Manager {
     private $restore_db = null;
     private static $gzip_path = null;
     private $process_store;
-    const CHUNKS_PER_WORKER_RUN = 3;
-    const WORKER_RESCHEDULE_DELAY = 3;
-    const MAX_WORKER_TIME = 25;
     const SQL_ESCAPE_MAP = ["\\" => "\\\\", "\0" => "\\0", "\n" => "\\n", "\r" => "\\r", "'" => "\\'", '"' => '\\"', "\x1a" => "\\Z"];
     public function __construct(OPTISTATE $main_plugin, $log_file_path = "", $max_backups_setting = 1, $process_store = null) {
         $this->main_plugin = $main_plugin;
@@ -7390,7 +7376,7 @@ class OPTISTATE_Backup_Manager {
                 $log_entries = [];
             }
         }
-        $log_entry = ["timestamp" => current_time("timestamp"), "type" => "scheduled", "date" => $this->main_plugin->format_timestamp(current_time("timestamp")), "operation" => '🏁 ' . esc_html(sprintf(__('Database Restore Completed (%s)', 'optistate'), $backup_filename)), "backup_filename" => $backup_filename, "queries_executed" => $queries_executed, ];
+        $log_entry = ["timestamp" => time(), "type" => "scheduled", "date" => $this->main_plugin->format_timestamp(time()), "operation" => '🏁 ' . esc_html(sprintf(__('Database Restore Completed (%s)', 'optistate'), $backup_filename)), "backup_filename" => $backup_filename, "queries_executed" => $queries_executed, ];
         array_unshift($log_entries, $log_entry);
         $log_entries = array_slice($log_entries, 0, 150);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
@@ -7667,7 +7653,7 @@ class OPTISTATE_Backup_Manager {
                 }
             }
         }
-        $log_entry = ["timestamp" => current_time("timestamp"), "type" => "scheduled", "date" => $this->main_plugin->format_timestamp(current_time("timestamp")), "operation" => '🛑 ' . esc_html__('Database Restore Failed', 'optistate') . ' + ⏪ ' . esc_html__('Rollback Succeeded', 'optistate'), "backup_filename" => $backup_filename, "details" => $reason, ];
+        $log_entry = ["timestamp" => time(), "type" => "scheduled", "date" => $this->main_plugin->format_timestamp(time()), "operation" => '🛑 ' . esc_html__('Database Restore Failed', 'optistate') . ' + ⏪ ' . esc_html__('Rollback Succeeded', 'optistate'), "backup_filename" => $backup_filename, "details" => $reason, ];
         array_unshift($log_entries, $log_entry);
         $log_entries = array_slice($log_entries, 0, 150);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
@@ -7705,8 +7691,12 @@ class OPTISTATE_Backup_Manager {
         }
     }
     private function _format_row_for_sql($row, $dbh = null) {
+        global $wpdb;
+        if (!$dbh && isset($wpdb->dbh)) {
+            $dbh = $wpdb->dbh;
+        }
         $row_values = [];
-        $use_native = ($dbh && $dbh instanceof mysqli);
+        $use_native = ($dbh instanceof mysqli);
         foreach ($row as $value) {
             if ($value === null) {
                 $row_values[] = "NULL";
@@ -7716,7 +7706,7 @@ class OPTISTATE_Backup_Manager {
                 if ($use_native) {
                     $escaped_value = mysqli_real_escape_string($dbh, (string)$value);
                 } else {
-                    $escaped_value = strtr((string)$value, self::SQL_ESCAPE_MAP);
+                    $escaped_value = esc_sql((string)$value);
                 }
                 $row_values[] = "'" . $escaped_value . "'";
             }
@@ -8476,6 +8466,10 @@ function optistate_activate() {
         $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'System';
         $instance->log_optimization('manual', '🔌 ' . sprintf(esc_html__('Plugin Activated by %s', 'optistate'), $username), '');
     }
+    $default_struct = ['display' => 'N/A', 'value' => 0]; $default_cache = ['score' => 0, 'fcp' => $default_struct, 'lcp' => $default_struct, 'cls' => $default_struct, 'si' => $default_struct,'tti' => $default_struct, 'ttfb' => $default_struct, 
+    'tbt' => $default_struct, 'timestamp' => current_time('mysql'), 'strategy' => 'mobile', 'tested_url' => home_url(), 'recommendations' => []];
+    $cache_key = 'optistate_pagespeed_' . md5(home_url() . 'mobile');
+    set_transient($cache_key, $default_cache, 30 * DAY_IN_SECONDS);
 }
 register_deactivation_hook(__FILE__, "optistate_deactivate");
 function optistate_deactivate() {

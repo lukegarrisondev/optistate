@@ -124,7 +124,8 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
  	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-5">5.5. 🔪 Detailed Database Cleanup (The "Scalpel")</a></li>
     <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-6">5.6. ⚡ Advanced Database Optimization (The "Power Tools")</a></li>
  	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-7">5.7. 🔍 Database Structure Analysis</a></li>
-    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-8">5.8. ↳↰ Database Search &amp; Replace</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-8">5.8. 🔢 MySQL Index Manager</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-9">5.9. ↳↰ Database Search &amp; Replace</a></li>
 </ul>
 </li>
  	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-6">⏰ Automatic Backup &amp; Cleanup (Section 7)</a></strong>
@@ -143,6 +144,7 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-3-1">7.3.1 🖥 Nginx Server Configuration (Security + Caching)</a></li>
  	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-4">7.4. 🏗️ Feature: WordPress Core Optimizations (A-Z)</a></li>
 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-5">7.5. 📊 Feature: Performance Metrics (PageSpeed)</a></li>
+	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-7-6">7.6. 🤖 Feature: Bad Bot Blocker</a></li>
 </ul>
 </li>
  	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-8">🎯 Optimization Strategies: Putting It All Together</a></strong>
@@ -711,7 +713,7 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 </li>
 </ul>
 <h3 id="ch-5-7" class="h3title">🔍 5.7. Database Structure Analysis</h3>
-<p style="margin-bottom: 15px;">At the bottom of Section 6, this tool provides a complete map of your database structure and allows you to remove unused tables.</p>
+<p style="margin-bottom: 15px;">Inside section 6, under the Advanced tab, this tool provides a complete map of your database structure and allows you to remove unused tables.</p>
 <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
  	<li style="margin-bottom: 8px;"><strong>📊 Database Summary:</strong> Shows total tables, core vs. plugin tables, and total size.</li>
  	<li style="margin-bottom: 8px;"><strong>🏗️ WordPress Core Tables:</strong> Lists all standard WP tables (e.g., <code>wp_posts</code>, <code>wp_users</code>) with descriptions of what they do.</li>
@@ -723,7 +725,27 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
         </ul>
     </li>
 </ul>
-<h3 id="ch-5-8" class="h3title">↳↰ 5.8. Database Search &amp; Replace</h3>
+<h3 id="ch-5-8" class="h3title">🔢 5.8. MySQL Index Manager</h3>
+<p style="margin-bottom: 15px;">Located inside section 6, The MySQL Index Manager is a high-performance tool designed to streamline how your database retrieves data. Think of an index like the index at the back of a book: instead of reading every page to find a topic, the database uses the index to jump straight to the information it needs.</p>
+
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚀 Why This Matters</strong>
+    <p style="margin-bottom: 0;">Without proper indexing, your database performs "Full Table Scans," which consume massive CPU resources and slow down your site as it grows. This tool identifies missing indexes and suggests "Composite Indexes" (multi-column) to make complex queries lightning-fast.</p>
+</blockquote>
+
+<h4 class="h4title">🛠️ How to Use the Index Manager</h4>
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Analyze:</strong> Click the "Analyze Database Indexes" button. The plugin will scan your core WordPress tables (Options, Posts, Postmeta, Usermeta).</li>
+    <li style="margin-bottom: 8px;"><strong>Review Recommendations:</strong> The tool will show you exactly what is missing and explain the benefit (e.g., "Speeds up initial site loading").</li>
+    <li style="margin-bottom: 8px;"><strong>Apply:</strong> Click "Add Index" to apply the optimization. The plugin handles the complex SQL commands for you.</li>
+</ol>
+
+<h4 class="h4title">🛡️ Intelligent Safety Features</h4>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Redundancy Detection:</strong> The plugin won't let you add an index if a "Covering Index" already exists. This prevents "Index Bloat," which can actually slow down database writes.</li>
+    <li style="margin-bottom: 8px;"><strong>Duplicate Prevention:</strong> It automatically checks if an index with the same name or column structure exists before attempting any changes.</li>
+</ul>
+<h3 id="ch-5-9" class="h3title">↳↰ 5.9. Database Search &amp; Replace</h3>
 <p style="margin-bottom: 15px;">Located in the "Advanced" tab, this professional-grade tool allows you to find and replace text strings across your entire database. It is essential for tasks like migrating domains (http to https), updating shortcodes, or fixing bulk content errors.</p>
 <blockquote class="niceblock">
     <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 CRITICAL WARNING</strong>
@@ -1542,6 +1564,157 @@ brotli_types text/plain text/html text/css text/xml text/javascript
     <li style="margin-bottom: 8px;"><strong>30-Day Persistence:</strong> To reduce API overhead and provide a stable reference, audit results are cached for <strong>30 days</strong>. You can bypass this cache at any time by clicking "Run Audit" to force a fresh test.</li>
     <li style="margin-bottom: 8px;"><strong>Activity Logging:</strong> Every successful audit is automatically recorded in the Activity Log (Section 8) using the format: <code>Performance Audit Updated (Score% - Strategy)</code>. For example: <code>⚡ Performance Audit Updated (98% - Desktop)</code>.</li>
 </ul>
+<h3 id="ch-7-6" class="h3title">🤖 7.6. Feature: Bad Bot Blocker</h3>
+<p style="margin-bottom: 15px;">Not all traffic to your website is human or helpful. Resource-intensive bots—such as aggressive SEO crawlers, backlink analyzers, and competitive intelligence tools—can consume up to 40% of your server resources without providing any value to your business or visitors.</p>
+
+<div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 18px; margin-bottom: 15px; border-radius: 4px;">
+    <strong>💡 The Benefit:</strong> By blocking these bots at the application level, you save CPU cycles and RAM, ensuring your server remains responsive for real visitors and legitimate search engines like Google and Bing.
+</div>
+
+<h4 class="h4title">🎯 What This Feature Blocks</h4>
+<p style="margin-bottom: 15px;">The Bad Bot Blocker targets specific categories of bots that consume resources without benefiting your website:</p>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>🔗 SEO Crawler Bots:</strong> Tools like AhrefsBot, SemrushBot, and MJ12bot that crawl your site repeatedly to build backlink databases. These only benefit their platforms' subscribers, not your website.</li>
+    <li style="margin-bottom: 8px;"><strong>📊 Competitive Intelligence Bots:</strong> Bots that analyze your content, pricing, and structure to provide data to your competitors or third-party analytics services.</li>
+    <li style="margin-bottom: 8px;"><strong>⚡ High-Volume Crawlers:</strong> Bots known for aggressive crawling patterns that ignore standard rate-limiting protocols and consume excessive bandwidth.</li>
+</ul>
+
+<div style="border-left: 4px solid #10b981; padding: 12px 18px; margin: 15px 0; background-color: #f0fdf4; border-radius: 4px;">
+    <strong style="color: #065f46;">✅ What This Feature DOES NOT Block:</strong>
+    <ul style="padding-left: 20px; margin-top: 8px; margin-bottom: 0;">
+        <li style="margin-bottom: 5px;">Legitimate search engines (Google, Bing, DuckDuckGo, Yahoo, Yandex)</li>
+        <li style="margin-bottom: 5px;">Social media crawlers (Facebook, Twitter, LinkedIn)</li>
+        <li style="margin-bottom: 5px;">Monitoring services (Pingdom, UptimeRobot)</li>
+        <li style="margin-bottom: 5px;">Content delivery networks and caching services</li>
+    </ul>
+</div>
+
+<h4 class="h4title">🤖 Default Blocked Bots List</h4>
+<p style="margin-bottom: 10px;">When enabled, the following bots are blocked by default. This list has been carefully curated to include only resource-intensive crawlers that provide no direct benefit to your website:</p>
+
+<div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin: 15px 0;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #d1d5db;">
+                <th style="text-align: left; padding: 10px; color: #1e40af; font-weight: 600;">Bot Name</th>
+                <th style="text-align: left; padding: 10px; color: #1e40af; font-weight: 600;">Purpose</th>
+                <th style="text-align: center; padding: 10px; color: #1e40af; font-weight: 600;">Impact</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>MJ12bot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Majestic SEO backlink crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>AhrefsBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Ahrefs backlink database crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">VERY HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>SemrushBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Semrush SEO platform crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">VERY HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>DotBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Moz Link Explorer crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>PetalBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Huawei Petal Search crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">VERY HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>Bytespider</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">ByteDance/TikTok AI crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">EXTREME</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>Mauibot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Unknown bot from AWS</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">MEDIUM</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>MegaIndex</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Russian SEO backlink crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>SerpstatBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">Serpstat SEO platform crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>BLEXBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">WebMeUp backlink checker</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px;"><strong>DataForSeoBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">DataForSEO API crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;"><strong>AspiegelBot</strong></td>
+                <td style="padding: 10px; font-size: 0.95em;">SEO competitive analysis crawler</td>
+                <td style="padding: 10px; text-align: center;"><span style="background-color: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">HIGH</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 18px; margin: 15px 0; border-radius: 4px;">
+    <strong style="color: #92400e;">📝 Customization Available:</strong> You can customize this list directly in the plugin settings by adding or removing bot user agents (one per line). To learn more about specific bots and their purposes, visit the <a href="https://radar.cloudflare.com/bots/directory?kind=all" target="_blank" style="color: #b45309; text-decoration: underline; font-weight: 600;">Cloudflare Bot Directory</a>.
+</div>
+
+<h4 class="h4title">⚙️ How It Works</h4>
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>🛡️ Early Blocking:</strong> Bots are identified by their User-Agent string and blocked before they can trigger resource-intensive WordPress processes.</li>
+    <li style="margin-bottom: 8px;"><strong>📉 Immediate Resource Savings:</strong> By preventing these bots from executing PHP and database queries, your <em>Time to First Byte (TTFB)</em> remains stable even during high bot activity.</li>
+    <li style="margin-bottom: 8px;"><strong>✅ SEO Safe:</strong> This feature is carefully designed to never block legitimate search engines (Google, Bing, DuckDuckGo, Yahoo, Yandex) or social media crawlers, ensuring your search rankings and social sharing remain unaffected.</li>
+    <li style="margin-bottom: 8px;"><strong>🔧 Fully Customizable:</strong> Advanced users can modify the blocked bot list in the Performance tab to suit their specific needs or allow certain crawlers if they use those services.</li>
+</ul>
+
+<h4 class="h4title">💡 When Should You Use This Feature?</h4>
+<div style="background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 15px; margin: 15px 0;">
+    <p style="margin-bottom: 10px;"><strong style="color: #065f46;">✅ Recommended for:</strong></p>
+    <ul style="padding-left: 20px; margin-top: 8px; margin-bottom: 15px;">
+        <li style="margin-bottom: 5px;">Sites experiencing high server load from bot traffic</li>
+        <li style="margin-bottom: 5px;">Shared hosting environments with limited resources</li>
+        <li style="margin-bottom: 5px;">Sites that don't need to be indexed by third-party SEO tools</li>
+        <li style="margin-bottom: 5px;">Most WordPress websites (as a general optimization)</li>
+    </ul>
+    <p style="margin-bottom: 10px;"><strong style="color: #92400e;">⚠️ Consider disabling if:</strong></p>
+    <ul style="padding-left: 20px; margin-top: 8px; margin-bottom: 0;">
+        <li style="margin-bottom: 5px;">You actively use services like Ahrefs, Semrush, or Moz and want them to crawl your site</li>
+        <li style="margin-bottom: 5px;">You're running an SEO tool or service that needs to analyze competitor websites</li>
+        <li style="margin-bottom: 5px;">You have custom monitoring bots that might use similar user agents</li>
+    </ul>
+</div>
+
+<blockquote style="border-left: 4px solid #3b82f6; padding: 12px 18px; margin: 15px 0 15px 0; font-style: italic; color: #555; background-color: #eff6ff; border-radius: 4px;">
+    <strong style="color: #1e40af; font-style: normal; font-weight: bold; display: block; margin-bottom: 8px;">💡 PRO TIP: Nginx Users</strong>
+    <p style="margin-bottom: 0;">For maximum performance, we recommend combining this feature with the Nginx security rules provided below. This allows your server to drop bad traffic at the web server level, before it even reaches PHP or WordPress—resulting in even greater resource savings.</p>
+
+<div style="background-color: #1a1a1a; color: #fff; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #333;">
+    <h4 style="color: #60a5fa; margin-top: 0; margin-bottom: 15px;">🚀 Nginx Implementation Guide</h4>
+    <p style="font-size: 0.9em; margin-bottom: 15px; color: #ccc;">If you are using an Nginx server, add the following block to your server configuration file (e.g., <code>/etc/nginx/sites-available/your-domain.com</code>) inside the <code>server { }</code> block. This will block bots at the web server level for maximum efficiency:</p>
+    <pre style="background: #000; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 13px; color: #4ade80; overflow-x: auto; margin-bottom: 0;">
+# WP-OPTIMAL-STATE: High-Performance Bot Blocking
+if ($http_user_agent ~* (MJ12bot|AhrefsBot|SemrushBot|DotBot|PetalBot|Bytespider|Mauibot|MegaIndex|SerpstatBot|BLEXBot|DataForSeoBot|AspiegelBot)) {
+    return 403;
+}</pre>
+    <p style="font-size: 0.9em; margin-top: 10px; margin-bottom: 8px; color: #999;"><strong>Important:</strong> After adding this configuration:</p>
+    <ol style="font-size: 0.9em; color: #999; padding-left: 20px; margin: 0;">
+        <li style="margin-bottom: 5px;">Test your configuration: <code>nginx -t</code></li>
+        <li style="margin-bottom: 5px;">If test passes, reload Nginx: <code>systemctl reload nginx</code></li>
+        <li>Monitor your server logs to ensure legitimate traffic isn't affected</li>
+    </ol>
+</div>
+</blockquote>
 <h2 id="ch-8" class="h2title">🎯 8. Optimization Strategies: Putting It All Together</h2>
 <p style="margin-bottom: 15px;">Here are a few "recipes" for common scenarios.</p>
 

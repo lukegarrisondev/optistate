@@ -39,7 +39,7 @@ class OPTISTATE_Process_Store {
                 process_value = VALUES(process_value), 
                 expiration = VALUES(expiration), 
                 created_at = VALUES(created_at)";
-                $suppress = $wpdb->suppress_errors(true);
+        $suppress = $wpdb->suppress_errors(true);
         $result = $wpdb->query($wpdb->prepare($sql, $key, $json_value, $expire_time, $created_at));
         $wpdb->suppress_errors($suppress);
         return $result !== false;
@@ -69,7 +69,7 @@ class OPTISTATE_Process_Store {
     }
     public function cleanup() {
         global $wpdb;
-        self::$runtime_cache = []; 
+        self::$runtime_cache = [];
         $suppress = $wpdb->suppress_errors(true);
         $wpdb->query($wpdb->prepare("DELETE FROM {$this->table_name} WHERE expiration > 0 AND expiration < %d", time()));
         $wpdb->suppress_errors($suppress);
@@ -159,18 +159,15 @@ class OPTISTATE {
         $this->temp_dir = $base_dir . self::TEMP_DIR_NAME . '/';
         $this->cache_dir = $base_dir . self::CACHE_DIR_NAME . '/';
         if (is_admin() || (defined('DOING_AJAX') && DOING_AJAX) || (defined('WP_CLI') && WP_CLI)) {
-        $this->ensure_directories_exist();
-        $config_constants = get_transient('optistate_config_constants');
+            $this->ensure_directories_exist();
+            $config_constants = get_transient('optistate_config_constants');
             if ($config_constants === false) {
-            $config_constants = [
-            'WP_POST_REVISIONS' => $this->is_constant_in_wp_config('WP_POST_REVISIONS'), 
-            'EMPTY_TRASH_DAYS' => $this->is_constant_in_wp_config('EMPTY_TRASH_DAYS')
-            ];
-            set_transient('optistate_config_constants', $config_constants, 12 * HOUR_IN_SECONDS);
-        }
-        $this->is_revisions_defined = $config_constants['WP_POST_REVISIONS'];
-        $this->is_trash_days_defined = $config_constants['EMPTY_TRASH_DAYS'];
-            } else {
+                $config_constants = ['WP_POST_REVISIONS' => $this->is_constant_in_wp_config('WP_POST_REVISIONS'), 'EMPTY_TRASH_DAYS' => $this->is_constant_in_wp_config('EMPTY_TRASH_DAYS') ];
+                set_transient('optistate_config_constants', $config_constants, 12 * HOUR_IN_SECONDS);
+            }
+            $this->is_revisions_defined = $config_constants['WP_POST_REVISIONS'];
+            $this->is_trash_days_defined = $config_constants['EMPTY_TRASH_DAYS'];
+        } else {
             $this->is_revisions_defined = false;
         }
         $settings = $this->get_persistent_settings();
@@ -259,7 +256,7 @@ class OPTISTATE {
     }
     public function format_timestamp($timestamp, $is_utc = false) {
         $format = get_option('date_format') . ' ' . get_option('time_format');
-        return wp_date($format, $timestamp); 
+        return wp_date($format, $timestamp);
     }
     public function get_total_database_size($force_refresh = false) {
         if (!$force_refresh) {
@@ -457,28 +454,28 @@ class OPTISTATE {
     }
     public function validate_consent_for_session() {
         $perf_settings = $this->_performance_get_settings();
-        $server_caching = $perf_settings['server_caching'] ?? [];
+        $server_caching = $perf_settings['server_caching']??[];
         if (empty($server_caching['enabled']) || !empty($server_caching['disable_cookie_check'])) {
-        return;
+            return;
         }
         if (isset($_COOKIE['optistate_session_validated'])) {
-             return;
+            return;
         }
         $path = defined('COOKIEPATH') ? COOKIEPATH : '/';
         $domain = defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '';
         $secure = is_ssl();
         if ($this->has_any_consent_cookie()) {
             if (!isset($_COOKIE['optistate_consent_flag'])) {
-                 setcookie('optistate_consent_flag', '1', time() + YEAR_IN_SECONDS, $path, $domain, $secure, true);
+                setcookie('optistate_consent_flag', '1', time() + YEAR_IN_SECONDS, $path, $domain, $secure, true);
             }
             setcookie('optistate_session_validated', '1', 0, $path, $domain, $secure, true);
         } else {
-             $expires = time() - YEAR_IN_SECONDS;
-             if (isset($_COOKIE['optistate_consent_flag'])) {
-                 setcookie('optistate_consent_flag', '', $expires, $path, $domain, $secure, true);
+            $expires = time() - YEAR_IN_SECONDS;
+            if (isset($_COOKIE['optistate_consent_flag'])) {
+                setcookie('optistate_consent_flag', '', $expires, $path, $domain, $secure, true);
             }
             if (isset($_COOKIE['optistate_session_validated'])) {
-            setcookie('optistate_session_validated', '', $expires, $path, $domain, $secure, true);
+                setcookie('optistate_session_validated', '', $expires, $path, $domain, $secure, true);
             }
         }
     }
@@ -977,7 +974,7 @@ class OPTISTATE {
         $this->update_cron_schedule($settings["auto_optimize_days"], $settings["auto_optimize_time"]);
     }
     private function register_ajax_handlers() {
-        $handlers = ["get_stats", "clean_item", "optimize_tables", "one_click_optimize", "optimize_autoload", "get_optimization_log", "save_max_backups", "save_auto_settings", "get_health_score", "get_performance_features", "save_performance_features", "check_htaccess_status", "purge_page_cache", "get_cache_stats", "export_settings", "import_settings", "search_replace_dry_run", "run_pagespeed_audit", "save_pagespeed_settings", "check_pagespeed_status"];
+        $handlers = ["get_stats", "clean_item", "optimize_tables", "one_click_optimize", "optimize_autoload", "get_optimization_log", "save_max_backups", "save_auto_settings", "get_health_score", "get_performance_features", "save_performance_features", "check_htaccess_status", "purge_page_cache", "get_cache_stats", "export_settings", "import_settings", "search_replace_dry_run", "run_pagespeed_audit", "save_pagespeed_settings", "check_pagespeed_status", "analyze_indexes", "check_index_status"];
         foreach ($handlers as $handler) {
             add_action("wp_ajax_optistate_" . $handler, [$this, "ajax_" . $handler]);
         }
@@ -1221,8 +1218,8 @@ class OPTISTATE {
             }
         }
         $as_actions_table = $wpdb->prefix . 'actionscheduler_actions';
-        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $as_actions_table))) { 
-        $stats['action_scheduler'] = (int)$wpdb->get_var("SELECT COUNT(*) FROM $as_actions_table WHERE status IN ('complete', 'failed', 'canceled')");
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $as_actions_table))) {
+            $stats['action_scheduler'] = (int)$wpdb->get_var("SELECT COUNT(*) FROM $as_actions_table WHERE status IN ('complete', 'failed', 'canceled')");
         }
         $stats['oembed_cache'] = (int)$wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key LIKE '_oembed_%'");
         $current_time = time();
@@ -1427,13 +1424,14 @@ class OPTISTATE {
                                         <td>
                                     <strong><?php echo esc_html($backup["filename"]); ?></strong>
                                     <div style="margin-top: 5px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
-                                    <?php if ($backup["verified"]) { echo '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' . esc_html__("Integrity", "optistate") . "</span>";
-                                        } else {
-                                        echo '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' . esc_html__("Integrity", "optistate") . "</span>";
-                                        } 
-                                    $b_type = isset($backup['type']) ? $backup['type'] : 'MANUAL';
-                                    $b_class = ($b_type === 'SCHEDULED') ? 'optistate-type-scheduled' : 'optistate-type-manual';
-                                    $b_icon = ($b_type === 'SCHEDULED') ? '⏰' : '👤'; ?>
+                                    <?php if ($backup["verified"]) {
+                    echo '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' . esc_html__("Integrity", "optistate") . "</span>";
+                } else {
+                    echo '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' . esc_html__("Integrity", "optistate") . "</span>";
+                }
+                $b_type = isset($backup['type']) ? $backup['type'] : 'MANUAL';
+                $b_class = ($b_type === 'SCHEDULED') ? 'optistate-type-scheduled' : 'optistate-type-manual';
+                $b_icon = ($b_type === 'SCHEDULED') ? '⏰' : '👤'; ?>
                                 <span class="optistate-backup-type" title="<?php echo esc_attr($b_type === 'MANUAL' ? 'Created manually by user' : 'Created automatically by the system'); ?>">
                                 <?php echo $b_icon . ' ' . esc_html($b_type); ?></span>
                                 </div>
@@ -1509,7 +1507,8 @@ class OPTISTATE {
                     <div class="optistate-card optistate-card-highlight">
 <h2>
     <span>
-        <?php echo '💥 '; echo esc_html__('2. One-Click Optimization', 'optistate'); ?>
+        <?php echo '💥 ';
+        echo esc_html__('2. One-Click Optimization', 'optistate'); ?>
     </span>
     <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-3'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
@@ -1525,7 +1524,8 @@ class OPTISTATE {
                     <div class="optistate-card optistate-health-dashboard">
 <h2>
     <span>
-        <?php echo '📊 '; echo esc_html__('3. Database Health Score', 'optistate'); ?>
+        <?php echo '📊 ';
+        echo esc_html__('3. Database Health Score', 'optistate'); ?>
     </span>
     <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-1'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
@@ -1656,26 +1656,19 @@ class OPTISTATE {
                     <option value=""><?php echo esc_html__('🏠 Homepage (Default)', 'optistate'); ?></option>
                     <optgroup label="<?php echo esc_attr__('Recent Posts', 'optistate'); ?>">
                         <?php
-                        $recent_posts = get_posts([
-                            'numberposts' => 10,
-                            'post_type' => 'post',
-                            'post_status' => 'publish'
-                        ]);
-                        foreach ($recent_posts as $post) {
-                            echo '<option value="' . esc_attr(get_permalink($post->ID)) . '">' . esc_html($post->post_title) . '</option>';
-                        }
-                        ?>
+        $recent_posts = get_posts(['numberposts' => 10, 'post_type' => 'post', 'post_status' => 'publish']);
+        foreach ($recent_posts as $post) {
+            echo '<option value="' . esc_attr(get_permalink($post->ID)) . '">' . esc_html($post->post_title) . '</option>';
+        }
+?>
                     </optgroup>
                     <optgroup label="<?php echo esc_attr__('Pages', 'optistate'); ?>">
                         <?php
-                        $pages = get_pages([
-                            'number' => 20,
-                            'sort_column' => 'post_title'
-                        ]);
-                        foreach ($pages as $page) {
-                            echo '<option value="' . esc_attr(get_permalink($page->ID)) . '">' . esc_html($page->post_title) . '</option>';
-                        }
-                        ?>
+        $pages = get_pages(['number' => 20, 'sort_column' => 'post_title']);
+        foreach ($pages as $page) {
+            echo '<option value="' . esc_attr(get_permalink($page->ID)) . '">' . esc_html($page->post_title) . '</option>';
+        }
+?>
                     </optgroup>
                 </select>
                 <input type="text" id="optistate-custom-url" 
@@ -1748,14 +1741,16 @@ class OPTISTATE {
     <div class="optistate-card">
 <h2>
     <span>
-        <?php echo '🧹 '; echo esc_html__("5. Detailed Database Cleanup", "optistate"); ?>
+        <?php echo '🧹 ';
+        echo esc_html__("5. Detailed Database Cleanup", "optistate"); ?>
     </span>
     <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-5'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
                 <p style="line-height: 1.7em;">
-            <?php echo '🔹 '; echo esc_html__('Items marked with this symbol ⚠️ are not included in the one-click optimization and should be reviewed carefully before deletion.', 'optistate'); ?><br>
+            <?php echo '🔹 ';
+        echo esc_html__('Items marked with this symbol ⚠️ are not included in the one-click optimization and should be reviewed carefully before deletion.', 'optistate'); ?><br>
             </p>
                <div class="optistate-cleanup-grid" id="optistate-cleanup-items"></div>
             <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #f0f0f1; text-align: right;">
@@ -1767,7 +1762,8 @@ class OPTISTATE {
             </div> </div> <div id="tab-advanced" class="optistate-tab-content"> <div class="optistate-card">
 <h2>
     <span>
-        <?php echo '🗄️ '; echo esc_html__("6. Advanced Database Optimization", "optistate"); ?>
+        <?php echo '🗄️ ';
+        echo esc_html__("6. Advanced Database Optimization", "optistate"); ?>
     </span>
     <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-6'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
@@ -1804,7 +1800,7 @@ class OPTISTATE {
                             <?php echo esc_html__('Identifies large autoloaded options and sets them to non-autoload to boost site speed.', 'optistate'); ?>
                         </p>
                     </div>
-                    <div class="optistate-analyzer-section">
+                    <div class="optistate-analyzer-section" style="margin-top: 30px;">
                         <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
                             <?php echo '🧩 ';
         echo esc_html__('Database Structure Analysis', 'optistate'); ?>
@@ -1827,8 +1823,30 @@ class OPTISTATE {
                         </div>
                         <div id="optistate-table-analysis-results" style="display: none;"></div>
                     </div>
-                   <hr style="margin: 35px 35px 25px;">
-                <div class="optistate-search-replace-section" style="margin-top: 25px;">
+<div class="optistate-analyzer-section" style="margin-top: 30px;">
+                        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+        <?php echo '🔢 ' . esc_html__('MySQL Index Manager', 'optistate'); ?>
+            <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-8'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+        <span class="dashicons dashicons-info"></span>
+    </a>
+    </h3>
+    <p style="line-height: 1.7em; margin-bottom: 15px;">
+        <?php echo '⊹ ';
+        echo esc_html__('Scans your database for missing high-impact indexes that can drastically improve query performance.', 'optistate'); ?><br>
+        <?php echo '⏲ ';
+        echo esc_html__('Adding missing indexes to columns like `autoload` can reduce query time by up to 90%.', 'optistate'); ?>
+    </p>
+    <button type="button" class="button button-secondary" id="optistate-analyze-indexes-btn" style="margin-bottom: 15px;">
+            <?php echo '🔎 ';
+        echo esc_html__("Scan for Missing Indexes", "optistate"); ?>
+    </button>
+    <div id="optistate-index-analysis-loading" style="display: none; padding: 10px;">
+        <span class="spinner is-active" style="float:none; margin:0;"></span> 
+        <?php echo esc_html__('Analyzing database schema...', 'optistate'); ?>
+    </div>
+    <div id="optistate-index-results" style="display: none;"></div>
+</div>
+                <div class="optistate-sr-form" style="margin-top: 30px;">
     <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: #d63638;">
         ↳↰ <?php echo esc_html__('Database Search & Replace', 'optistate'); ?>
     </h3>
@@ -1840,7 +1858,7 @@ class OPTISTATE {
             <?php echo esc_html__('2. Create a fresh database backup before replacing.', 'optistate'); ?>
         </p>
     </div>
-   <div class="optistate-sr-form">
+   
     <div style="display: flex; gap: 20px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 300px;">
             <label for="optistate-sr-search" class="sr-search"><?php esc_html_e('Search For:', 'optistate'); ?></label>
@@ -1851,7 +1869,7 @@ class OPTISTATE {
             <input type="text" id="optistate-sr-replace" class="sr-search-2" placeholder="e.g. https://new-domain.com" maxlength="600">
         </div>
     </div>
-    <div style="margin-top: 10px;">
+    <div style="margin-top: 15px;">
         <label style="cursor: pointer;">
             <input type="checkbox" id="optistate-sr-case-sensitive" style="margin-right: 4px;">
             <span style="font-weight: 600;"><?php esc_html_e('🔎 Case Sensitive', 'optistate'); ?></span>
@@ -1867,7 +1885,7 @@ class OPTISTATE {
         </label>
         <p class="description" style="margin-top: 5px; margin-left: 24px;">
             <?php esc_html_e('If checked, searches for partial text anywhere in strings (e.g., "http://" in URLs). If unchecked, only matches complete words with boundaries.', 'optistate'); ?><br>
-            <?php esc_html_e('ⓘ Usage example: "http://" ⮕ "https://".', 'optistate'); ?>
+            <?php esc_html_e('ⓘ Usage example: "http://" ⮕ "https://"', 'optistate'); ?>
         </p>
     </div>
     <div style="margin-top: 15px;">
@@ -1900,7 +1918,6 @@ class OPTISTATE {
        </div>
       </div>
     </div>
-   </div>
             <div id="tab-automation" class="optistate-tab-content">
                 <div class="optistate-card">
 <h2>
@@ -1946,15 +1963,22 @@ class OPTISTATE {
                                         </span>
                                         <br>
                                         <span id="auto-task-desc-full" style="<?php echo $auto_backup_only ? 'display:none;' : ''; ?>">
-                                            <?php echo 'ℹ️ '; echo esc_html__('When enabled, the following tasks will be performed regularly:', 'optistate'); ?> 
-                                            <?php echo '➜ '; echo esc_html__('Database Backup', 'optistate'); ?> 
-                                            <?php echo '➜ '; echo esc_html__('One-Click Optimization.', 'optistate'); ?><br>
-                                            <?php echo '💡'; echo esc_html__('Tip: Choose a time when website traffic is usually lower.', 'optistate'); ?> 
+                                            <?php echo 'ℹ️ ';
+        echo esc_html__('When enabled, the following tasks will be performed regularly:', 'optistate'); ?> 
+                                            <?php echo '➜ ';
+        echo esc_html__('Database Backup', 'optistate'); ?> 
+                                            <?php echo '➜ ';
+        echo esc_html__('One-Click Optimization.', 'optistate'); ?><br>
+                                            <?php echo '💡';
+        echo esc_html__('Tip: Choose a time when website traffic is usually lower.', 'optistate'); ?> 
                                         </span>
                                         <span id="auto-task-desc-backup-only" style="<?php echo $auto_backup_only ? '' : 'display:none;'; ?>">
-                                            <?php echo 'ℹ️ '; echo esc_html__('When enabled, the following tasks will be performed regularly:', 'optistate'); ?> 
-                                            <?php echo '➜ '; echo esc_html__('Database Backup.', 'optistate'); ?><br>
-                                            <?php echo '💡'; echo esc_html__('Tip: Choose a time when website traffic is usually lower.', 'optistate'); ?> 
+                                            <?php echo 'ℹ️ ';
+        echo esc_html__('When enabled, the following tasks will be performed regularly:', 'optistate'); ?> 
+                                            <?php echo '➜ ';
+        echo esc_html__('Database Backup.', 'optistate'); ?><br>
+                                            <?php echo '💡';
+        echo esc_html__('Tip: Choose a time when website traffic is usually lower.', 'optistate'); ?> 
                                         </span>
                                     </p>
                                 </td>
@@ -2184,7 +2208,7 @@ class OPTISTATE {
         $log_entries = $this->get_optimization_log();
         $log_entry = ["timestamp" => time(), "type" => $type, "date" => wp_date(get_option('date_format') . ' ' . get_option('time_format'), time()), "operation" => $operation, "backup_filename" => $backup_filename, "timezone" => get_option("timezone_string"), "gmt_offset" => get_option("gmt_offset"), ];
         array_unshift($log_entries, $log_entry);
-        $log_entries = array_slice($log_entries, 0, 150);
+        $log_entries = array_slice($log_entries, 0, 200);
         $this->save_log_to_file($log_entries);
     }
     private function save_log_to_file($log_entries) {
@@ -2595,25 +2619,18 @@ class OPTISTATE {
         if (!$task || $task['status'] !== 'pending') {
             return;
         }
-        @set_time_limit(120); 
+        @set_time_limit(120);
         $test_url = $task['url'];
         $strategy = $task['strategy'];
         $settings = $this->get_persistent_settings();
         $api_key = isset($settings['pagespeed_api_key']) ? trim($settings['pagespeed_api_key']) : '';
         $endpoint = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
-        $args = [
-            'url' => $test_url,
-            'strategy' => $strategy,
-            'category' => ['performance']
-        ];
+        $args = ['url' => $test_url, 'strategy' => $strategy, 'category' => ['performance']];
         if (!empty($api_key)) {
             $args['key'] = $api_key;
         }
         $endpoint = add_query_arg($args, $endpoint);
-        $response = wp_remote_get($endpoint, [
-            'timeout' => 60,
-            'headers' => ['Accept' => 'application/json']
-        ]);
+        $response = wp_remote_get($endpoint, ['timeout' => 60, 'headers' => ['Accept' => 'application/json']]);
         if (is_wp_error($response)) {
             $task['status'] = 'error';
             $task['message'] = __('API Connection Failed: ', 'optistate') . $response->get_error_message();
@@ -2630,43 +2647,18 @@ class OPTISTATE {
             $this->process_store->set($task_id, $task, 600);
             return;
         }
-        $lighthouse = $data['lighthouseResult'] ?? [];
-        $audits = $lighthouse['audits'] ?? [];
+        $lighthouse = $data['lighthouseResult']??[];
+        $audits = $lighthouse['audits']??[];
         $perf_settings = $this->_performance_get_settings();
-        $features_status = [
-            'server_caching' => !empty($perf_settings['server_caching']['enabled']),
-            'browser_caching' => !empty($perf_settings['browser_caching']),
-            'lazy_load' => !empty($perf_settings['lazy_load']),
-            'db_query_caching' => !empty($perf_settings['db_query_caching']['enabled'])
-        ];
+        $features_status = ['server_caching' => !empty($perf_settings['server_caching']['enabled']), 'browser_caching' => !empty($perf_settings['browser_caching']), 'lazy_load' => !empty($perf_settings['lazy_load']), 'db_query_caching' => !empty($perf_settings['db_query_caching']['enabled']) ];
         $recommendations = [];
         if (isset($audits['server-response-time'])) {
             $srt_audit = $audits['server-response-time'];
             if (isset($srt_audit['numericValue']) && $srt_audit['numericValue'] > 600) {
                 if (!$features_status['server_caching']) {
-                    $recommendations[] = [
-                        'priority' => 'high',
-                        'icon' => 'dashicons-superhero',
-                        'title' => __('Enable Server-Side Page Caching', 'optistate'),
-                        'description' => sprintf(
-                            __('Server response time (TTFB) is %s. Enable Server-Side Page Caching to serve pre-rendered HTML instantly, eliminating PHP processing and database queries on each request.', 'optistate'),
-                            isset($srt_audit['displayValue']) ? str_replace('Root document took ', '', $srt_audit['displayValue']) : 'slow'
-                        ),
-                        'tab' => '#tab-performance',
-                        'feature' => 'server_caching'
-                    ];
+                    $recommendations[] = ['priority' => 'high', 'icon' => 'dashicons-superhero', 'title' => __('Enable Server-Side Page Caching', 'optistate'), 'description' => sprintf(__('Server response time (TTFB) is %s. Enable Server-Side Page Caching to serve pre-rendered HTML instantly, eliminating PHP processing and database queries on each request.', 'optistate'), isset($srt_audit['displayValue']) ? str_replace('Root document took ', '', $srt_audit['displayValue']) : 'slow'), 'tab' => '#tab-performance', 'feature' => 'server_caching'];
                 } else if (!$features_status['db_query_caching']) {
-                    $recommendations[] = [
-                        'priority' => 'medium',
-                        'icon' => 'dashicons-database',
-                        'title' => __('Enable Database Query Caching', 'optistate'),
-                        'description' => sprintf(
-                            __('TTFB is %s. You have page caching enabled, but database queries may still be slowing down cache generation. Enable DB Query Caching to reduce MySQL overhead.', 'optistate'),
-                            isset($srt_audit['displayValue']) ? str_replace('Root document took ', '', $srt_audit['displayValue']) : 'slow'
-                        ),
-                        'tab' => '#tab-performance',
-                        'feature' => 'db_query_caching'
-                    ];
+                    $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-database', 'title' => __('Enable Database Query Caching', 'optistate'), 'description' => sprintf(__('TTFB is %s. You have page caching enabled, but database queries may still be slowing down cache generation. Enable DB Query Caching to reduce MySQL overhead.', 'optistate'), isset($srt_audit['displayValue']) ? str_replace('Root document took ', '', $srt_audit['displayValue']) : 'slow'), 'tab' => '#tab-performance', 'feature' => 'db_query_caching'];
                 }
             }
         }
@@ -2675,54 +2667,23 @@ class OPTISTATE {
             if (isset($rbl_audit['score']) && $rbl_audit['score'] < 0.9) {
                 $blocking_count = isset($rbl_audit['details']['items']) ? count($rbl_audit['details']['items']) : 0;
                 if (!$features_status['browser_caching']) {
-                    $recommendations[] = [
-                        'priority' => 'high',
-                        'icon' => 'dashicons-performance',
-                        'title' => __('Enable Browser Caching', 'optistate'),
-                        'description' => sprintf(
-                            __('Your site has %d render-blocking resources. Enable Browser Caching to leverage browser cache for CSS, JavaScript, and static assets, reducing repeat load times.', 'optistate'),
-                            $blocking_count > 0 ? $blocking_count : 'multiple'
-                        ),
-                        'tab' => '#tab-performance',
-                        'feature' => 'browser_caching'
-                    ];
+                    $recommendations[] = ['priority' => 'high', 'icon' => 'dashicons-performance', 'title' => __('Enable Browser Caching', 'optistate'), 'description' => sprintf(__('Your site has %d render-blocking resources. Enable Browser Caching to leverage browser cache for CSS, JavaScript, and static assets, reducing repeat load times.', 'optistate'), $blocking_count > 0 ? $blocking_count : 'multiple'), 'tab' => '#tab-performance', 'feature' => 'browser_caching'];
                 }
             }
         }
         if (isset($audits['offscreen-images']) || isset($audits['modern-image-formats'])) {
-            $offscreen = $audits['offscreen-images'] ?? [];
-            $modern_formats = $audits['modern-image-formats'] ?? [];
-            
+            $offscreen = $audits['offscreen-images']??[];
+            $modern_formats = $audits['modern-image-formats']??[];
             if (isset($offscreen['score']) && $offscreen['score'] < 0.9) {
                 if (!$features_status['lazy_load']) {
                     $offscreen_count = isset($offscreen['details']['items']) ? count($offscreen['details']['items']) : 0;
-                    $recommendations[] = [
-                        'priority' => 'high',
-                        'icon' => 'dashicons-images-alt2',
-                        'title' => __('Enable Lazy Loading for Images', 'optistate'),
-                        'description' => sprintf(
-                            __('Detected %d off-screen images loading immediately. Enable Lazy Loading to defer images below the fold, reducing initial page weight and improving FCP/LCP.', 'optistate'),
-                            $offscreen_count > 0 ? $offscreen_count : 'multiple'
-                        ),
-                        'tab' => '#tab-performance',
-                        'feature' => 'lazy_load'
-                    ];
+                    $recommendations[] = ['priority' => 'high', 'icon' => 'dashicons-images-alt2', 'title' => __('Enable Lazy Loading for Images', 'optistate'), 'description' => sprintf(__('Detected %d off-screen images loading immediately. Enable Lazy Loading to defer images below the fold, reducing initial page weight and improving FCP/LCP.', 'optistate'), $offscreen_count > 0 ? $offscreen_count : 'multiple'), 'tab' => '#tab-performance', 'feature' => 'lazy_load'];
                 }
             }
             if (isset($modern_formats['score']) && $modern_formats['score'] < 0.9) {
                 $potential_savings = isset($modern_formats['details']['overallSavingsBytes']) ? round($modern_formats['details']['overallSavingsBytes'] / 1024) : 0;
                 if ($potential_savings > 50) {
-                    $recommendations[] = [
-                        'priority' => 'medium',
-                        'icon' => 'dashicons-format-image',
-                        'title' => __('Use Modern Image Formats', 'optistate'),
-                        'description' => sprintf(
-                            __('Serving images in WebP or AVIF format could save ~%d KB. Consider using an image optimization plugin or CDN that automatically converts images to modern formats.', 'optistate'),
-                            $potential_savings
-                        ),
-                        'tab' => null,
-                        'feature' => null
-                    ];
+                    $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-format-image', 'title' => __('Use Modern Image Formats', 'optistate'), 'description' => sprintf(__('Serving images in WebP or AVIF format could save ~%d KB. Consider using an image optimization plugin or CDN that automatically converts images to modern formats.', 'optistate'), $potential_savings), 'tab' => null, 'feature' => null];
                 }
             }
         }
@@ -2730,132 +2691,61 @@ class OPTISTATE {
             $uj_audit = $audits['unused-javascript'];
             if (isset($uj_audit['score']) && $uj_audit['score'] < 0.9) {
                 $wasted_bytes = isset($uj_audit['details']['overallSavingsBytes']) ? round($uj_audit['details']['overallSavingsBytes'] / 1024) : 0;
-                $recommendations[] = [
-                    'priority' => 'medium',
-                    'icon' => 'dashicons-editor-code',
-                    'title' => __('Reduce Unused JavaScript', 'optistate'),
-                    'description' => sprintf(
-                        __('~%d KB of unused JavaScript detected. Remove emoji scripts and unnecessary scripts from the Performance tab. Consider code splitting or deferring non-critical scripts.', 'optistate'),
-                        $wasted_bytes > 0 ? $wasted_bytes : 'significant amount'
-                    ),
-                    'tab' => '#tab-performance',
-                    'feature' => 'emoji_script'
-                ];
+                $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-editor-code', 'title' => __('Reduce Unused JavaScript', 'optistate'), 'description' => sprintf(__('~%d KB of unused JavaScript detected. Remove emoji scripts and unnecessary scripts from the Performance tab. Consider code splitting or deferring non-critical scripts.', 'optistate'), $wasted_bytes > 0 ? $wasted_bytes : 'significant amount'), 'tab' => '#tab-performance', 'feature' => 'emoji_script'];
             }
         }
-        $tbt_value = $audits['total-blocking-time']['numericValue'] ?? 0;
-        $tti_value = $audits['interactive']['numericValue'] ?? 0;
+        $tbt_value = $audits['total-blocking-time']['numericValue']??0;
+        $tti_value = $audits['interactive']['numericValue']??0;
         if ($tbt_value > 600 || $tti_value > 7300) {
-            $recommendations[] = [
-                'priority' => 'high',
-                'icon' => 'dashicons-database',
-                'title' => __('Reduce JavaScript Execution Time', 'optistate'),
-                'description' => sprintf(
-                    __('Total Blocking Time is %d ms (target: <200ms). This makes your site feel unresponsive. Optimize database queries via "Optimize All Tables" and "Optimize Autoloaded Options" in Advanced tab. Consider disabling heavy plugins during page load.', 'optistate'),
-                    round($tbt_value)
-                ),
-                'tab' => '#tab-advanced',
-                'feature' => 'database'
-            ];
+            $recommendations[] = ['priority' => 'high', 'icon' => 'dashicons-database', 'title' => __('Reduce JavaScript Execution Time', 'optistate'), 'description' => sprintf(__('Total Blocking Time is %d ms (target: <200ms). This makes your site feel unresponsive. Optimize database queries via "Optimize All Tables" and "Optimize Autoloaded Options" in Advanced tab. Consider disabling heavy plugins during page load.', 'optistate'), round($tbt_value)), 'tab' => '#tab-advanced', 'feature' => 'database'];
+        }
+        if (isset($audits['server-response-time'])) {
+            $ttfb_audit = $audits['server-response-time'];
+            $ttfb_value = $ttfb_audit['numericValue']??0;
+            if ($ttfb_value > 600 && $features_status['server_caching']) {
+                $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-list-view', 'title' => __('Optimize Database Indexes', 'optistate'), 'description' => sprintf(__('Server response time is %s despite caching being enabled. Missing database indexes on frequently-queried columns can slow down page generation. Run "MySQL Index Manager" in the Advanced tab to analyze and add recommended indexes.', 'optistate'), isset($ttfb_audit['displayValue']) ? str_replace('Root document took ', '', $ttfb_audit['displayValue']) : 'slow'), 'tab' => '#tab-advanced', 'feature' => 'indexes'];
+            }
         }
         if (isset($audits['unused-css-rules'])) {
             $uc_audit = $audits['unused-css-rules'];
             if (isset($uc_audit['score']) && $uc_audit['score'] < 0.9) {
                 $wasted_css = isset($uc_audit['details']['overallSavingsBytes']) ? round($uc_audit['details']['overallSavingsBytes'] / 1024) : 0;
-                $recommendations[] = [
-                    'priority' => 'low',
-                    'icon' => 'dashicons-admin-appearance',
-                    'title' => __('Reduce Unused CSS', 'optistate'),
-                    'description' => sprintf(
-                        __('~%d KB of unused CSS detected. Consider generating Critical CSS or using a plugin to inline above-the-fold styles and defer the rest.', 'optistate'),
-                        $wasted_css > 0 ? $wasted_css : 'significant amount'
-                    ),
-                    'tab' => null,
-                    'feature' => null
-                ];
+                $recommendations[] = ['priority' => 'low', 'icon' => 'dashicons-admin-appearance', 'title' => __('Reduce Unused CSS', 'optistate'), 'description' => sprintf(__('~%d KB of unused CSS detected. Consider generating Critical CSS or using a plugin to inline above-the-fold styles and defer the rest.', 'optistate'), $wasted_css > 0 ? $wasted_css : 'significant amount'), 'tab' => null, 'feature' => null];
             }
         }
         if (isset($audits['uses-rel-preload'])) {
             $preload_audit = $audits['uses-rel-preload'];
             if (isset($preload_audit['score']) && $preload_audit['score'] < 0.9) {
                 $potential_savings = isset($preload_audit['details']['overallSavingsMs']) ? round($preload_audit['details']['overallSavingsMs']) : 0;
-                $recommendations[] = [
-                    'priority' => 'medium',
-                    'icon'     => 'dashicons-external',
-                    'title'    => __('Preload Critical Assets', 'optistate'),
-                    'description' => sprintf(
-                        __('Key resources (fonts, hero images) are discovered late, delaying render by ~%d ms. Use <link rel="preload"> to fetch critical assets immediately, improving LCP and preventing layout shifts.', 'optistate'),
-                        $potential_savings > 0 ? $potential_savings : 'several hundred'
-                    ),
-                    'tab'      => null,
-                    'feature'  => null
-                ];
+                $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-external', 'title' => __('Preload Critical Assets', 'optistate'), 'description' => sprintf(__('Key resources (fonts, hero images) are discovered late, delaying render by ~%d ms. Use <link rel="preload"> to fetch critical assets immediately, improving LCP and preventing layout shifts.', 'optistate'), $potential_savings > 0 ? $potential_savings : 'several hundred'), 'tab' => null, 'feature' => null];
             }
         }
         if (isset($audits['unminified-javascript'])) {
             $minify_audit = $audits['unminified-javascript'];
             if (isset($minify_audit['score']) && $minify_audit['score'] < 0.9) {
                 $savings = isset($minify_audit['details']['overallSavingsBytes']) ? round($minify_audit['details']['overallSavingsBytes'] / 1024) : 0;
-                $recommendations[] = [
-                    'priority' => 'medium',
-                    'icon'     => 'dashicons-media-code',
-                    'title'    => __('Minify JavaScript', 'optistate'),
-                    'description' => sprintf(
-                        __('Unminified JavaScript could be reduced by ~%d KB. Minification removes whitespace and comments, reducing file size and parse time. Use a minification plugin or CDN.', 'optistate'),
-                        $savings > 0 ? $savings : 'significant amount'
-                    ),
-                    'tab'      => null,
-                    'feature'  => null
-                ];
+                $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-media-code', 'title' => __('Minify JavaScript', 'optistate'), 'description' => sprintf(__('Unminified JavaScript could be reduced by ~%d KB. Minification removes whitespace and comments, reducing file size and parse time. Use a minification plugin or CDN.', 'optistate'), $savings > 0 ? $savings : 'significant amount'), 'tab' => null, 'feature' => null];
             }
         }
         if (isset($audits['largest-contentful-paint-element'])) {
             $lcp_audit = $audits['largest-contentful-paint-element'];
-            $lcp_value = $audits['largest-contentful-paint']['numericValue'] ?? 0;
+            $lcp_value = $audits['largest-contentful-paint']['numericValue']??0;
             if ($lcp_value > 2500) {
                 $lcp_element = isset($lcp_audit['details']['items'][0]['node']['nodeLabel']) ? $lcp_audit['details']['items'][0]['node']['nodeLabel'] : 'main content element';
-                $recommendations[] = [
-                    'priority' => 'high',
-                    'icon' => 'dashicons-images-alt',
-                    'title' => __('Optimize Largest Contentful Paint', 'optistate'),
-                    'description' => sprintf(
-                        __('LCP is %.1f s (target: <2.5s). The slowest element is: "%s". Optimize this element by using WebP format, adding proper sizing, preloading if it\'s an image, or enabling server-side caching.', 'optistate'),
-                        $lcp_value / 1000,
-                        substr($lcp_element, 0, 50)
-                    ),
-                    'tab' => '#tab-performance',
-                    'feature' => 'server_caching'
-                ];
+                $recommendations[] = ['priority' => 'high', 'icon' => 'dashicons-images-alt', 'title' => __('Optimize Largest Contentful Paint', 'optistate'), 'description' => sprintf(__('LCP is %.1f s (target: <2.5s). The slowest element is: "%s". Optimize this element by using WebP format, adding proper sizing, preloading if it\'s an image, or enabling server-side caching.', 'optistate'), $lcp_value / 1000, substr($lcp_element, 0, 50)), 'tab' => '#tab-performance', 'feature' => 'server_caching'];
             }
         }
         if (isset($audits['third-party-summary'])) {
             $tp_audit = $audits['third-party-summary'];
             if (isset($tp_audit['score']) && $tp_audit['score'] < 0.9) {
                 $blocking_time = isset($tp_audit['details']['summary']['blockingTime']) ? round($tp_audit['details']['summary']['blockingTime']) : 0;
-                $recommendations[] = [
-                    'priority' => 'low',
-                    'icon'     => 'dashicons-cloud',
-                    'title'    => __('Reduce Third-Party Impact', 'optistate'),
-                    'description' => sprintf(
-                        __('Third-party scripts blocked the main thread for %d ms. Audit analytics, ads, and social widgets. Consider self-hosting critical scripts or using facades (click-to-load) for non-essential embeds.', 'optistate'),
-                        $blocking_time > 0 ? $blocking_time : 'significant time'
-                    ),
-                    'tab'      => null,
-                    'feature'  => null
-                ];
+                $recommendations[] = ['priority' => 'low', 'icon' => 'dashicons-cloud', 'title' => __('Reduce Third-Party Impact', 'optistate'), 'description' => sprintf(__('Third-party scripts blocked the main thread for %d ms. Audit analytics, ads, and social widgets. Consider self-hosting critical scripts or using facades (click-to-load) for non-essential embeds.', 'optistate'), $blocking_time > 0 ? $blocking_time : 'significant time'), 'tab' => null, 'feature' => null];
             }
         }
         if (isset($audits['font-display'])) {
             $font_audit = $audits['font-display'];
             if (isset($font_audit['score']) && $font_audit['score'] < 1) {
-                $recommendations[] = [
-                    'priority' => 'medium',
-                    'icon' => 'dashicons-editor-textcolor',
-                    'title' => __('Optimize Web Font Loading', 'optistate'),
-                    'description' => __('Web fonts are blocking text rendering. Add font-display: swap to your @font-face rules to show text immediately with system fonts, then swap to custom fonts when loaded. This prevents invisible text (FOIT).', 'optistate'),
-                    'tab' => null,
-                    'feature' => null
-                ];
+                $recommendations[] = ['priority' => 'medium', 'icon' => 'dashicons-editor-textcolor', 'title' => __('Optimize Web Font Loading', 'optistate'), 'description' => __('Web fonts are blocking text rendering. Add font-display: swap to your @font-face rules to show text immediately with system fonts, then swap to custom fonts when loaded. This prevents invisible text (FOIT).', 'optistate'), 'tab' => null, 'feature' => null];
             }
         }
         if (isset($audits['dom-size'])) {
@@ -2863,53 +2753,26 @@ class OPTISTATE {
             if (isset($dom_audit['score']) && $dom_audit['score'] < 0.9) {
                 $dom_elements = isset($dom_audit['numericValue']) ? round($dom_audit['numericValue']) : 0;
                 if ($dom_elements > 1500) {
-                    $recommendations[] = [
-                        'priority' => 'low',
-                        'icon' => 'dashicons-networking',
-                        'title' => __('Reduce DOM Size', 'optistate'),
-                        'description' => sprintf(
-                            __('Page contains %s DOM elements (recommended: <1,500). Large DOMs increase memory usage, slow down style calculations, and hurt layout performance. Simplify page structure, remove unused elements, or implement pagination.', 'optistate'),
-                            number_format($dom_elements)
-                        ),
-                        'tab' => null,
-                        'feature' => null
-                    ];
+                    $recommendations[] = ['priority' => 'low', 'icon' => 'dashicons-networking', 'title' => __('Reduce DOM Size', 'optistate'), 'description' => sprintf(__('Page contains %s DOM elements (recommended: <1,500). Large DOMs increase memory usage, slow down style calculations, and hurt layout performance. Simplify page structure, remove unused elements, or implement pagination.', 'optistate'), number_format($dom_elements)), 'tab' => null, 'feature' => null];
                 }
             }
         }
-        usort($recommendations, function($a, $b) {
+        usort($recommendations, function ($a, $b) {
             $priority_order = ['high' => 0, 'medium' => 1, 'low' => 2];
-            return $priority_order[$a['priority']] <=> $priority_order[$b['priority']];
+            return $priority_order[$a['priority']]<=>$priority_order[$b['priority']];
         });
-        $ttfb_display = $audits['server-response-time']['displayValue'] ?? 'N/A';
+        $ttfb_display = $audits['server-response-time']['displayValue']??'N/A';
         if ($ttfb_display !== 'N/A') {
             $ttfb_display = str_replace('Root document took ', '', $ttfb_display);
         }
-        $results = [
-            'score' => isset($lighthouse['categories']['performance']['score']) ? round($lighthouse['categories']['performance']['score'] * 100) : 0,
-            'fcp' => ['display' => $audits['first-contentful-paint']['displayValue'] ?? 'N/A', 'value' => $audits['first-contentful-paint']['numericValue'] ?? 0],
-            'lcp' => ['display' => $audits['largest-contentful-paint']['displayValue'] ?? 'N/A', 'value' => $audits['largest-contentful-paint']['numericValue'] ?? 0],
-            'cls' => ['display' => $audits['cumulative-layout-shift']['displayValue'] ?? 'N/A', 'value' => $audits['cumulative-layout-shift']['numericValue'] ?? 0],
-            'tbt' => ['display' => $audits['total-blocking-time']['displayValue'] ?? 'N/A', 'value' => $audits['total-blocking-time']['numericValue'] ?? 0],
-            'si' => ['display' => $audits['speed-index']['displayValue'] ?? 'N/A', 'value' => $audits['speed-index']['numericValue'] ?? 0],
-            'tti' => ['display' => $audits['interactive']['displayValue'] ?? 'N/A', 'value' => $audits['interactive']['numericValue'] ?? 0],
-            'ttfb' => ['display' => $ttfb_display, 'value' => $audits['server-response-time']['numericValue'] ?? 0],
-            'timestamp' => current_time(get_option('date_format') . ' ' . get_option('time_format')),
-            'strategy' => ucfirst($strategy),
-            'tested_url' => $test_url,
-            'recommendations' => array_slice($recommendations, 0, 5)
-        ];
-        update_option('optistate_pagespeed_last_state', [
-            'url' => $test_url,
-            'strategy' => $strategy,
-            'timestamp' => time()
-        ], false);
+        $results = ['score' => isset($lighthouse['categories']['performance']['score']) ? round($lighthouse['categories']['performance']['score'] * 100) : 0, 'fcp' => ['display' => $audits['first-contentful-paint']['displayValue']??'N/A', 'value' => $audits['first-contentful-paint']['numericValue']??0], 'lcp' => ['display' => $audits['largest-contentful-paint']['displayValue']??'N/A', 'value' => $audits['largest-contentful-paint']['numericValue']??0], 'cls' => ['display' => $audits['cumulative-layout-shift']['displayValue']??'N/A', 'value' => $audits['cumulative-layout-shift']['numericValue']??0], 'tbt' => ['display' => $audits['total-blocking-time']['displayValue']??'N/A', 'value' => $audits['total-blocking-time']['numericValue']??0], 'si' => ['display' => $audits['speed-index']['displayValue']??'N/A', 'value' => $audits['speed-index']['numericValue']??0], 'tti' => ['display' => $audits['interactive']['displayValue']??'N/A', 'value' => $audits['interactive']['numericValue']??0], 'ttfb' => ['display' => $ttfb_display, 'value' => $audits['server-response-time']['numericValue']??0], 'timestamp' => current_time(get_option('date_format') . ' ' . get_option('time_format')), 'strategy' => ucfirst($strategy), 'tested_url' => $test_url, 'recommendations' => array_slice($recommendations, 0, 5) ];
+        update_option('optistate_pagespeed_last_state', ['url' => $test_url, 'strategy' => $strategy, 'timestamp' => time() ], false);
         $cache_key = 'optistate_pagespeed_' . md5($test_url . $strategy);
         set_transient($cache_key, $results, 30 * DAY_IN_SECONDS);
         $task['status'] = 'done';
         $task['results'] = $results;
         $this->process_store->set($task_id, $task, 600);
-        $log_message = sprintf('🚦 ' . __('Performance Audit: %d%% (%s) - %s', 'optistate'), $results['score'], $results['strategy'], parse_url($test_url, PHP_URL_PATH) ?: '/');
+        $log_message = sprintf('🚦 ' . __('Performance Audit: %d%% (%s) - %s', 'optistate'), $results['score'], $results['strategy'], parse_url($test_url, PHP_URL_PATH) ? : '/');
         $this->log_optimization("manual", $log_message, "");
     }
     public function ajax_run_pagespeed_audit() {
@@ -2935,40 +2798,31 @@ class OPTISTATE {
             return;
         }
         if (!$this->check_rate_limit("run_pagespeed", 10)) {
-            wp_send_json_error(['message' => __('Please wait 10 seconds before running another audit.', 'optistate')], 429);
+            wp_send_json_error(['message' => __('Please wait 10 seconds before running another audit.', 'optistate') ], 429);
             return;
         }
         $test_url_parsed = parse_url($test_url);
         $home_url_parsed = parse_url(home_url());
         if (!isset($test_url_parsed['host']) || !isset($home_url_parsed['host'])) {
-             wp_send_json_error(['message' => __('Invalid URL format.', 'optistate')]);
-             return;
+            wp_send_json_error(['message' => __('Invalid URL format.', 'optistate') ]);
+            return;
         }
         $test_host = $test_url_parsed['host'];
         $home_host = $home_url_parsed['host'];
         $is_valid_domain = ($test_host === $home_host) || (substr($test_host, -strlen('.' . $home_host)) === '.' . $home_host);
         if (!$is_valid_domain) {
-            wp_send_json_error(['message' => __('Security Restriction: You can only test URLs belonging to this domain or its subdomains.', 'optistate')]);
+            wp_send_json_error(['message' => __('Security Restriction: You can only test URLs belonging to this domain or its subdomains.', 'optistate') ]);
             return;
         }
         try {
             $task_id = 'psi_' . bin2hex(random_bytes(8));
-            $task_data = [
-                'status' => 'pending',
-                'url' => $test_url,
-                'strategy' => $strategy,
-                'started' => time(),
-                'user_id' => get_current_user_id()
-            ];
+            $task_data = ['status' => 'pending', 'url' => $test_url, 'strategy' => $strategy, 'started' => time(), 'user_id' => get_current_user_id() ];
             $this->process_store->set($task_id, $task_data, 600);
             wp_schedule_single_event(time(), 'optistate_run_pagespeed_worker', [$task_id]);
-            wp_send_json_success([
-                'status' => 'processing', 
-                'task_id' => $task_id,
-                'message' => __('Audit started in background...', 'optistate')
-            ]);
-        } catch (Exception $e) {
-            wp_send_json_error(['message' => __('Failed to start background task.', 'optistate')]);
+            wp_send_json_success(['status' => 'processing', 'task_id' => $task_id, 'message' => __('Audit started in background...', 'optistate') ]);
+        }
+        catch(Exception $e) {
+            wp_send_json_error(['message' => __('Failed to start background task.', 'optistate') ]);
         }
     }
     public function ajax_save_pagespeed_settings() {
@@ -2981,29 +2835,26 @@ class OPTISTATE {
         $api_key = trim($api_key);
         $length = strlen($api_key);
         if (!empty($api_key) && ($length < 30 || $length > 80)) {
-            wp_send_json_error(['message' => __('API Key must be between 30 and 80 characters.', 'optistate')]);
+            wp_send_json_error(['message' => __('API Key must be between 30 and 80 characters.', 'optistate') ]);
         }
         $this->save_persistent_settings(['pagespeed_api_key' => $api_key]);
-        wp_send_json_success(['message' => __('API Key saved successfully.', 'optistate')]);
+        wp_send_json_success(['message' => __('API Key saved successfully.', 'optistate') ]);
     }
     public function ajax_check_pagespeed_status() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $this->check_user_access();
         $task_id = isset($_POST['task_id']) ? sanitize_text_field(wp_unslash($_POST['task_id'])) : '';
         if (empty($task_id)) {
-            wp_send_json_error(['message' => __('Invalid Task ID.', 'optistate')]);
+            wp_send_json_error(['message' => __('Invalid Task ID.', 'optistate') ]);
             return;
         }
         $task = $this->process_store->get($task_id);
         if (!$task) {
-            wp_send_json_error(['message' => __('Audit session expired. Please try again.', 'optistate')]);
+            wp_send_json_error(['message' => __('Audit session expired. Please try again.', 'optistate') ]);
             return;
         }
         if ($task['status'] === 'done') {
-            wp_send_json_success([
-                'status' => 'done',
-                'data' => $task['results']
-            ]);
+            wp_send_json_success(['status' => 'done', 'data' => $task['results']]);
         } elseif ($task['status'] === 'error') {
             wp_send_json_error(['message' => $task['message']]);
         } else {
@@ -3081,13 +2932,7 @@ class OPTISTATE {
         wp_send_json_success($cleaned);
     }
     private function calculate_health_score($stats) {
-        $score_data = [
-            'overall_score' => 100,
-            'category_scores' => [],
-            'issues' => [],
-            'recommendations' => [],
-            'last_calculated' => current_time('Y-m-d H:i:s')
-        ];
+        $score_data = ['overall_score' => 100, 'category_scores' => [], 'issues' => [], 'recommendations' => [], 'last_calculated' => current_time('Y-m-d H:i:s') ];
         $performance_score = $this->calculate_performance_score($stats);
         $cleanliness_score = $this->calculate_cleanliness_score($stats);
         $efficiency_score = $this->calculate_efficiency_score($stats);
@@ -3098,29 +2943,22 @@ class OPTISTATE {
         $score_data['overall_score'] = (int)max(0, min(100, $adjusted_score));
         $score_data['category_scores']['performance'] = (int)max(0, min(100, 100 - ((100 - $performance_score) * 1.3)));
         $score_data['category_scores']['cleanliness'] = (int)max(0, min(100, 100 - ((100 - $cleanliness_score) * 1.3)));
-        $score_data['category_scores']['efficiency']  = (int)max(0, min(100, 100 - ((100 - $efficiency_score) * 1.3)));
+        $score_data['category_scores']['efficiency'] = (int)max(0, min(100, 100 - ((100 - $efficiency_score) * 1.3)));
         $score_data['issues'] = $this->identify_issues($stats, $score_data);
         $detailed_recommendations = [];
         if (empty($score_data['issues'])) {
-            $detailed_recommendations[] = [
-                'priority' => 'success',
-                'message' => __('Excellent! Your database is fully optimized and structurally healthy.', 'optistate')
-            ];
+            $detailed_recommendations[] = ['priority' => 'success', 'message' => __('Excellent! Your database is fully optimized and structurally healthy.', 'optistate') ];
         } else {
-            usort($score_data['issues'], function($a, $b) {
+            usort($score_data['issues'], function ($a, $b) {
                 $priorities = ['high' => 3, 'medium' => 2, 'low' => 1];
-                return $priorities[$b['severity']] <=> $priorities[$a['severity']];
+                return $priorities[$b['severity']]<=>$priorities[$a['severity']];
             });
-
             foreach ($score_data['issues'] as $issue) {
                 $priority = $issue['severity'];
                 if ($priority === 'low') {
                     $priority = 'info';
                 }
-                $detailed_recommendations[] = [
-                    'priority' => $priority,
-                    'message' => $issue['message']
-                ];
+                $detailed_recommendations[] = ['priority' => $priority, 'message' => $issue['message']];
             }
         }
         $score_data['recommendations'] = $detailed_recommendations;
@@ -3133,31 +2971,31 @@ class OPTISTATE {
         }
         $autoload_bytes = isset($stats['autoload_size_bytes']) ? (int)$stats['autoload_size_bytes'] : 0;
         if ($autoload_bytes > 2.5 * 1024 * 1024) {
-            $score -= 35;
+            $score-= 35;
         } elseif ($autoload_bytes > 1.5 * 1024 * 1024) {
-            $score -= 25;
+            $score-= 25;
         } elseif ($autoload_bytes > 800 * 1024) {
-            $score -= 12;
+            $score-= 12;
         } elseif ($autoload_bytes > 500 * 1024) {
-            $score -= 5;
+            $score-= 5;
         }
         $table_overhead = isset($stats['table_overhead_bytes']) ? (float)$stats['table_overhead_bytes'] : 0;
         $total_size = isset($stats['total_db_size_bytes']) ? (float)$stats['total_db_size_bytes'] : 1;
         $overhead_ratio = ($total_size > 0) ? ($table_overhead / $total_size) * 100 : 0;
         if ($overhead_ratio > 12) {
-            $score -= 18;
+            $score-= 18;
         } elseif ($overhead_ratio > 8) {
-            $score -= 12;
+            $score-= 12;
         } elseif ($overhead_ratio > 4) {
-            $score -= 5;
+            $score-= 5;
         }
         $expired_transients = isset($stats['expired_transients']) ? (int)$stats['expired_transients'] : 0;
         if ($expired_transients > 1000) {
-            $score -= 14;
+            $score-= 14;
         } elseif ($expired_transients > 500) {
-            $score -= 8;
+            $score-= 8;
         } elseif ($expired_transients > 100) {
-            $score -= 5;
+            $score-= 5;
         }
         return max(0, min(100, $score));
     }
@@ -3169,38 +3007,38 @@ class OPTISTATE {
         $junk_count = 0;
         $junk_keys = ['post_revisions', 'auto_drafts', 'trashed_posts', 'spam_comments', 'trashed_comments', 'pingbacks', 'trackbacks'];
         foreach ($junk_keys as $key) {
-            $junk_count += isset($stats[$key]) ? (int)$stats[$key] : 0;
+            $junk_count+= isset($stats[$key]) ? (int)$stats[$key] : 0;
         }
         if ($junk_count > 5000) {
-            $score -= 30;
+            $score-= 30;
         } elseif ($junk_count > 1000) {
-            $score -= 20;
+            $score-= 20;
         } elseif ($junk_count > 500) {
-            $score -= 12;
+            $score-= 12;
         } elseif ($junk_count > 100) {
-            $score -= 5;
+            $score-= 5;
         }
         $orphan_keys = ['orphaned_postmeta', 'orphaned_commentmeta', 'orphaned_relationships', 'orphaned_usermeta', 'duplicate_postmeta', 'duplicate_commentmeta'];
         $orphan_count = 0;
         foreach ($orphan_keys as $key) {
-            $orphan_count += isset($stats[$key]) ? (int)$stats[$key] : 0;
+            $orphan_count+= isset($stats[$key]) ? (int)$stats[$key] : 0;
         }
         if ($orphan_count > 1000) {
-            $score -= 25;
+            $score-= 25;
         } elseif ($orphan_count > 100) {
-            $score -= 12;
+            $score-= 12;
         } elseif ($orphan_count > 0) {
-            $score -= 5;
+            $score-= 5;
         }
         $woo_bloat = isset($stats['woo_bloat']) ? (int)$stats['woo_bloat'] : 0;
         $as_bloat = isset($stats['action_scheduler']) ? (int)$stats['action_scheduler'] : 0;
         $app_bloat = $woo_bloat + $as_bloat;
         if ($app_bloat > 10000) {
-            $score -= 18;
+            $score-= 18;
         } elseif ($app_bloat > 2000) {
-            $score -= 10;
+            $score-= 10;
         } elseif ($app_bloat > 500) {
-            $score -= 3;
+            $score-= 3;
         }
         return max(0, min(100, $score));
     }
@@ -3215,32 +3053,32 @@ class OPTISTATE {
         $data_size = max(1, $total_size - $index_size - $overhead);
         $index_ratio = ($index_size / $data_size) * 100;
         if ($index_ratio < 1) {
-            $score -= 20;
-            } elseif ($index_ratio < 2) {
-              $score -= 12;
-            }
+            $score-= 20;
+        } elseif ($index_ratio < 2) {
+            $score-= 12;
+        }
         if ($index_ratio > 300) {
-            $score -= 20;
+            $score-= 20;
         } elseif ($index_ratio > 200) {
-            $score -= 15;
+            $score-= 15;
         } elseif ($index_ratio > 150) {
-            $score -= 10;
+            $score-= 10;
         } elseif ($index_ratio > 120) {
-            $score -= 5;
+            $score-= 5;
         }
         $table_count = isset($stats['total_tables_count']) ? (int)$stats['total_tables_count'] : 0;
         if ($table_count > 250) {
-            $score -= 16;
+            $score-= 16;
         } elseif ($table_count > 150) {
-            $score -= 10;
+            $score-= 10;
         } elseif ($table_count > 90) {
-            $score -= 5;
+            $score-= 5;
         }
         $empty_terms = isset($stats['empty_taxonomies']) ? (int)$stats['empty_taxonomies'] : 0;
         if ($empty_terms > 250) {
-            $score -= 10;
+            $score-= 10;
         } elseif ($empty_terms > 100) {
-            $score -= 5;
+            $score-= 5;
         }
         return max(0, min(100, $score));
     }
@@ -3249,80 +3087,35 @@ class OPTISTATE {
         $autoload_bytes = isset($stats['autoload_size_bytes']) ? (int)$stats['autoload_size_bytes'] : 0;
         $autoload_mb = round($autoload_bytes / 1024 / 1024, 2);
         if ($autoload_bytes > 1.5 * 1024 * 1024) {
-            $issues[] = [
-                'type'     => 'performance',
-                'severity' => 'high',
-                'message'  => sprintf(__('Critical: Autoloaded options size is %s MB. This data loads on every page request, significantly slowing down TTFB. Run "Advanced ⮕ Optimize Autoloaded Options".', 'optistate'), $autoload_mb),
-                'action'   => 'optimize_autoload'
-            ];
+            $issues[] = ['type' => 'performance', 'severity' => 'high', 'message' => sprintf(__('Critical: Autoloaded options size is %s MB. This data loads on every page request, significantly slowing down TTFB. Run "Advanced ⮕ Optimize Autoloaded Options".', 'optistate'), $autoload_mb), 'action' => 'optimize_autoload'];
         } elseif ($autoload_bytes > 800 * 1024) {
-            $issues[] = [
-                'type'     => 'performance',
-                'severity' => 'medium',
-                'message'  => sprintf(__('Warning: Autoloaded options size is high (%s MB). Reduce this to under 800KB for optimal performance. Run "Advanced ⮕ Optimize Autoloaded Options".', 'optistate'), $autoload_mb),
-                'action'   => 'optimize_autoload'
-            ];
+            $issues[] = ['type' => 'performance', 'severity' => 'medium', 'message' => sprintf(__('Warning: Autoloaded options size is high (%s MB). Reduce this to under 800KB for optimal performance. Run "Advanced ⮕ Optimize Autoloaded Options".', 'optistate'), $autoload_mb), 'action' => 'optimize_autoload'];
         }
         $eff_overhead = isset($stats['table_overhead_bytes']) ? (float)$stats['table_overhead_bytes'] : 0;
         if ($eff_overhead > 1.7 * 1024 * 1024) {
-            $issues[] = [
-                'type'     => 'performance',
-                'severity' => 'medium',
-                'message'  => sprintf(__('Database tables are fragmented (approx. %s recoverable space). Run "Advanced ⮕ Optimize All Tables" to defragment.', 'optistate'), size_format($eff_overhead)),
-                'action'   => 'optimize_tables'
-            ];
+            $issues[] = ['type' => 'performance', 'severity' => 'medium', 'message' => sprintf(__('Database tables are fragmented (approx. %s recoverable space). Run "Advanced ⮕ Optimize All Tables" to defragment.', 'optistate'), size_format($eff_overhead)), 'action' => 'optimize_tables'];
         }
         $revisions = isset($stats['post_revisions']) ? (int)$stats['post_revisions'] : 0;
         if ($revisions > 500) {
-            $issues[] = [
-                'type'     => 'cleanliness',
-                'severity' => 'medium',
-                'message'  => sprintf(__('Found %s post revisions. Limiting revisions in "Performance Features" is recommended to prevent future bloat.', 'optistate'), number_format_i18n($revisions)),
-                'action'   => 'clean_post_revisions'
-            ];
+            $issues[] = ['type' => 'cleanliness', 'severity' => 'medium', 'message' => sprintf(__('Found %s post revisions. Limiting revisions in "Performance Features" is recommended to prevent future bloat.', 'optistate'), number_format_i18n($revisions)), 'action' => 'clean_post_revisions'];
         }
-        $orphans = (int)($stats['orphaned_postmeta'] ?? 0) + (int)($stats['orphaned_commentmeta'] ?? 0) + (int)($stats['orphaned_relationships'] ?? 0);
+        $orphans = (int)($stats['orphaned_postmeta']??0) + (int)($stats['orphaned_commentmeta']??0) + (int)($stats['orphaned_relationships']??0);
         if ($orphans > 0) {
-            $issues[] = [
-                'type'     => 'cleanliness',
-                'severity' => ($orphans > 1000 ? 'high' : 'medium'),
-                'message'  => sprintf(__('%s items of orphaned metadata detected. These are leftovers from deleted content and should be removed.', 'optistate'), number_format_i18n($orphans)),
-                'action'   => 'one_click_optimize'
-            ];
+            $issues[] = ['type' => 'cleanliness', 'severity' => ($orphans > 1000 ? 'high' : 'medium'), 'message' => sprintf(__('%s items of orphaned metadata detected. These are leftovers from deleted content and should be removed.', 'optistate'), number_format_i18n($orphans)), 'action' => 'one_click_optimize'];
         }
-        $garbage = (int)($stats['spam_comments'] ?? 0) + (int)($stats['trashed_comments'] ?? 0) + (int)($stats['trashed_posts'] ?? 0);
+        $garbage = (int)($stats['spam_comments']??0) + (int)($stats['trashed_comments']??0) + (int)($stats['trashed_posts']??0);
         if ($garbage > 500) {
-            $issues[] = [
-                'type'     => 'cleanliness',
-                'severity' => 'low',
-                'message'  => sprintf(__('Trash and Spam folders contain %s items. Emptying them will free up space.', 'optistate'), number_format_i18n($garbage)),
-                'action'   => 'one_click_optimize'
-            ];
+            $issues[] = ['type' => 'cleanliness', 'severity' => 'low', 'message' => sprintf(__('Trash and Spam folders contain %s items. Emptying them will free up space.', 'optistate'), number_format_i18n($garbage)), 'action' => 'one_click_optimize'];
         }
         $tables = isset($stats['total_tables_count']) ? (int)$stats['total_tables_count'] : 0;
         if ($tables > 200) {
-            $issues[] = [
-                'type'     => 'efficiency',
-                'severity' => 'medium',
-                'message'  => sprintf(__('High table count detected (%d tables). Check for tables left behind by uninstalled plugins using the "Advanced ⮕ Database Structure Analysis" tool.', 'optistate'), $tables),
-                'action'   => 'tab_advanced'
-            ];
+            $issues[] = ['type' => 'efficiency', 'severity' => 'medium', 'message' => sprintf(__('High table count detected (%d tables). Check for tables left behind by uninstalled plugins using the "Advanced ⮕ Database Structure Analysis" tool.', 'optistate'), $tables), 'action' => 'tab_advanced'];
         } elseif ($tables > 90) {
-            $issues[] = [
-                'type'     => 'efficiency',
-                'severity' => 'low',
-                'message'  => sprintf(__('Above average table count detected (%d tables). Check for tables left behind by uninstalled plugins using the "Advanced ⮕ Database Structure Analysis" tool.', 'optistate'), $tables),
-                'action'   => 'tab_advanced'
-            ];
+            $issues[] = ['type' => 'efficiency', 'severity' => 'low', 'message' => sprintf(__('Above average table count detected (%d tables). Check for tables left behind by uninstalled plugins using the "Advanced ⮕ Database Structure Analysis" tool.', 'optistate'), $tables), 'action' => 'tab_advanced'];
         }
         $as_completed = isset($stats['action_scheduler']) ? (int)$stats['action_scheduler'] : 0;
         if ($as_completed > 5000) {
-            $issues[] = [
-                'type'     => 'efficiency',
-                'severity' => 'low',
-                'message'  => sprintf(__('Action Scheduler logs are accumulating (%s items). These can be safely purged to reduce table size.', 'optistate'), number_format_i18n($as_completed)),
-                'action'   => 'clean_action_scheduler'
-            ];
+            $issues[] = ['type' => 'efficiency', 'severity' => 'low', 'message' => sprintf(__('Action Scheduler logs are accumulating (%s items). These can be safely purged to reduce table size.', 'optistate'), number_format_i18n($as_completed)), 'action' => 'clean_action_scheduler'];
         }
         return $issues;
     }
@@ -3348,14 +3141,13 @@ class OPTISTATE {
             $stats = $this->get_combined_database_statistics($force_refresh);
             $health_score = $this->calculate_health_score($stats);
             set_transient($cache_key, $health_score, self::STATS_CACHE_DURATION);
-
             wp_send_json_success($health_score);
         }
         catch(Exception $e) {
             wp_send_json_error(['message' => esc_html__('Failed to calculate health score', 'optistate'), 'error' => esc_html($e->getMessage()) ]);
         }
     }
-   public function ajax_one_click_optimize() {
+    public function ajax_one_click_optimize() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $this->check_user_access();
         if (!$this->check_rate_limit("one_click", 30)) {
@@ -3376,7 +3168,7 @@ class OPTISTATE {
         $cleaned['health_score'] = $health_score;
         wp_send_json_success($cleaned);
     }
-   public function ajax_get_optimization_log() {
+    public function ajax_get_optimization_log() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
         $log = $this->get_optimization_log();
         wp_send_json_success($log);
@@ -3397,7 +3189,7 @@ class OPTISTATE {
         }
         wp_send_json_success(["message" => __("Maximum backups setting saved successfully!", "optistate"), ]);
     }
-     private function perform_optimizations($return_data = false) {
+    private function perform_optimizations($return_data = false) {
         global $wpdb;
         $is_automated = (wp_doing_cron() && (doing_action('optistate_scheduled_cleanup') || doing_action('optistate_async_backup_complete')));
         $is_cli = (defined('WP_CLI') && WP_CLI);
@@ -3915,154 +3707,10 @@ class OPTISTATE {
         global $wpdb;
         return $this->run_batch_delete("DELETE FROM {$wpdb->comments} WHERE comment_type = 'trackback' LIMIT %d");
     }
-   private function _performance_init_features() {
+    private function _performance_init_features() {
         $has_persistent_cache = wp_using_ext_object_cache();
-        $this->performance_feature_definitions = ['server_caching' => ['title' => __('🌐 Server-Side Page Caching', 'optistate'), 'description' => __('Drastically improves site speed by storing fully rendered pages as static HTML files. When a visitor requests a page, the lightweight cached file is served directly, bypassing slow PHP and database queries. Combine this with browser caching for ultimate performance. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc.', 'optistate'), 'impact' => 'high', 'type' => 'custom_caching', 'default' => ['enabled' => false, 'lifetime' => 86400, 'query_string_mode' => 'include_safe', 'exclude_urls' => "/cart*\n/my-account*\n/checkout*\n/wp-login.php*\n/wp-admin*", 'mobile_cache' => false, 'disable_cookie_check' => false, 'custom_consent_cookie' => '', 'auto_preload' => false], 'safe' => true
-            ],
-            'browser_caching' => [
-                'title' => __('💻 Browser Caching (.htaccess)', 'optistate'),
-                'description' => __('Enables browser caching by adding optimized caching and security rules to your .htaccess file. This improves page load times for returning visitors by storing static assets in their browser.<br>Requires Apache server with writable .htaccess file. For Nginx servers, manual configuration is required - see user manual (section 7.3.1) for details. Combine this with server-side caching for ultimate performance. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc.', 'optistate'),
-                'impact' => 'medium',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'db_query_caching' => [
-                'title'       => __('🗄️ Database Query Caching', 'optistate'),
-                'description' => $has_persistent_cache 
-                    ? __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached. Do not activate if you use another plugin for this purpose.', 'optistate')
-                    : __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached.<br>⚠️ Requirement Missing: A persistent object cache (Redis or Memcached) is not detected. This feature cannot be activated.', 'optistate'),
-                'impact'      => 'high',
-                'type'        => 'custom_db_caching',
-                'default'     => [
-                    'enabled'            => false,
-                    'ttl_main'           => 43200,
-                    'ttl_secondary'      => 86400,
-                    'exclude_post_types' => 'shop_order,ticket,product',
-                    'exclude_ids'        => '',
-                    'flush_on_comments'  => true,
-                    'flush_on_save'      => true,
-                ],
-                'safe'        => true,
-                'disabled'    => ! $has_persistent_cache
-            ],
-            'lazy_load' => [
-                'title'       => __('⏲ Lazy Load Images & Iframes', 'optistate'),
-                'description' => __('Enforces native browser lazy loading by injecting loading="lazy" and decoding="async" attributes into images and iframes.<br>This improves Core Web Vitals by deferring off-screen media until needed.', 'optistate'),
-                'impact'      => 'medium',
-                'type'        => 'toggle',
-                'default'     => false,
-                'safe'        => true
-            ],
-            'post_revisions' => [
-                'title' => __('📝 Post Revisions Limit', 'optistate'),
-                'description' => __('WordPress saves a new copy every time you click "Save Draft". Limiting revisions prevents database bloat while keeping recent versions for safety.', 'optistate'),
-                'impact' => 'medium',
-                'options' => [
-                    'default' => __('WordPress Default (Unlimited)', 'optistate'),
-                    'limit_3' => __('Limit to 3 Revisions', 'optistate'),
-                    'limit_5' => __('Limit to 5 Revisions', 'optistate'),
-                    'limit_10' => __('Limit to 10 Revisions', 'optistate'),
-                    'disable' => __('Disable Revisions (not recommended)', 'optistate')
-                ],
-                'default' => 'default',
-                'safe' => false
-            ],
-            'trash_auto_empty' => [
-                'title' => __('🗑️ Automatic Trash Emptying', 'optistate'),
-                'description' => __('By default, WordPress automatically purges trashed posts and pages older than 30 days. However, you can customize this period or completely disable automatic emptying.<br>⚠ Warning: Once emptied, deleted content cannot be recovered.', 'optistate'),
-                'impact' => 'medium',
-                'options' => [
-                    'default' => __('WordPress Default (30 days)', 'optistate'),
-                    'disable' => __('Disable Auto-Empty (Keep Forever)', 'optistate'),
-                    'days_7' => __('7 Days', 'optistate'),
-                    'days_14' => __('14 Days', 'optistate'),
-                    'days_30' => __('30 Days', 'optistate'),
-                    'days_60' => __('60 Days', 'optistate'),
-                    'days_90' => __('90 Days', 'optistate')
-                ],
-                'default' => 'default',
-                'safe' => false
-            ],
-            'xmlrpc' => [
-                'title' => __('ᯤ XML-RPC Interface', 'optistate'),
-                'description' => __('Disables the XML-RPC API used by legacy mobile apps. It has been replaced by the REST API and is a frequent target for brute-force attacks.', 'optistate'),
-                'impact' => 'medium',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => false
-            ],
-            'heartbeat_api' => [
-                'title' => __('၊၊||၊ Heartbeat API Control', 'optistate'),
-                'description' => __('Reduces or disables the WordPress Heartbeat API that creates frequent AJAX calls (every 15-60 seconds). This saves server resources but may disable real-time features like post editing locks.', 'optistate'),
-                'impact' => 'high',
-                'options' => [
-                    'default' => __('WordPress Default (Every 15-60 seconds)', 'optistate'),
-                    'slow' => __('Slow Down (Every 2 minutes)', 'optistate'),
-                    'disable_admin' => __('Disable in Admin Area', 'optistate'),
-                    'disable_frontend' => __('Disable on Frontend Only', 'optistate'),
-                    'disable_all' => __('Disable Everywhere', 'optistate')
-                ],
-                'default' => 'default',
-                'safe' => true
-            ],
-            'emoji_script' => [
-                'title' => __('😊 Emoji Scripts', 'optistate'),
-                'description' => __('Removes the emoji detection JavaScript (wp-emoji-release.min.js) loaded on every page. Modern browsers display emojis natively, making this script redundant.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'self_pingbacks' => [
-                'title' => __('↩️ Self Pingbacks', 'optistate'),
-                'description' => __('Prevents WordPress from creating pingback notifications when you link to your own posts, reducing unnecessary database operations.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'rest_api_link' => [
-                'title' => __('🔗 REST API Link Tag', 'optistate'),
-                'description' => __('Removes the REST API discovery link from page headers. The REST API will still work, but external discovery is disabled.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'shortlink' => [
-                'title' => __('🔗 Shortlink Tag', 'optistate'),
-                'description' => __('Removes the shortlink meta tag from page headers. Shortlinks are rarely used and removing them saves minimal bandwidth.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'rsd_link' => [
-                'title' => __('🔗 RSD (Really Simple Discovery) Link', 'optistate'),
-                'description' => __('Removes the RSD link used by external blog clients. Unless you use desktop blogging software, this can be safely removed.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'wlwmanifest' => [
-                'title' => __('🪟 Windows Live Writer Manifest', 'optistate'),
-                'description' => __('Removes the Windows Live Writer manifest link. This software is discontinued and the link is no longer needed.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ],
-            'wp_generator' => [
-                'title' => __('♯ WordPress Version Meta Tag', 'optistate'),
-                'description' => __('Removes the WordPress version number from page headers. This improves security by hiding your WordPress version from potential attackers.', 'optistate'),
-                'impact' => 'low',
-                'type' => 'toggle',
-                'default' => false,
-                'safe' => true
-            ]
-        ];
+        $default_bots = "MJ12bot\nAhrefsBot\nSemrushBot\nDotBot\nPetalBot\nBytespider\nMauibot\nMegaIndex\nSerpstatBot\nBLEXBot\nDataForSeoBot\nAspiegelBot";
+        $this->performance_feature_definitions = ['server_caching' => ['title' => __('🌐 Server-Side Page Caching', 'optistate'), 'description' => __('Drastically improves site speed by storing fully rendered pages as static HTML files. When a visitor requests a page, the lightweight cached file is served directly, bypassing slow PHP and database queries. Combine this with browser caching for ultimate performance. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc.', 'optistate'), 'impact' => 'high', 'type' => 'custom_caching', 'default' => ['enabled' => false, 'lifetime' => 86400, 'query_string_mode' => 'include_safe', 'exclude_urls' => "/cart*\n/my-account*\n/checkout*\n/wp-login.php*\n/wp-admin*", 'mobile_cache' => false, 'disable_cookie_check' => false, 'custom_consent_cookie' => '', 'auto_preload' => false], 'safe' => true], 'browser_caching' => ['title' => __('💻 Browser Caching (.htaccess)', 'optistate'), 'description' => __('Enables browser caching by adding optimized caching and security rules to your .htaccess file. This improves page load times for returning visitors by storing static assets in their browser.<br>Requires Apache server with writable .htaccess file. For Nginx servers, manual configuration is required - see user manual (section 7.3.1) for details. Combine this with server-side caching for ultimate performance. DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc.', 'optistate'), 'impact' => 'medium', 'type' => 'toggle', 'default' => false, 'safe' => true], 'db_query_caching' => ['title' => __('🗄️ Database Query Caching', 'optistate'), 'description' => $has_persistent_cache ? __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached. Do not activate if you use another plugin for this purpose.', 'optistate') : __('Advanced object caching for database queries. Reduces database load by caching complex query results in Redis/Memcached.<br>⚠️ Requirement Missing: A persistent object cache (Redis or Memcached) is not detected. This feature cannot be activated.', 'optistate'), 'impact' => 'high', 'type' => 'custom_db_caching', 'default' => ['enabled' => false, 'ttl_main' => 43200, 'ttl_secondary' => 86400, 'exclude_post_types' => 'shop_order,ticket,product', 'exclude_ids' => '', 'flush_on_comments' => true, 'flush_on_save' => true, ], 'safe' => true, 'disabled' => !$has_persistent_cache], 'lazy_load' => ['title' => __('⏲ Lazy Load Images & Iframes', 'optistate'), 'description' => __('Enforces native browser lazy loading by injecting loading="lazy" and decoding="async" attributes into images and iframes.<br>This improves Core Web Vitals by deferring off-screen media until needed.', 'optistate'), 'impact' => 'medium', 'type' => 'toggle', 'default' => false, 'safe' => true], 'bad_bot_blocker' => ['title' => __('🤖 Bad Bot Blocker', 'optistate'), 'description' => __('Blocks resource-intensive SEO crawlers that provide competitive intelligence to other businesses. Does NOT block legitimate search engines like Google, Bing, or regional search engines. You can customize the list to match your needs.', 'optistate'), 'impact' => 'high', 'type' => 'custom_bot_blocker', 'default' => ['enabled' => false, 'user_agents' => $default_bots], 'safe' => true], 'post_revisions' => ['title' => __('📝 Post Revisions Limit', 'optistate'), 'description' => __('WordPress saves a new copy every time you click "Save Draft". Limiting revisions prevents database bloat while keeping recent versions for safety.', 'optistate'), 'impact' => 'medium', 'options' => ['default' => __('WordPress Default (Unlimited)', 'optistate'), 'limit_3' => __('Limit to 3 Revisions', 'optistate'), 'limit_5' => __('Limit to 5 Revisions', 'optistate'), 'limit_10' => __('Limit to 10 Revisions', 'optistate'), 'disable' => __('Disable Revisions (not recommended)', 'optistate') ], 'default' => 'default', 'safe' => false], 'trash_auto_empty' => ['title' => __('🗑️ Automatic Trash Emptying', 'optistate'), 'description' => __('By default, WordPress automatically purges trashed posts and pages older than 30 days. However, you can customize this period or completely disable automatic emptying.<br>⚠ Warning: Once emptied, deleted content cannot be recovered.', 'optistate'), 'impact' => 'medium', 'options' => ['default' => __('WordPress Default (30 days)', 'optistate'), 'disable' => __('Disable Auto-Empty (Keep Forever)', 'optistate'), 'days_7' => __('7 Days', 'optistate'), 'days_14' => __('14 Days', 'optistate'), 'days_30' => __('30 Days', 'optistate'), 'days_60' => __('60 Days', 'optistate'), 'days_90' => __('90 Days', 'optistate') ], 'default' => 'default', 'safe' => false], 'xmlrpc' => ['title' => __('ᯤ XML-RPC Interface', 'optistate'), 'description' => __('Disables the XML-RPC API used by legacy mobile apps. It has been replaced by the REST API and is a frequent target for brute-force attacks.', 'optistate'), 'impact' => 'medium', 'type' => 'toggle', 'default' => false, 'safe' => false], 'heartbeat_api' => ['title' => __('၊၊||၊ Heartbeat API Control', 'optistate'), 'description' => __('Reduces or disables the WordPress Heartbeat API that creates frequent AJAX calls (every 15-60 seconds). This saves server resources but may disable real-time features like post editing locks.', 'optistate'), 'impact' => 'high', 'options' => ['default' => __('WordPress Default (Every 15-60 seconds)', 'optistate'), 'slow' => __('Slow Down (Every 2 minutes)', 'optistate'), 'disable_admin' => __('Disable in Admin Area', 'optistate'), 'disable_frontend' => __('Disable on Frontend Only', 'optistate'), 'disable_all' => __('Disable Everywhere', 'optistate') ], 'default' => 'default', 'safe' => true], 'emoji_script' => ['title' => __('😊 Emoji Scripts', 'optistate'), 'description' => __('Removes the emoji detection JavaScript (wp-emoji-release.min.js) loaded on every page. Modern browsers display emojis natively, making this script redundant.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true], 'self_pingbacks' => ['title' => __('↩️ Self Pingbacks', 'optistate'), 'description' => __('Prevents WordPress from creating pingback notifications when you link to your own posts, reducing unnecessary database operations.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true], 'rest_api_link' => ['title' => __('🔗 REST API Link Tag', 'optistate'), 'description' => __('Removes the REST API discovery link from page headers. The REST API will still work, but external discovery is disabled.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true], 'shortlink' => ['title' => __('🔗 Shortlink Tag', 'optistate'), 'description' => __('Removes the shortlink meta tag from page headers. Shortlinks are rarely used and removing them saves minimal bandwidth.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true], 'rsd_link' => ['title' => __('🔗 RSD (Really Simple Discovery) Link', 'optistate'), 'description' => __('Removes the RSD link used by external blog clients. Unless you use desktop blogging software, this can be safely removed.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true], 'wlwmanifest' => ['title' => __('🪟 Windows Live Writer Manifest', 'optistate'), 'description' => __('Removes the Windows Live Writer manifest link. This software is discontinued and the link is no longer needed.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true], 'wp_generator' => ['title' => __('♯ WordPress Version Meta Tag', 'optistate'), 'description' => __('Removes the WordPress version number from page headers. This improves security by hiding your WordPress version from potential attackers.', 'optistate'), 'impact' => 'low', 'type' => 'toggle', 'default' => false, 'safe' => true]];
     }
     private function _performance_get_settings() {
         $settings = $this->get_persistent_settings();
@@ -4080,27 +3728,33 @@ class OPTISTATE {
             if (!isset($this->performance_feature_definitions[$key])) {
                 continue;
             }
-            $feature = $this->performance_feature_definitions[$key];
-            if (isset($feature['type']) && $feature['type'] === 'custom_caching' && $key === 'server_caching') {
-                if (!is_array($value)) {
-                    continue;
+            $feature_def = $this->performance_feature_definitions[$key];
+            if (isset($feature_def['type']) && $feature_def['type'] === 'custom_caching' && $key === 'server_caching') {
+                if (is_array($value)) {
+                    $allowed_query_modes = ['ignore_all', 'include_safe', 'unique_cache'];
+                    $query_mode = $value['query_string_mode']??'include_safe';
+                    if (!in_array($query_mode, $allowed_query_modes, true)) {
+                        $query_mode = 'include_safe';
+                    }
+                    $validated_features[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => $query_mode, 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''),];
                 }
-                $allowed_query_modes = ['ignore_all', 'include_safe', 'unique_cache'];
-                $query_mode = $value['query_string_mode']??'include_safe';
-                if (!in_array($query_mode, $allowed_query_modes, true)) {
-                    $query_mode = 'include_safe';
+            } elseif (isset($feature_def['type']) && $feature_def['type'] === 'custom_bot_blocker') {
+                if (is_array($value)) {
+                    $raw_bots = isset($value['user_agents']) ? (string)$value['user_agents'] : '';
+                    $bots_array = array_filter(array_map(function ($bot) {
+                        return substr(trim($bot), 0, 100);
+                    }, explode("\n", $raw_bots)));
+                    $clean_bots_string = implode("\n", $bots_array);
+                    $validated_features[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'user_agents' => $clean_bots_string];
                 }
-                $validated_features[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => $query_mode, 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''), 'mobile_cache' => filter_var($value['mobile_cache']??false, FILTER_VALIDATE_BOOLEAN), 'disable_cookie_check' => filter_var($value['disable_cookie_check']??false, FILTER_VALIDATE_BOOLEAN), 'custom_consent_cookie' => sanitize_text_field($value['custom_consent_cookie']??'') ];
-            } elseif (isset($feature['type']) && $feature['type'] === 'toggle') {
-                $validated_features[$key] = ($value === 'true' || $value === true || $value === 1 || $value === '1');
-            } elseif (isset($feature['options'])) {
-                if (array_key_exists($value, $feature['options'])) {
+            } elseif (isset($feature_def['type']) && $feature_def['type'] === 'toggle') {
+                $validated_features[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (isset($feature_def['options']) && is_array($feature_def['options'])) {
+                if (array_key_exists($value, $feature_def['options'])) {
                     $validated_features[$key] = sanitize_key($value);
                 } else {
-                    $validated_features[$key] = $feature['default'];
+                    $validated_features[$key] = $feature_def['default'];
                 }
-            } else {
-                $validated_features[$key] = sanitize_text_field($value);
             }
         }
         return $this->save_persistent_settings(['performance_features' => $validated_features]);
@@ -4166,11 +3820,14 @@ class OPTISTATE {
             remove_action('wp_head', 'wp_generator');
             add_filter('the_generator', '__return_empty_string');
         }
-        if ( ! empty( $settings['lazy_load'] ) ) {
-        $this->_performance_enable_lazy_load();
+        if (!empty($settings['lazy_load'])) {
+            $this->_performance_enable_lazy_load();
+        }
+        if (!empty($settings['bad_bot_blocker'])) {
+            $this->_performance_block_bad_bots();
         }
     }
-   private function _performance_optimize_heartbeat($mode) {
+    private function _performance_optimize_heartbeat($mode) {
         switch ($mode) {
             case 'slow':
                 add_filter('heartbeat_settings', function ($settings) {
@@ -4274,7 +3931,115 @@ class OPTISTATE {
         }
         return $filtered_image;
     }
-   public function ajax_get_performance_features() {
+    public function ajax_analyze_indexes() {
+        check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
+        $this->check_user_access();
+        if (!$this->check_rate_limit("analyze_indexes", 10)) {
+            wp_send_json_error(['message' => __('🕔 Rate limit: Please wait 10 seconds.', 'optistate') ], 429);
+            return;
+        }
+        $this->process_store->create_table();
+        global $wpdb;
+        $recommendations = [];
+        $targets = [$wpdb->options => [[['autoload'], 'autoload', __('Speeds up the initial loading of your website by quickly finding auto-loaded settings.', 'optistate') ], [['autoload', 'option_name'], 'idx_autoload_option', __('Optimizes the retrieval of specific site settings, reducing database work during page loads.', 'optistate') ]], $wpdb->postmeta => [[['meta_key'], 'meta_key', __('Essential for plugins that search or filter content by custom fields.', 'optistate') ], [['post_id', 'meta_key'], 'idx_post_meta_composite', __('Significantly faster processing of custom fields for individual posts and pages.', 'optistate') ]], $wpdb->posts => [[['post_type', 'post_status', 'post_date'], 'idx_type_status_date', __('Drastically improves the speed of post lists, archives, and blog feeds.', 'optistate') ], [['post_type', 'ID'], 'idx_type_id', __('Speeds up internal lookups when WordPress checks for specific content types.', 'optistate') ]], $wpdb->usermeta => [[['user_id', 'meta_key'], 'idx_user_meta_composite', __('Makes checking user permissions and profiles faster, especially for logged-in users.', 'optistate') ]]];
+        foreach ($targets as $table => $indexes) {
+            if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) !== $table) {
+                continue;
+            }
+            $raw_indexes = $wpdb->get_results("SHOW INDEX FROM `$table`", ARRAY_A);
+            $existing_indexes = [];
+            foreach ($raw_indexes as $idx) {
+                $key_name = $idx['Key_name'];
+                $seq = $idx['Seq_in_index'];
+                $col = $idx['Column_name'];
+                $existing_indexes[$key_name][$seq] = $col;
+            }
+            foreach ($indexes as $target) {
+                list($columns, $suggested_name, $reason) = $target;
+                $all_cols_exist = true;
+                foreach ($columns as $col) {
+                    $col_check = $wpdb->get_results("SHOW COLUMNS FROM `$table` LIKE '$col'");
+                    if (empty($col_check)) {
+                        $all_cols_exist = false;
+                        break;
+                    }
+                }
+                if (!$all_cols_exist) continue;
+                $is_covered = false;
+                foreach ($existing_indexes as $key_name => $idx_cols) {
+                    ksort($idx_cols);
+                    $idx_cols_values = array_values($idx_cols);
+                    if (count($idx_cols_values) >= count($columns)) {
+                        $slice = array_slice($idx_cols_values, 0, count($columns));
+                        if ($slice === $columns) {
+                            $is_covered = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$is_covered) {
+                    $recommendations[] = ['table' => $table, 'column' => implode(', ', $columns), 'raw_columns' => implode(',', $columns), 'index_name' => $suggested_name, 'reason' => $reason, 'status' => 'missing'];
+                }
+            }
+        }
+        wp_send_json_success(['recommendations' => $recommendations]);
+    }
+    public function ajax_check_index_status() {
+        check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
+        $this->check_user_access();
+        $task_id = isset($_POST['task_id']) ? sanitize_text_field(wp_unslash($_POST['task_id'])) : '';
+        if (empty($task_id)) {
+            wp_send_json_error(['message' => __('Invalid Task ID.', 'optistate') ]);
+            return;
+        }
+        $task = $this->process_store->get($task_id);
+        if (!$task) {
+            wp_send_json_error(['message' => __('Task expired or not found.', 'optistate') ]);
+            return;
+        }
+        if ($task['status'] === 'done') {
+            wp_send_json_success(['status' => 'done']);
+        } elseif ($task['status'] === 'error') {
+            wp_send_json_error(['message' => __('Error: ', 'optistate') . $task['message']]);
+        } else {
+            wp_send_json_success(['status' => 'processing']);
+        }
+    }
+    private function _performance_block_bad_bots() {
+        if (is_user_logged_in() || is_admin()) {
+            return;
+        }
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        if (empty($ua)) {
+            return;
+        }
+        $settings = $this->_performance_get_settings();
+        $bots_list = [];
+        if (isset($settings['bad_bot_blocker']) && is_array($settings['bad_bot_blocker'])) {
+            if (!empty($settings['bad_bot_blocker']['enabled'])) {
+                $raw_bots = isset($settings['bad_bot_blocker']['user_agents']) ? $settings['bad_bot_blocker']['user_agents'] : '';
+                $bots_list = array_filter(array_map('trim', explode("\n", $raw_bots)));
+            } else {
+                return;
+            }
+        } elseif (!empty($settings['bad_bot_blocker'])) {
+            $default_string = "MJ12bot\nAhrefsBot\nSemrushBot\nDotBot\nPetalBot\nBytespider\nMauibot\nMegaIndex\nSerpstatBot\nBLEXBot\nDataForSeoBot\nAspiegelBot";
+            $bots_list = explode("\n", $default_string);
+        } else {
+            return;
+        }
+        if (empty($bots_list)) {
+            return;
+        }
+        foreach ($bots_list as $bot) {
+            if (empty($bot)) continue;
+            if (stripos($ua, $bot) !== false) {
+                header('HTTP/1.1 403 Forbidden');
+                die('Access Denied: ' . esc_html($bot) . ' is blocked by WP Optimal State.');
+            }
+        }
+    }
+    public function ajax_get_performance_features() {
         check_ajax_referer(OPTISTATE::NONCE_ACTION, 'nonce');
         $current_settings = $this->_performance_get_settings();
         $response = [];
@@ -4306,6 +4071,8 @@ class OPTISTATE {
         $current_settings = $this->_performance_get_settings();
         $feature_definitions = $this->performance_feature_definitions;
         $changes_to_log = [];
+        $current_user = wp_get_current_user();
+        $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'Unknown';
         foreach ($feature_definitions as $key => $def) {
             if (!isset($features[$key])) {
                 continue;
@@ -4317,9 +4084,14 @@ class OPTISTATE {
             if (isset($def['type']) && $def['type'] === 'custom_caching' && $key === 'server_caching') {
                 $new_value_normalized = filter_var($new_value_raw['enabled']??false, FILTER_VALIDATE_BOOLEAN);
                 $old_value_normalized = (bool)($old_value_raw['enabled']??false);
-            } elseif (isset($def['type']) && $def['type'] === 'custom_db_caching') { 
+            } elseif (isset($def['type']) && $def['type'] === 'custom_bot_blocker') {
                 $new_value_normalized = filter_var($new_value_raw['enabled']??false, FILTER_VALIDATE_BOOLEAN);
                 $old_value_normalized = (bool)($old_value_raw['enabled']??false);
+                $old_bots = isset($old_value_raw['user_agents']) ? trim($old_value_raw['user_agents']) : '';
+                $new_bots = isset($new_value_raw['user_agents']) ? trim($new_value_raw['user_agents']) : '';
+                if ($old_bots !== $new_bots) {
+                    $changes_to_log[$key . '_list'] = ['title' => $def['title'], 'old' => 'list_updated', 'new' => 'list_updated', 'type' => 'list_update'];
+                }
             } elseif (isset($def['type']) && $def['type'] === 'toggle') {
                 $new_value_normalized = ($new_value_raw === 'true' || $new_value_raw === true || $new_value_raw === 1 || $new_value_raw === '1');
                 $old_value_normalized = (bool)$old_value_raw;
@@ -4343,13 +4115,15 @@ class OPTISTATE {
             foreach ($changes_to_log as $key => $change) {
                 $operation = '';
                 $title = wp_strip_all_tags($change['title']);
-                if ($key === 'post_revisions' || $key === 'trash_auto_empty' || $key === 'heartbeat_api') {
+                if ($change['type'] === 'list_update') {
+                    $operation = sprintf(__('%s Updated by %s', 'optistate'), $title, $username);
+                } elseif (strpos($key, 'post_revisions') !== false || strpos($key, 'trash_auto_empty') !== false || strpos($key, 'heartbeat_api') !== false) {
                     $operation = sprintf(__('%s Updated', 'optistate'), $title);
-                } elseif ($change['type'] === 'custom_caching' || $change['type'] === 'custom_db_caching' || $change['type'] === 'toggle') {
-                    if ($key === 'server_caching' || $key === 'browser_caching' || $key === 'db_query_caching') {
-                        $operation = $change['new'] ? sprintf(__('%s Activated', 'optistate'), $title) : sprintf(__('%s Deactivated', 'optistate'), $title);
+                } elseif ($change['type'] === 'custom_caching' || $change['type'] === 'custom_bot_blocker' || $change['type'] === 'toggle') {
+                    if ($change['new']) {
+                        $operation = sprintf(__('%s Activated by %s', 'optistate'), $title, $username);
                     } else {
-                        $operation = $change['new'] ? sprintf(__('%s Activated', 'optistate'), $title) : sprintf(__('%s Deactivated', 'optistate'), $title);
+                        $operation = sprintf(__('%s Deactivated by %s', 'optistate'), $title, $username);
                     }
                 } elseif ($change['type'] === 'options' && isset($change['options'])) {
                     $old_label = $change['options'][$change['old']]??$change['old'];
@@ -4365,11 +4139,6 @@ class OPTISTATE {
                 $this->secure_cache_directory();
             }
             $message = __('Performance settings saved successfully!', 'optistate');
-            if ($query_mode_changed) {
-                $this->purge_entire_cache();
-                $this->log_optimization("manual", '🗑️ ' . __("Page Cache Purged (Query Mode Changed)", "optistate"), "");
-                $message.= ' ' . __('The page cache was automatically purged to apply the new query string settings.', 'optistate');
-            }
             wp_send_json_success(['message' => $message]);
         } else {
             wp_send_json_error(['message' => __('Failed to save settings. Please try again.', 'optistate') ]);
@@ -4754,7 +4523,18 @@ class OPTISTATE {
             $feature_def = $this->performance_feature_definitions[$key];
             if (isset($feature_def['type']) && $feature_def['type'] === 'custom_caching' && $key === 'server_caching') {
                 if (is_array($value)) {
-                    $validated[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => in_array($value['query_string_mode']??'include_safe', ['ignore_all', 'include_safe', 'unique_cache'], true) ? $value['query_string_mode'] : 'include_safe', 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''), 'mobile_cache' => filter_var($value['mobile_cache']??false, FILTER_VALIDATE_BOOLEAN), 'disable_cookie_check' => filter_var($value['disable_cookie_check']??false, FILTER_VALIDATE_BOOLEAN), 'custom_consent_cookie' => sanitize_text_field($value['custom_consent_cookie']??'') ];
+                    $validated[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => in_array($value['query_string_mode']??'include_safe', ['ignore_all', 'include_safe', 'unique_cache'], true) ? $value['query_string_mode'] : 'include_safe', 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''), 'disable_cookie_check' => filter_var($value['disable_cookie_check']??false, FILTER_VALIDATE_BOOLEAN),];
+                }
+            } elseif (isset($feature_def['type']) && $feature_def['type'] === 'custom_bot_blocker') {
+                if (is_array($value)) {
+                    $raw_bots = isset($value['user_agents']) ? (string)$value['user_agents'] : '';
+                    $bots_array = array_filter(array_map(function ($bot) {
+                        return substr(trim($bot), 0, 100);
+                    }, explode("\n", $raw_bots)));
+                    $clean_bots_string = implode("\n", $bots_array);
+                    $validated[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'user_agents' => $clean_bots_string];
+                } else {
+                    $validated[$key] = $feature_def['default'];
                 }
             } elseif (isset($feature_def['type']) && $feature_def['type'] === 'toggle') {
                 $validated[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -5062,7 +4842,7 @@ class OPTISTATE_Backup_Manager {
         $this->process_store = ($process_store instanceof OPTISTATE_Process_Store) ? $process_store : new OPTISTATE_Process_Store();
         $upload_dir = wp_upload_dir();
         $this->backup_dir = trailingslashit($upload_dir['basedir']) . OPTISTATE::BACKUP_DIR_NAME . '/';
-        $this->log_file_path = $log_file_path ?: trailingslashit($upload_dir['basedir']) . OPTISTATE::SETTINGS_DIR_NAME . '/' . OPTISTATE::LOG_FILE_NAME;
+        $this->log_file_path = $log_file_path ? : trailingslashit($upload_dir['basedir']) . OPTISTATE::SETTINGS_DIR_NAME . '/' . OPTISTATE::LOG_FILE_NAME;
         $this->ensure_secure_backup_dir();
         $this->create_backup_metadata_table();
         if (!$this->check_backup_directory_permissions()) {
@@ -5462,7 +5242,7 @@ class OPTISTATE_Backup_Manager {
         }
         $filename = isset($_GET["file"]) ? basename(wp_unslash($_GET["file"])) : '';
         if (!preg_match('/\.sql(\.gz)?$/i', $filename)) {
-             wp_die(esc_html__("Security violation: Invalid file type.", "optistate"));
+            wp_die(esc_html__("Security violation: Invalid file type.", "optistate"));
         }
         if (empty($filename)) {
             wp_die(esc_html__("Invalid filename.", "optistate"));
@@ -5832,14 +5612,12 @@ class OPTISTATE_Backup_Manager {
         $result = null;
         $rows = [];
         $dbh = (isset($wpdb->dbh) && $wpdb->dbh instanceof mysqli) ? $wpdb->dbh : null;
-
         if ($dbh && $wpdb->use_mysqli) {
             $use_mysqli_unbuffered = true;
             $result = mysqli_query($dbh, $query, MYSQLI_USE_RESULT);
         } else {
             $rows = $wpdb->get_results($query, ARRAY_A);
         }
-
         if (($use_mysqli_unbuffered && !$result) || (!$use_mysqli_unbuffered && empty($rows))) {
             return ['status' => 'done', 'offset' => 0];
         }
@@ -5867,7 +5645,7 @@ class OPTISTATE_Backup_Manager {
                 }
             }
             $current_buffer[] = $row_string;
-            $current_buffer_len += $row_len;
+            $current_buffer_len+= $row_len;
             $memory_pressure = false;
             if ($row_count % 1000 === 0) {
                 $memory_pressure = (memory_get_usage(true) > $unsafe_memory_threshold);
@@ -6557,7 +6335,7 @@ class OPTISTATE_Backup_Manager {
             if ($old_tables_result && $old_tables_result->num_rows > 0) {
                 $tables_to_drop = [];
                 while ($row = $old_tables_result->fetch_row()) {
-                $tables_to_drop[] = "`" . esc_sql($row[0]) . "`";
+                    $tables_to_drop[] = "`" . esc_sql($row[0]) . "`";
                 }
                 $old_tables_result->free();
                 if (!empty($tables_to_drop)) {
@@ -6742,7 +6520,7 @@ class OPTISTATE_Backup_Manager {
         $operation_text = ($type === 'scheduled') ? __('Scheduled Backup Created (%s)', 'optistate') : __('Backup Created (%s)', 'optistate');
         $log_entry = ["timestamp" => $local_timestamp_val, "type" => $type, "date" => $formatted_date_string, "operation" => '💾 ' . esc_html(sprintf($operation_text, $backup_filename)), "backup_filename" => $backup_filename, "file_size" => $this->wp_filesystem->exists($backup_filepath) ? $this->wp_filesystem->size($backup_filepath) : 0, ];
         array_unshift($log_entries, $log_entry);
-        $log_entries = array_slice($log_entries, 0, 150);
+        $log_entries = array_slice($log_entries, 0, 200);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
         if ($json_data !== false) {
             $this->wp_filesystem->put_contents($this->log_file_path, $json_data, FS_CHMOD_FILE);
@@ -6772,7 +6550,7 @@ class OPTISTATE_Backup_Manager {
         $operation_text = '▶ ' . esc_html(sprintf(__('Database Restore Started (%s)', 'optistate'), $backup_filename));
         $log_entry = ["timestamp" => $local_timestamp_val, "type" => $type, "date" => $formatted_date_string, "operation" => $operation_text, "backup_filename" => $backup_filename, ];
         array_unshift($log_entries, $log_entry);
-        $log_entries = array_slice($log_entries, 0, 150);
+        $log_entries = array_slice($log_entries, 0, 200);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
         if ($json_data !== false) {
             $this->wp_filesystem->put_contents($this->log_file_path, $json_data, FS_CHMOD_FILE);
@@ -6918,18 +6696,7 @@ class OPTISTATE_Backup_Manager {
             if (strpos($filename, 'SAFETY-RESTORE-') === 0) {
                 $type = 'SCHEDULED';
             }
-            $backup_list[] = [
-                "filename" => $filename, 
-                "date" => $formatted_date, 
-                "size" => size_format($file_size, 2), 
-                "size_bytes" => $file_size, 
-                "timestamp" => $file_timestamp, 
-                "filepath" => $file, 
-                "download_url" => $download_url, 
-                "verified" => $verification["valid"], 
-                "verification_message" => $verification["message"],
-                "type" => $type
-            ];
+            $backup_list[] = ["filename" => $filename, "date" => $formatted_date, "size" => size_format($file_size, 2), "size_bytes" => $file_size, "timestamp" => $file_timestamp, "filepath" => $file, "download_url" => $download_url, "verified" => $verification["valid"], "verification_message" => $verification["message"], "type" => $type];
         }
         usort($backup_list, function ($a, $b) {
             return $b["timestamp"] - $a["timestamp"];
@@ -7179,8 +6946,8 @@ class OPTISTATE_Backup_Manager {
         }
         $filename = isset($_POST["filename"]) ? basename(wp_unslash($_POST["filename"])) : '';
         if (!preg_match('/\.sql(\.gz)?$/i', $filename)) {
-             wp_send_json_error(["message" => esc_html__("Security violation: Invalid file type.", "optistate") ]);
-             return;
+            wp_send_json_error(["message" => esc_html__("Security violation: Invalid file type.", "optistate") ]);
+            return;
         }
         if (strpos($filename, "..") !== false || strpos($filename, "/") !== false || strpos($filename, "\\") !== false) {
             wp_send_json_error(["message" => esc_html__("Invalid filename.", "optistate") ]);
@@ -7221,7 +6988,7 @@ class OPTISTATE_Backup_Manager {
                 }
                 $log_entry = ["timestamp" => time(), "type" => "manual", "date" => wp_date(get_option('date_format') . ' ' . get_option('time_format'), time()), "operation" => "🗑️ " . sprintf(__("Backup Deleted (%s)", "optistate"), $filename), "backup_filename" => "", "timezone" => get_option("timezone_string"), "gmt_offset" => get_option("gmt_offset") ];
                 array_unshift($log_entries, $log_entry);
-                $log_entries = array_slice($log_entries, 0, 150);
+                $log_entries = array_slice($log_entries, 0, 200);
                 $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
                 if ($json_data) {
                     $this->wp_filesystem->put_contents($this->log_file_path, $json_data, FS_CHMOD_FILE);
@@ -7378,7 +7145,7 @@ class OPTISTATE_Backup_Manager {
         }
         $log_entry = ["timestamp" => time(), "type" => "scheduled", "date" => $this->main_plugin->format_timestamp(time()), "operation" => '🏁 ' . esc_html(sprintf(__('Database Restore Completed (%s)', 'optistate'), $backup_filename)), "backup_filename" => $backup_filename, "queries_executed" => $queries_executed, ];
         array_unshift($log_entries, $log_entry);
-        $log_entries = array_slice($log_entries, 0, 150);
+        $log_entries = array_slice($log_entries, 0, 200);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
         if ($json_data !== false) {
             if ($this->wp_filesystem) {
@@ -7655,7 +7422,7 @@ class OPTISTATE_Backup_Manager {
         }
         $log_entry = ["timestamp" => time(), "type" => "scheduled", "date" => $this->main_plugin->format_timestamp(time()), "operation" => '🛑 ' . esc_html__('Database Restore Failed', 'optistate') . ' + ⏪ ' . esc_html__('Rollback Succeeded', 'optistate'), "backup_filename" => $backup_filename, "details" => $reason, ];
         array_unshift($log_entries, $log_entry);
-        $log_entries = array_slice($log_entries, 0, 150);
+        $log_entries = array_slice($log_entries, 0, 200);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
         if ($json_data !== false) {
             $this->wp_filesystem->put_contents($this->log_file_path, $json_data, FS_CHMOD_FILE);
@@ -7684,7 +7451,7 @@ class OPTISTATE_Backup_Manager {
         $operation_text = '❌ ' . esc_html(sprintf(__('Backup Failed (%s)', 'optistate'), $error_message));
         $log_entry = ["timestamp" => $local_timestamp_val, "type" => $type, "date" => $formatted_date_string, "operation" => $operation_text, "backup_filename" => $backup_filename, "file_size" => 0, ];
         array_unshift($log_entries, $log_entry);
-        $log_entries = array_slice($log_entries, 0, 150);
+        $log_entries = array_slice($log_entries, 0, 200);
         $json_data = json_encode($log_entries, JSON_PRETTY_PRINT);
         if ($json_data !== false) {
             $this->wp_filesystem->put_contents($this->log_file_path, $json_data, FS_CHMOD_FILE);
@@ -8182,7 +7949,7 @@ class OPTISTATE_Backup_Manager {
         }
         $status = $task_data['status'];
         if ($status === 'pending' || $status === 'decompressing') {
-            wp_send_json_success(['status' => 'decompressing', 'message' => sprintf(__('DECOMPRESSING BACKUP ....', 'optistate'))]);
+            wp_send_json_success(['status' => 'decompressing', 'message' => sprintf(__('DECOMPRESSING BACKUP ....', 'optistate')) ]);
         } elseif ($status === 'restore_starting') {
             $this->delete_process_state($decompression_key);
             wp_send_json_success(['status' => 'restore_starting', 'message' => esc_html__('Decompression complete! Initiating restore...', 'optistate'), 'master_restore_key' => $task_data['master_restore_key']]);
@@ -8466,8 +8233,8 @@ function optistate_activate() {
         $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'System';
         $instance->log_optimization('manual', '🔌 ' . sprintf(esc_html__('Plugin Activated by %s', 'optistate'), $username), '');
     }
-    $default_struct = ['display' => 'N/A', 'value' => 0]; $default_cache = ['score' => 0, 'fcp' => $default_struct, 'lcp' => $default_struct, 'cls' => $default_struct, 'si' => $default_struct,'tti' => $default_struct, 'ttfb' => $default_struct, 
-    'tbt' => $default_struct, 'timestamp' => current_time('mysql'), 'strategy' => 'mobile', 'tested_url' => home_url(), 'recommendations' => []];
+    $default_struct = ['display' => 'N/A', 'value' => 0];
+    $default_cache = ['score' => 0, 'fcp' => $default_struct, 'lcp' => $default_struct, 'cls' => $default_struct, 'si' => $default_struct, 'tti' => $default_struct, 'ttfb' => $default_struct, 'tbt' => $default_struct, 'timestamp' => current_time('mysql'), 'strategy' => 'mobile', 'tested_url' => home_url(), 'recommendations' => []];
     $cache_key = 'optistate_pagespeed_' . md5(home_url() . 'mobile');
     set_transient($cache_key, $default_cache, 30 * DAY_IN_SECONDS);
 }
@@ -8511,10 +8278,7 @@ function optistate_deactivate() {
              WHERE option_name LIKE %s", '%optistate_%'));
         if (!empty($options_to_delete)) {
             $placeholders = implode(',', array_fill(0, count($options_to_delete), '%s'));
-            $wpdb->query($wpdb->prepare(
-                "DELETE FROM {$wpdb->options} WHERE option_name IN ($placeholders)",
-                ...$options_to_delete
-            ));
+            $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name IN ($placeholders)", ...$options_to_delete));
         }
     }
     catch(Exception $e) {
@@ -8528,10 +8292,7 @@ function optistate_deactivate() {
     if ($wp_filesystem) {
         $upload_dir = wp_upload_dir();
         $base_dir = trailingslashit($upload_dir['basedir']);
-        $dirs_to_clean = [
-        $base_dir . OPTISTATE::CACHE_DIR_NAME . '/',
-        $base_dir . OPTISTATE::TEMP_DIR_NAME . '/'
-        ];
+        $dirs_to_clean = [$base_dir . OPTISTATE::CACHE_DIR_NAME . '/', $base_dir . OPTISTATE::TEMP_DIR_NAME . '/'];
         foreach ($dirs_to_clean as $dir) {
             if ($wp_filesystem->is_dir($dir)) {
                 $wp_filesystem->delete($dir, true);

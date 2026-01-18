@@ -4,7 +4,6 @@
  */
 jQuery(document).ready(function($) {
   'use strict';
-  const POLL_INTERVAL_FAST = 1000;
   const POLL_INTERVAL_NORMAL = 2000;
   const POLL_INTERVAL_SLOW = 3000;
   const SELECTORS = {
@@ -1018,7 +1017,6 @@ jQuery(document).ready(function($) {
       errorMsg = (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) ?
         xhr.responseJSON.data.message :
         sprintf(__('An error occurred (Status: %d). Please try again.', 'optistate'), xhr.status);
-
       showToast(errorMsg, 'error');
     }
     isProcessing = false;
@@ -1240,19 +1238,11 @@ jQuery(document).ready(function($) {
     if(days > 0) {
       let statusText;
       if(autoBackupOnly) {
-        statusText = '✅ ' + sprintf(
-          __('Automated *backup only* is enabled and will run every %d days at %s.', 'optistate'),
-          days,
-          esc_html(timeDisplay)
-        );
+        statusText = '✅ ' + sprintf(__('Automated *backup only* is enabled and will run every %s days at %s.', 'optistate'), days, esc_html(timeDisplay));
         $taskDescFull.hide();
         $taskDescBackupOnly.show();
       } else {
-        statusText = '✅ ' + sprintf(
-          __('Automated *backup & cleanup* is enabled and will run every %d days at %s.', 'optistate'),
-          days,
-          esc_html(timeDisplay)
-        );
+        statusText = '✅ ' + sprintf(__('Automated *backup & cleanup* is enabled and will run every %s days at %s.', 'optistate'), days, esc_html(timeDisplay));
         $taskDescFull.show();
         $taskDescBackupOnly.hide();
       }
@@ -1292,20 +1282,12 @@ jQuery(document).ready(function($) {
     const timeDisplay = formatTimeForDisplay(time);
     if(days > 0) {
       let statusText;
-      if(isBackupOnly) {
-        statusText = '✅ ' + sprintf(
-          __('Automated *backup only* is enabled and will run every %d days at %s.', 'optistate'),
-          days,
-          esc_html(timeDisplay)
-        );
+      if(autoBackupOnly) {
+        statusText = '✅ ' + sprintf(__('Automated *backup only* is enabled and will run every %s days at %s.', 'optistate'), days, esc_html(timeDisplay));
         $taskDescFull.hide();
         $taskDescBackupOnly.show();
       } else {
-        statusText = '✅ ' + sprintf(
-          __('Automated *backup & cleanup* is enabled and will run every %d days at %s.', 'optistate'),
-          days,
-          esc_html(timeDisplay)
-        );
+        statusText = '✅ ' + sprintf(__('Automated *backup & cleanup* is enabled and will run every %s days at %s.', 'optistate'), days, esc_html(timeDisplay));
         $taskDescFull.show();
         $taskDescBackupOnly.hide();
       }
@@ -1394,7 +1376,7 @@ jQuery(document).ready(function($) {
     }
     const overallScore = parseInt(scoreData.overall_score, 10);
     const $scoreValue = $('#health-score-value');
-    $scoreValue.text(overallScore);
+    $scoreValue.text(overallScore.toLocaleString());
     $scoreValue.removeClass('score-excellent score-good score-fair score-poor score-critical');
     const $scoreCircle = $('.health-score-circle');
     let color = '';
@@ -1416,9 +1398,9 @@ jQuery(document).ready(function($) {
     }
     $scoreCircle.css('border-color', color);
     if(scoreData.category_scores) {
-      $('#health-score-performance').text(Math.round(scoreData.category_scores.performance || 0));
-      $('#health-score-cleanliness').text(Math.round(scoreData.category_scores.cleanliness || 0));
-      $('#health-score-efficiency').text(Math.round(scoreData.category_scores.efficiency || 0));
+      $('#health-score-performance').text(Math.round(scoreData.category_scores.performance || 0).toLocaleString());
+      $('#health-score-cleanliness').text(Math.round(scoreData.category_scores.cleanliness || 0).toLocaleString());
+      $('#health-score-efficiency').text(Math.round(scoreData.category_scores.efficiency || 0).toLocaleString());
     }
     const $recommendations = $('#health-score-recommendations-list');
     $recommendations.empty();
@@ -1469,7 +1451,12 @@ jQuery(document).ready(function($) {
         if(key === 'db_creation_date') {
           value = '<span style="white-space: nowrap;">' + esc_html(value) + '</span>';
         } else {
-          value = esc_html(String(value));
+          const numValue = typeof value === 'number' ? value : parseInt(value, 10);
+          if (!isNaN(numValue) && String(numValue) === String(value)) {
+            value = esc_html(numValue.toLocaleString());
+          } else {
+            value = esc_html(String(value));
+          }
         }
         const div = document.createElement('div');
         div.className = 'optistate-stat-item';
@@ -1771,7 +1758,7 @@ jQuery(document).ready(function($) {
       div.innerHTML = `
         <div class="optistate-cleanup-header">
           <span class="optistate-cleanup-title">${esc_html(item.title)} ${warningIcon}</span>
-          <span class="optistate-cleanup-count">${count}</span>
+          <span class="optistate-cleanup-count">${count.toLocaleString()}</span>
         </div>
         <div class="optistate-cleanup-desc">${esc_html(item.desc)}</div>
         <button class="optistate-clean-btn" data-type="${esc_attr(item.key)}" 
@@ -1869,35 +1856,15 @@ jQuery(document).ready(function($) {
                   runOptimizationStep();
                   return;
                 }
-                const messages = [
-                  sprintf(
-                    __('Successfully optimized %d tables!', 'optistate'),
-                    parseInt(data.optimized, 10) || 0
-                  )
-                ];
+                const messages = [sprintf(__('Successfully optimized %s tables!', 'optistate'), (parseInt(data.optimized, 10) || 0).toLocaleString())];
                 if(data.reclaimed > 0) {
-                  messages.push(
-                    sprintf(
-                      __('Reclaimed %s of space.', 'optistate'),
-                      formatBytes(data.reclaimed)
-                    )
-                  );
+                  messages.push(sprintf(__('Reclaimed %s of space.', 'optistate'), formatBytes(data.reclaimed)));
                 }
                 if(data.skipped > 0) {
-                  messages.push(
-                    sprintf(
-                      __('%d tables skipped (no optimization needed).', 'optistate'),
-                      parseInt(data.skipped, 10)
-                    )
-                  );
+                  messages.push(sprintf(__('%s tables skipped (no optimization needed).', 'optistate'), parseInt(data.skipped, 10).toLocaleString()));
                 }
                 if(data.failed > 0) {
-                  messages.push(
-                    sprintf(
-                      __('%d tables failed to optimize.', 'optistate'),
-                      parseInt(data.failed, 10)
-                    )
-                  );
+                  messages.push(sprintf(__('%s tables failed to optimize.', 'optistate'), parseInt(data.failed, 10).toLocaleString()));
                 }
                 const message = messages.join('<br>');
                 let detailsHtml = `<div class="optistate-success">${message}</div>`;
@@ -2023,14 +1990,14 @@ jQuery(document).ready(function($) {
       const trackbacks = parseInt(statsCache['trackbacks'], 10) || 0;
       const totalOrphaned = orphanedPostmeta + orphanedCommentmeta + orphanedRelationships + orphanedUsermeta;
       const totalPingTrack = pingbacks + trackbacks;
-      message += '• Clean post revisions <strong>(' + postRevisions + ')</strong><br>';
-      message += '• Delete auto-drafts <strong>(' + autoDrafts + ')</strong><br>';
-      message += '• Delete trashed comments <strong>(' + trashedComments + ')</strong><br>';
-      message += '• Delete expired transients <strong>(' + expiredTransients + ')</strong><br>';
-      message += '• Remove duplicate postmeta <strong>(' + duplicatePostmeta + ')</strong><br>';
-      message += '• Remove duplicate commentmeta <strong>(' + duplicateCommentmeta + ')</strong><br>';
-      message += '• Remove orphaned data <strong>(' + totalOrphaned + ')</strong><br>';
-      message += '• Clean pingbacks and trackbacks <strong>(' + totalPingTrack + ')</strong><br>';
+      message += '• Clean post revisions <strong>(' + postRevisions.toLocaleString() + ')</strong><br>';
+      message += '• Delete auto-drafts <strong>(' + autoDrafts.toLocaleString() + ')</strong><br>';
+      message += '• Delete trashed comments <strong>(' + trashedComments.toLocaleString() + ')</strong><br>';
+      message += '• Delete expired transients <strong>(' + expiredTransients.toLocaleString() + ')</strong><br>';
+      message += '• Remove duplicate postmeta <strong>(' + duplicatePostmeta.toLocaleString() + ')</strong><br>';
+      message += '• Remove duplicate commentmeta <strong>(' + duplicateCommentmeta.toLocaleString() + ')</strong><br>';
+      message += '• Remove orphaned data <strong>(' + totalOrphaned.toLocaleString() + ')</strong><br>';
+      message += '• Clean pingbacks and trackbacks <strong>(' + totalPingTrack.toLocaleString() + ')</strong><br>';
     } else {
       message += __('• Clean post revisions', 'optistate') + '<br>';
       message += __('• Delete auto-drafts', 'optistate') + '<br>';
@@ -2065,7 +2032,7 @@ jQuery(document).ready(function($) {
                 if(key === 'health_score') continue;
                 const count = parseInt(cleanup_response.data[key], 10) || 0;
                 html += '<div class="optistate-result-item">' + sprintf(
-                  __('Cleaned %d %s', 'optistate'),
+                  __('Cleaned %s %s', 'optistate'),
                   count,
                   esc_html(key.replace(/_/g, ' '))
                 ) + '</div>';
@@ -2080,12 +2047,7 @@ jQuery(document).ready(function($) {
               .done(function(optimize_response) {
                 if(optimize_response && optimize_response.success && optimize_response.data) {
                   const data = optimize_response.data;
-                  const messages = [
-                    sprintf(
-                      __('Successfully optimized %d tables!', 'optistate'),
-                      parseInt(data.optimized, 10) || 0
-                    )
-                  ];
+                  const messages = [sprintf(__('Successfully optimized %s tables!', 'optistate'), (parseInt(data.optimized, 10) || 0).toLocaleString())];
                   if(data.reclaimed > 0) {
                     messages.push(
                       sprintf(
@@ -2207,15 +2169,15 @@ jQuery(document).ready(function($) {
     summaryHtml += '</h4>';
     summaryHtml += '<div class="optistate-summary-grid">';
     summaryHtml += '<div class="optistate-summary-item">';
-    summaryHtml += '<div class="optistate-summary-value">' + data.totals.total_tables + '</div>';
+    summaryHtml += '<div class="optistate-summary-value">' + data.totals.total_tables.toLocaleString() + '</div>';
     summaryHtml += '<div class="optistate-summary-label">' + __('Total Tables', 'optistate') + '</div>';
     summaryHtml += '</div>';
     summaryHtml += '<div class="optistate-summary-item">';
-    summaryHtml += '<div class="optistate-summary-value" style="color: #00a32a;">' + data.totals.core_count + '</div>';
+    summaryHtml += '<div class="optistate-summary-value" style="color: #00a32a;">' + data.totals.core_count.toLocaleString() + '</div>';
     summaryHtml += '<div class="optistate-summary-label">' + __('WordPress Core', 'optistate') + '</div>';
     summaryHtml += '</div>';
     summaryHtml += '<div class="optistate-summary-item">';
-    summaryHtml += '<div class="optistate-summary-value" style="color: #d63638;">' + data.totals.plugin_count + '</div>';
+    summaryHtml += '<div class="optistate-summary-value" style="color: #d63638;">' + data.totals.plugin_count.toLocaleString() + '</div>';
     summaryHtml += '<div class="optistate-summary-label">' + __('Plugin/Theme', 'optistate') + '</div>';
     summaryHtml += '</div>';
     summaryHtml += '<div class="optistate-summary-item">';
@@ -2241,7 +2203,7 @@ jQuery(document).ready(function($) {
     if(data.core_tables && data.core_tables.length > 0) {
       const coreCategory = document.createElement('div');
       coreCategory.className = 'optistate-table-category core-tables';
-      coreCategory.innerHTML = '<h4><span class="dashicons dashicons-wordpress"></span>' + __('WordPress Core Tables', 'optistate') + ' (' + data.core_tables.length + ') - ' + formatBytes(data.totals.core_size) + '</h4>';
+      coreCategory.innerHTML = '<h4><span class="dashicons dashicons-wordpress"></span>' + __('WordPress Core Tables', 'optistate') + ' (' + data.core_tables.length.toLocaleString() + ') - ' + formatBytes(data.totals.core_size) + '</h4>';
       data.core_tables.forEach(function(table) {
         coreCategory.appendChild(renderTableItem(table, true));
       });
@@ -2250,7 +2212,7 @@ jQuery(document).ready(function($) {
     if(data.plugin_tables && data.plugin_tables.length > 0) {
       const pluginCategory = document.createElement('div');
       pluginCategory.className = 'optistate-table-category plugin-tables';
-      pluginCategory.innerHTML = '<h4><span class="dashicons dashicons-admin-plugins"></span>' + __('Plugin & Theme Tables', 'optistate') + ' (' + data.plugin_tables.length + ') - ' + formatBytes(data.totals.plugin_size) + '</h4>';
+      pluginCategory.innerHTML = '<h4><span class="dashicons dashicons-admin-plugins"></span>' + __('Plugin & Theme Tables', 'optistate') + ' (' + data.plugin_tables.length.toLocaleString() + ') - ' + formatBytes(data.totals.plugin_size) + '</h4>';
       data.plugin_tables.forEach(function(table) {
         pluginCategory.appendChild(renderTableItem(table, false));
       });
@@ -2272,56 +2234,64 @@ jQuery(document).ready(function($) {
   }
 
   $('#optistate-analyze-indexes-btn').on('click', function() {
-    const $btn = $(this);
-    const $loading = $('#optistate-index-analysis-loading');
-    const $results = $('#optistate-index-results');
-    $btn.prop('disabled', true);
-    $loading.fadeIn(200);
-    $results.hide().empty();
-    $.ajax({
-      url: optistate_Ajax.ajaxurl,
-      type: 'POST',
-      data: {
-        action: 'optistate_analyze_indexes',
-        nonce: optistate_Ajax.nonce
-      },
-      success: function(response) {
-        if(response && response.success) {
-          const recs = response.data.recommendations;
-          if(recs.length === 0) {
-            $results.html('<div class="notice notice-success inline" style="padding:10px;"><p>✅ ' + __('Great news! No missing critical indexes found.', 'optistate') + '</p></div>');
-          } else {
-            let html = '<table class="widefat striped" style="border: 1px solid #ddd;">';
-            html += '<thead><tr><th>Table</th><th>Columns</th><th>Purpose</th><th>Action</th></tr></thead><tbody>';
-            recs.forEach(rec => {
-              html += `<tr>
-                    <td><code>${rec.table}</code></td>
-                    <td><code>${rec.column}</code></td> 
-                    <td style="color: #d63638;">${rec.reason}</td>
-                    <td><button class="button optistate-add-index-btn" data-table="${rec.table}" data-column="${rec.raw_columns}" data-index="${rec.index_name}" disabled>${__('Add Index', 'optistate')}</button><br><span style="font-size: 12px; font-weight: bold; margin-left: 8px; color: #007F6C;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">PRO ONLY</a></span></td>
-                </tr>`;
-            });
-            $results.html(html + '</tbody></table>');
-          }
-          $results.slideDown(300);
-        } else {
-          showToast(response.data.message || 'Analysis failed', 'error');
-        }
-      },
-      error: function(xhr) {
-        let msg = __('Network error analyzing indexes.', 'optistate');
-        if(xhr.status === 429) msg = __('🕔 Please wait 10 seconds before scanning again.', 'optistate');
-        if(xhr.status === 500) msg = __('Server Error (500). Check PHP logs for table errors.', 'optistate');
-        showToast(msg, 'error');
-      },
-      complete: function() {
-        $loading.fadeOut(200);
-        $btn.prop('disabled', false);
-      }
+        const $btn = $(this);
+        const $loading = $('#optistate-index-analysis-loading');
+        const $results = $('#optistate-index-results');
+        $btn.prop('disabled', true);
+        $loading.fadeIn(200);
+        $results.hide().empty();
+        $.ajax({
+            url: optistate_Ajax.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'optistate_analyze_indexes',
+                nonce: optistate_Ajax.nonce
+            },
+            success: function(response) {
+                if (response && response.success) {
+                    const recs = response.data.recommendations;
+                    if (recs.length === 0) {
+                        $results.html('<div class="notice notice-success inline" style="padding:10px;"><p>✅ ' + __('Great news! No missing or redundant indexes found.', 'optistate') + '</p></div>');
+                    } else {
+                        let html = '<table class="widefat striped" style="border: 1px solid #ddd; border-top: none;">';
+                        html += '<thead><tr><th>' + __('Table', 'optistate') + '</th><th>' + __('Index / Columns', 'optistate') + '</th><th>' + __('Status & Analysis', 'optistate') + '</th><th>' + __('Action', 'optistate') + '</th></tr></thead><tbody>';
+                        recs.forEach(rec => {
+                            const isRedundant = (rec.type === 'redundant');
+                            const actionType = isRedundant ? 'drop' : 'add';
+                            const btnLabel = isRedundant ? __('Remove Bloat', 'optistate') : __('Fix Index', 'optistate');
+                            const btnClass = isRedundant ? 'button-link-delete' : 'button-primary';
+                            const statusColor = isRedundant ? '#d63638' : '#CC8400';
+                            html += `<tr>
+                                <td><code>${rec.table}</code></td>
+                                <td><strong>${rec.index_name}</strong><br><small><code>${rec.column}</code></small></td> 
+                                <td style="color: ${statusColor};">${rec.reason}</td>
+                                <td>
+                                    <button class="button ${btnClass} optistate-manage-index-btn" data-table="${rec.table}" data-type="${actionType}" data-column="${rec.raw_columns || ''}" data-index="${rec.index_name}" disabled>
+                                        ${btnLabel}
+                                    </button><br><div style="font-size: 12px; font-weight: bold; margin-top: 0"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO ONLY ↑</a></div>
+                                </td>
+                            </tr>`;
+                        });
+                        $results.html(html + '</tbody></table>');
+                    }
+                    $results.slideDown(300);
+                } else {
+                    showToast(response.data.message || 'Analysis failed', 'error');
+                }
+            },
+            error: function(xhr) {
+                let msg = __('Network error analyzing indexes.', 'optistate');
+                if (xhr.status === 429) msg = __('🕔 Please wait before scanning again.', 'optistate');
+                showToast(msg, 'error');
+            },
+            complete: function() {
+                $loading.fadeOut(200);
+                $btn.prop('disabled', false);
+            }
+        });
     });
-  });
 
-  $(document).on('click', '.optistate-add-index-btn', function(e) {
+  $(document).on('click', '.optistate-manage-index-btn', function() {
     if($(this).prop('disabled')) {
       e.preventDefault();
       e.stopPropagation();
@@ -2405,9 +2375,9 @@ jQuery(document).ready(function($) {
         const $elements = initCacheStatsElements();
         if(response && response.success) {
           requestAnimationFrame(() => {
-            $elements.fileCount.text(response.data.file_count);
+            $elements.fileCount.text(typeof response.data.file_count === 'number' ? response.data.file_count.toLocaleString() : response.data.file_count);
             $elements.totalSize.text(response.data.total_size);
-            $elements.mobileCount.text(response.data.mobile_file_count);
+            $elements.mobileCount.text(typeof response.data.mobile_file_count === 'number' ? response.data.mobile_file_count.toLocaleString() : response.data.mobile_file_count);
             $elements.avgSize.text(response.data.average_size);
             $elements.lastWrite.text(response.data.last_write);
             $elements.oldestPage.text(response.data.oldest_page);
@@ -2899,11 +2869,12 @@ jQuery(document).ready(function($) {
         </div>
         <div class="server-cache-settings-panel" style="${displayStyle}">
             <div class="optistate-feature-info-box" style="margin-top: 10px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #fff;">
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">
+                <label style="font-weight: 600; display: block;">
                     ${__('🚫 Blocked User Agents (One per line, 100 characters max)', 'optistate')}
                 </label>
-                <textarea class="bad-bot-list" rows="8" style="width: 100%; font-family: monospace;" placeholder="MJ12bot&#10;AhrefsBot&#10;...">${esc_html(settings.user_agents)}</textarea>
-                <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                ${__('⚠️ Caution: Do not block user agents commonly found in web browsers.', 'optistate')}
+                <textarea class="bad-bot-list" rows="8" style="width: 100%; font-family: monospace; margin-top: 8px;" placeholder="MJ12bot&#10;AhrefsBot&#10;...">${esc_html(settings.user_agents)}</textarea>
+                <div style="display: flex; justify-content: space-between; margin-top: 3px;">
                     <span class="description" style="color: #666;">
     ${__('Partial matches allowed. E.g., "Google" blocks "Googlebot". Case-insensitive.<br>You can view a complete list of bots on ', 'optistate')}
     <a href="https://radar.cloudflare.com/bots/directory?kind=all" target="_blank">${__('this page', 'optistate')}</a>${__('.', 'optistate')}
@@ -3203,7 +3174,7 @@ jQuery(document).ready(function($) {
             $status.fadeOut(300, function() {
               $(this).html('');
             }).fadeIn(300);
-          }, 3000);
+          }, 4000);
         } else {
           $status.html('<p class="optistate-error">✗ ' + (response.data.message || 'Export failed') + '</p>');
         }
@@ -3284,7 +3255,7 @@ jQuery(document).ready(function($) {
             successMsg += '• Max Backups: ' + response.data.summary.max_backups + '<br>';
             successMsg += '• Auto Optimize: Every ' + response.data.summary.auto_optimize_days + ' days<br>';
             successMsg += '• Email Notifications: ' + (response.data.summary.email_notifications ? 'Enabled' : 'Disabled') + '<br>';
-            successMsg += '• Performance Features: ' + response.data.summary.performance_features_count + ' configured<br>';
+            successMsg += '• Performance Features: ' + (typeof response.data.summary.performance_features_count === 'number' ? response.data.summary.performance_features_count.toLocaleString() : response.data.summary.performance_features_count) + ' configured<br>';
             if(response.data.summary.imported_from_site) {
               successMsg += '• Exported From: ' + response.data.summary.imported_from_site + '<br>';
             }
@@ -3333,12 +3304,13 @@ jQuery(document).ready(function($) {
     } else {
       title = '⚠️ ' + __('File Integrity Check Failed', 'optistate');
       message = '<span style="margin-bottom: 15px;">' + __('<strong>Critical Warning:</strong> This backup file appears to be damaged or corrupted.', 'optistate') + '</span>' +
-        '<p>' + __('<strong>Why is this unsafe?</strong><br>The current backup does not match its original digital fingerprint.<br>This means the data inside is incomplete or altered, which leads to SQL syntax errors.', 'optistate') + '</p>' +
+        '<p>' + __('<strong>Why is this unsafe?</strong><br>The current backup does not match its original digital fingerprint.', 'optistate') + '</p>' +
         '<p><strong>' + __('Common Causes:', 'optistate') + '</strong></p>' +
         '<ul style="list-style-type: disc; margin-left: 20px; margin-bottom: 15px;">' +
         '<li>' + __('<strong>Interrupted Process:</strong> The backup process was interrupted before finishing.', 'optistate') + '</li>' +
         '<li>' + __('<strong>Disk Error:</strong> The server ran out of space while writing the backup file.', 'optistate') + '</li>' +
         '<li>' + __('<strong>Modification:</strong> The backup file was opened and saved manually.', 'optistate') + '</li>' +
+        '<li>' + __('<strong>wp_optistate_backup_metadata</strong> table missing from the database.', 'optistate') + '</li>' +
         '</ul>' +
         '<div class="notice notice-error inline" style="margin-top: 15px; padding: 10px;">' +
         '<p style="margin: 0;">❌ <strong>DO NOT RESTORE:</strong> Using this file will likely crash your site. Please delete this backup and create a new one.</p>' +
@@ -3509,7 +3481,7 @@ jQuery(document).ready(function($) {
       html = '<div class="notice notice-info inline"><p>' + __('No matches found for this search term.', 'optistate') + '</p></div>';
     } else {
       html += '<div class="optistate-success" style="margin-bottom: 15px;">';
-      html += '<strong>' + sprintf(__('Found %d matches across %d tables.', 'optistate'), data.total_matches, data.tables_affected) + '</strong>';
+      html += '<strong>' + sprintf(__('Found %s matches across %s tables.', 'optistate'), data.total_matches.toLocaleString(), data.tables_affected.toLocaleString()) + '</strong>';
       html += '</div>';
       html += '<div style="max-height: 360px; overflow-y: auto; border: 1px solid #ddd;">';
       html += '<table class="widefat striped" style="border: 0;"><thead><tr><th>Table</th><th>Column</th><th>ID</th><th>Content Preview</th></tr></thead><tbody>';
@@ -3524,7 +3496,7 @@ jQuery(document).ready(function($) {
         });
       }
       if(data.total_matches > data.preview.length) {
-        html += '<tr><td colspan="4" style="text-align: center; color: #666;"><em>' + sprintf(__('%d more matches...', 'optistate'), data.total_matches - data.preview.length) + '</em></td></tr>';
+        html += '<tr><td colspan="4" style="text-align: center; color: #666;"><em>' + sprintf(__('%s more matches...', 'optistate'), (data.total_matches - data.preview.length).toLocaleString()) + '</em></td></tr>';
       }
       html += '</tbody></table></div>';
     }

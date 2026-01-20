@@ -123,9 +123,10 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
     <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-4">5.4. 🎯 Targeted Optimizations (The "Middle Ground")</a></li>
  	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-5">5.5. 🔪 Detailed Database Cleanup (The "Scalpel")</a></li>
     <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-6">5.6. ⚡ Advanced Database Optimization (The "Power Tools")</a></li>
- 	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-7">5.7. 🔍 Database Structure Analysis</a></li>
-	<li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-8">5.8. 🔢 MySQL Index Manager</a></li>
-    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-9">5.9. ↳↰ Database Search &amp; Replace</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-7">5.7. 🔍 Database Structure Analysis</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-8">5.8. 🔢 MySQL Index Manager</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-9">5.9. 🛡️ Referential Integrity Scanner</a></li>
+    <li style="margin-bottom: 5px;"><a style="text-decoration: none; color: #333;" href="#ch-5-10">5.10. ↳↰ Database Search &amp; Replace</a></li>
 </ul>
 </li>
  	<li style="margin-bottom: 8px;"><strong><a style="text-decoration: none; color: #16358a;" href="#ch-6">⏰ Automatic Backup &amp; Cleanup (Section 7)</a></strong>
@@ -740,9 +741,48 @@ code{font-family:'Courier New',Courier,monospace!important;background-color:#f3f
 <ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;"><strong>Initiate Scan:</strong> Click the <strong>"Scan for Missing Indexes"</strong> button. The plugin dynamically resolves your table prefixes (even if they are non-standard) and performs a deep schema audit.</li> <li style="margin-bottom: 8px;"><strong>Review Recommendations:</strong> <ul style="padding-left: 30px; margin-top: 5px;"> <li>Recommendations will display the <strong>Table</strong>, <strong>Column(s)</strong>, and a detailed <strong>Reason</strong> explaining the performance benefit.</li> </ul> </li> <li style="margin-bottom: 8px;"><strong>Apply Fixes:</strong> Click <strong>"Fix Index"</strong> to add a missing index or <strong>"Remove Bloat"</strong> to remove a redundant one.</li> </ol>
 
 <blockquote class="niceblock"> <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">⚠️ CAUTION: LARGE TABLES</strong> <p style="margin-bottom: 0; margin-top: 5px;">Adding or dropping indexes on tables with millions of rows can take several minutes and may temporarily lock the table. If your site has a very large database, it is recommended to perform these operations during low-traffic periods.</p> </blockquote>
+<h3 id="ch-5-9" class="h3title">🛡️ 5.9. Referential Integrity Scanner</h3>
 
+<p style="margin-bottom: 15px;">The Referential Integrity Scanner is a specialized sanitation tool designed to find "Zombie Data"—rows in your database that point to parent data that no longer exists.</p>
+
+<div style="background-color: #f0f6fc; border-left: 4px solid #2271b1; padding: 10px 18px; margin-left: 0; margin-right: 0; margin-bottom: 20px; color: #555; border-radius: 4px;">
+    ℹ️ <strong style="color: #135e96;">THE PROBLEM:</strong> Standard cleanup tools often miss complex relationships. For example, if a Post (ID: 123) was deleted directly via SQL or a buggy plugin, the Post Meta (which points to <code>post_id = 123</code>) might remain forever. This scanner specifically hunts down these broken links.
+</div>
+
+<h4 class="h4title">🔍 What It Detects</h4>
+
+<ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Orphaned Metadata:</strong>
+        <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+            <li><strong>Post Meta:</strong> Meta rows pointing to deleted posts.</li>
+            <li><strong>Comment Meta:</strong> Meta rows pointing to deleted comments.</li>
+            <li><strong>User Meta:</strong> Meta rows pointing to deleted users.</li>
+            <li><strong>Term Meta:</strong> Meta rows pointing to deleted taxonomy terms.</li>
+        </ul>
+    </li>
+    <li style="margin-bottom: 8px;"><strong>Broken Relationships:</strong>
+        <ul style="padding-left: 20px; margin-top: 5px; color: #555; list-style-type: disc;">
+            <li><strong>Orphaned Revisions:</strong> Revisions in <code>wp_posts</code> that have no parent post.</li>
+            <li><strong>Zombie Taxonomies:</strong> Rows in <code>term_taxonomy</code> that refer to term definitions that no longer exist.</li>
+            <li><strong>Comments on Deleted Posts:</strong> Comments still attached to a <code>post_ID</code> that has been removed.</li>
+        </ul>
+    </li>
+</ul>
+
+<h4 class="h4title">🚀 How to Use</h4>
+
+<ol style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;">
+    <li style="margin-bottom: 8px;"><strong>Scan:</strong> Click the <strong>"Scan Database Integrity"</strong> button. The tool will check foreign key relationships across your core tables.</li>
+    <li style="margin-bottom: 8px;"><strong>Review:</strong> Unlike the standard cleaner, this tool provides specific examples. It will show you the exact Issue Type (e.g., "Post Meta (Orphaned)") and provide sample IDs (e.g., <code>#452: _edit_lock</code>) so you can verify the data is truly junk.</li>
+    <li style="margin-bottom: 8px;"><strong>Fix:</strong> Click the <strong>"Fix Orphans"</strong> button next to any issue found. The plugin uses a batched deletion process to remove the orphaned rows without timing out your server.</li>
+</ol>
+
+<blockquote class="niceblock">
+    <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">⚠️ SAFETY FIRST</strong>
+    <p style="margin-bottom: 0; margin-top: 5px;">While orphaned data is generally safe to remove (as it points to nothing), <strong>always create a database backup</strong> before running integrity fixes, just as you would with any database operation.</p>
+</blockquote>
 <h4 class="h4title">🛠️ Technical Resilience</h4> <p style="margin-bottom: 15px;">The Index Manager includes several important safeguards:</p> <ul style="padding-left: 30px; margin-top: 10px; margin-bottom: 15px;"> <li style="margin-bottom: 8px;"><strong>Dynamic Prefix Handling:</strong> Correctly identifies WooCommerce and Core tables regardless of whether your prefix is <code>wp_</code>, <code>wp_custom_</code>, or another variation.</li> <li style="margin-bottom: 8px;"><strong>Case-Insensitive Table Matching:</strong> Ensures compatibility across different server environments (Linux/Windows) and collation settings.</li> <li style="margin-bottom: 8px;"><strong>Constraint Protection:</strong> The logic is programmed to <strong>never</strong> suggest dropping a <code>UNIQUE</code> index or a <code>PRIMARY KEY</code>, even if it appears redundant, to preserve data integrity.</li> </ul>
-<h3 id="ch-5-9" class="h3title">↳↰ 5.9. Database Search &amp; Replace</h3>
+<h3 id="ch-5-10" class="h3title">↳↰ 5.10. Database Search &amp; Replace</h3>
 <p style="margin-bottom: 15px;">Located in the "Advanced" tab, this professional-grade tool allows you to find and replace text strings across your entire database. It is essential for tasks like migrating domains (http to https), updating shortcodes, or fixing bulk content errors.</p>
 <blockquote class="niceblock">
     <strong style="color: #b45309; font-style: normal; font-weight: bold; display: block; margin-bottom: 5px;">🚨 CRITICAL WARNING</strong>

@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
 class OPTISTATE_Process_Store {
     private $table_name;
     private static $runtime_cache = [];
+    private const CACHE_GROUP = 'optistate_processes';
     public function __construct() {
         global $wpdb;
         $this->table_name = $wpdb->prefix . 'optistate_processes';
@@ -29,11 +30,9 @@ class OPTISTATE_Process_Store {
     public function set($key, $value, $expiration = 0) {
         global $wpdb;
         self::$runtime_cache[$key] = $value;
-        $group = 'optistate_processes';
-        wp_cache_set($key, $value, $group, $expiration);
+        wp_cache_set($key, $value, self::CACHE_GROUP, $expiration);
         $json_value = wp_json_encode($value);
-        $expiration = absint($expiration);
-        $expire_time = ($expiration > 0) ? time() + $expiration : 0;
+        $expire_time = ($expiration > 0) ? time() + absint($expiration) : 0;
         $created_at = current_time('mysql');
         $sql = "INSERT INTO {$this->table_name} (process_key, process_value, expiration, created_at) 
                 VALUES (%s, %s, %d, %s) 
@@ -50,8 +49,7 @@ class OPTISTATE_Process_Store {
         if (array_key_exists($key, self::$runtime_cache)) {
             return self::$runtime_cache[$key];
         }
-        $group = 'optistate_processes';
-        $cached_value = wp_cache_get($key, $group);
+        $cached_value = wp_cache_get($key, self::CACHE_GROUP);
         if ($cached_value !== false) {
             if ($cached_value === '___NOT_FOUND___') {
                 self::$runtime_cache[$key] = false;
@@ -62,10 +60,16 @@ class OPTISTATE_Process_Store {
         }
         global $wpdb;
         $suppress = $wpdb->suppress_errors(true);
-        $row = $wpdb->get_row($wpdb->prepare("SELECT process_value FROM {$this->table_name} WHERE process_key = %s", $key));
+            $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT process_value FROM {$this->table_name} 
+            WHERE process_key = %s 
+            AND (expiration = 0 OR expiration > %d)", 
+            $key, 
+            time()
+        ));
         $wpdb->suppress_errors($suppress);
         if (!$row) {
-            wp_cache_set($key, '___NOT_FOUND___', $group, 60);
+            wp_cache_set($key, '___NOT_FOUND___', self::CACHE_GROUP, 60);
             return false;
         }
         $decoded = json_decode($row->process_value, true);
@@ -73,13 +77,13 @@ class OPTISTATE_Process_Store {
             return false;
         }
         self::$runtime_cache[$key] = $decoded;
-        wp_cache_set($key, $decoded, $group, 300);
+        wp_cache_set($key, $decoded, self::CACHE_GROUP, 300);
         return $decoded;
     }
     public function delete($key) {
         global $wpdb;
         unset(self::$runtime_cache[$key]);
-        wp_cache_delete($key, 'optistate_processes');
+        wp_cache_delete($key, self::CACHE_GROUP);
         return $wpdb->delete($this->table_name, ['process_key' => $key], ['%s']);
     }
     public function cleanup() {
@@ -102,7 +106,9 @@ class OPTISTATE_Process_Store {
             UNIQUE KEY process_key (process_key),
             KEY expiration (expiration)
         ) $charset_collate;";
-        require_once (ABSPATH . 'wp-admin/includes/upgrade.php');
+        if (!function_exists('dbDelta')) {
+            require_once (ABSPATH . 'wp-admin/includes/upgrade.php');
+        }
         dbDelta($sql);
     }
     public function drop_table() {
@@ -125,6 +131,7 @@ class OPTISTATE {
     const LOG_FILE_NAME = 'optimization-log.json';
     const GENERATED_SETTINGS_FILE_NAME = 'generated-settings.php';
     const REGEX_BOUNDARY_FMT = '/(?:^|[^\p{L}\p{N}_])%s(?:[^\p{L}\p{N}_]|$)/%s';
+    const TRACKING_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'msclkid', 'mc_cid', 'mc_eid', '_ga', 'ref', 'source'];
     private $db_backup_manager;
     public $wp_filesystem;
     private $process_store;
@@ -142,12 +149,13 @@ class OPTISTATE {
     private $compiled_exclude_patterns = null;
     private $exclude_urls_raw_cache = null;
     private $performance_settings_cache = null;
-    private $tracking_params = ['utm_source' => true, 'utm_medium' => true, 'utm_campaign' => true, 'utm_content' => true, 'utm_term' => true, 'fbclid' => true, 'gclid' => true, 'msclkid' => true, 'mc_cid' => true, 'mc_eid' => true, '_ga' => true, 'ref' => true, 'source' => true];
     private $combined_consent_patterns = null;
     private $is_mobile_request = null;
+    private $upload_dir_info;
     public function __construct() {
         $this->wp_filesystem = $this->init_wp_filesystem();
         $this->process_store = new OPTISTATE_Process_Store();
+        $this->upload_dir_info = wp_upload_dir();
         if (!$this->wp_filesystem) {
             add_action('admin_notices', function () {
                 if (current_user_can('manage_options')) {
@@ -167,8 +175,7 @@ class OPTISTATE {
             return;
         }
         $this->early_cache_check();
-        $upload_dir = wp_upload_dir();
-        $base_dir = trailingslashit($upload_dir['basedir']);
+        $base_dir = trailingslashit($this->upload_dir_info['basedir']);
         $plugin_data_dir = $base_dir . self::SETTINGS_DIR_NAME . '/';
         $this->settings_file_path = $plugin_data_dir . self::SETTINGS_FILE_NAME;
         $this->log_file_path = $plugin_data_dir . self::LOG_FILE_NAME;
@@ -767,11 +774,8 @@ class OPTISTATE {
             }
         }
         if (!empty($_SERVER['QUERY_STRING'])) {
-            $query_string = esc_url_raw($_SERVER['QUERY_STRING']);
-            if ($query_string !== '') {
-                $query_params = [];
-                parse_str($query_string, $query_params);
-                if (is_array($query_params) && array_intersect_key($query_params, $this->tracking_params)) {
+            foreach (self::TRACKING_PARAMS as $param) {
+                if (isset($_GET[$param])) {
                     return;
                 }
             }
@@ -1002,7 +1006,7 @@ class OPTISTATE {
         $this->update_cron_schedule($settings["auto_optimize_days"], $settings["auto_optimize_time"]);
     }
     private function register_ajax_handlers() {
-        $handlers = ["get_stats", "clean_item", "optimize_tables", "one_click_optimize", "optimize_autoload", "get_optimization_log", "save_max_backups", "save_auto_settings", "get_health_score", "get_performance_features", "save_performance_features", "check_htaccess_status", "purge_page_cache", "get_cache_stats", "export_settings", "import_settings", "search_replace_dry_run", "run_pagespeed_audit", "save_pagespeed_settings", "check_pagespeed_status", "analyze_indexes", "check_index_status"];
+        $handlers = ["get_stats", "clean_item", "optimize_tables", "one_click_optimize", "optimize_autoload", "get_optimization_log", "save_max_backups", "save_auto_settings", "get_health_score", "get_performance_features", "save_performance_features", "check_htaccess_status", "purge_page_cache", "get_cache_stats", "export_settings", "import_settings", "search_replace_dry_run", "run_pagespeed_audit", "save_pagespeed_settings", "check_pagespeed_status", "analyze_indexes", "check_index_status", "scan_integrity", "fix_integrity"];
         foreach ($handlers as $handler) {
             add_action("wp_ajax_optistate_" . $handler, [$this, "ajax_" . $handler]);
         }
@@ -1262,7 +1266,7 @@ class OPTISTATE {
                 }
             }
         }
-        $queries = ['orphaned_postmeta' => "SELECT COUNT(pm.meta_id) FROM {$wpdb->postmeta} pm LEFT JOIN {$wpdb->posts} p ON pm.post_id = p.ID WHERE p.ID IS NULL", 'orphaned_commentmeta' => "SELECT COUNT(cm.meta_id) FROM {$wpdb->commentmeta} cm LEFT JOIN {$wpdb->comments} c ON cm.comment_id = c.comment_ID WHERE c.comment_ID IS NULL", 'orphaned_relationships' => "SELECT COUNT(tr.object_id) FROM {$wpdb->term_relationships} tr LEFT JOIN {$wpdb->posts} p ON tr.object_id = p.ID WHERE p.ID IS NULL", 'orphaned_usermeta' => "SELECT COUNT(um.umeta_id) FROM {$wpdb->usermeta} um LEFT JOIN {$wpdb->users} u ON um.user_id = u.ID WHERE u.ID IS NULL", 'expired_transients' => "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_%' AND option_value < UNIX_TIMESTAMP()", 'all_transients' => "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_%'", 'duplicate_postmeta' => "SELECT COUNT(*) FROM (SELECT 1 FROM {$wpdb->postmeta} GROUP BY post_id, meta_key, meta_value HAVING COUNT(*) > 1) as temp", 'duplicate_commentmeta' => "SELECT COUNT(*) FROM (SELECT 1 FROM {$wpdb->commentmeta} GROUP BY comment_id, meta_key, meta_value HAVING COUNT(*) > 1) as temp"];
+        $queries = ['orphaned_postmeta' => "SELECT COUNT(*) FROM {$wpdb->postmeta} pm WHERE NOT EXISTS (SELECT 1 FROM {$wpdb->posts} p WHERE p.ID = pm.post_id)", 'orphaned_commentmeta' => "SELECT COUNT(*) FROM {$wpdb->commentmeta} cm WHERE NOT EXISTS (SELECT 1 FROM {$wpdb->comments} c WHERE c.comment_ID = cm.comment_id)", 'orphaned_relationships' => "SELECT COUNT(*) FROM {$wpdb->term_relationships} tr WHERE NOT EXISTS (SELECT 1 FROM {$wpdb->posts} p WHERE p.ID = tr.object_id)", 'orphaned_usermeta' => "SELECT COUNT(*) FROM {$wpdb->usermeta} um WHERE NOT EXISTS (SELECT 1 FROM {$wpdb->users} u WHERE u.ID = um.user_id)", 'expired_transients' => "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_%' AND option_value < UNIX_TIMESTAMP()", 'all_transients' => "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '_transient_%'", 'duplicate_postmeta' => "SELECT COUNT(*) FROM (SELECT 1 FROM {$wpdb->postmeta} GROUP BY post_id, meta_key, meta_value HAVING COUNT(*) > 1) as temp", 'duplicate_commentmeta' => "SELECT COUNT(*) FROM (SELECT 1 FROM {$wpdb->commentmeta} GROUP BY comment_id, meta_key, meta_value HAVING COUNT(*) > 1) as temp"];
         $selects = [];
         foreach ($queries as $key => $sql) {
             $selects[] = "($sql) as $key";
@@ -1289,8 +1293,12 @@ class OPTISTATE {
          OR (option_name LIKE '_transient_wc_var_%%')
          OR (option_name LIKE '_transient_timeout_wc_report_%%' AND option_value < %d)", $current_time, $current_time, $week_ago));
         $woo_bloat = absint($woo_bloat);
+        static $wc_table_exists = null;
         $wc_session_table = $wpdb->prefix . 'woocommerce_sessions';
-        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wc_session_table)) === $wc_session_table) {
+        if ($wc_table_exists === null) {
+            $wc_table_exists = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wc_session_table)) === $wc_session_table);
+        }
+        if ($wc_table_exists) {
             $wc_sessions = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $wc_session_table WHERE session_expiry < %d", $current_time));
             $woo_bloat+= absint($wc_sessions);
         }
@@ -1361,7 +1369,7 @@ class OPTISTATE {
         if (!$this->check_user_access()) {
             echo '<div class="wrap optistate-wrap">';
             echo '<h1 class="optistate-title"><span class="dashicons dashicons-performance"></span> Optimal State (Free)</h1>';
-            echo '<div class="notice notice-error" style="margin: 20px 0; padding: 20px;">';
+            echo '<div class="notice notice-error optistate-access-notice">';
             echo '<h2>' . esc_html__('Access Restricted', 'optistate') . '</h2>';
             echo '<p>' . esc_html__('Your administrator account does not have permission to use this plugin. Please contact the site owner to request access.', 'optistate') . '</p>';
             echo '</div>';
@@ -1378,11 +1386,10 @@ class OPTISTATE {
     <div class="wrap optistate-wrap">
     <h1 class="optistate-title"><span class="dashicons dashicons-performance"></span> Optimal State (Free)</h1>
     <div class="gtranslate_wrapper"></div>
-    <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'images/optistate-logo-small.webp'); ?>"  alt="<?php echo esc_attr(OPTISTATE::PLUGIN_NAME); ?> Logo" class="optistate-logo">
-    <div class="db-backup-wrap" style="margin-top: -12px;">
+    <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'images/optistate-logo-small.webp'); ?>" alt="<?php echo esc_attr(OPTISTATE::PLUGIN_NAME); ?> Logo" class="optistate-logo">
+    <div class="db-backup-wrap os-mt-neg-12">
         <div class="optistate-container">
             <?php $server_type = $this->detect_server_type(); ?>
-            
             <div class="optistate-notice">
                 <strong><?php echo 'ℹ️ ';
         echo esc_html__("Need Help?", "optistate"); ?></strong>
@@ -1394,13 +1401,13 @@ class OPTISTATE {
             </div>
             <?php if ($server_type === 'nginx'): ?>
             <div class="notice nginx-notice">
-                <h3 style="margin-top: 0;">
+                <h3 class="os-mt-0">
                     <?php echo esc_html__('🖳 Nginx Server Detected', 'optistate'); ?>
                 </h3>
-                <p style="margin-bottom: 5px;">
+                <p class="os-mb-5">
                    <?php echo esc_html__('⚠️ Your server is running Nginx. Security rules must be configured manually (Important). Browser Caching also requires manual activation (Optional).', 'optistate'); ?>
                 </p>
-                <p style="margin-bottom: 0;">
+                <p class="os-mb-0">
                     <?php echo esc_html__('Please follow our', 'optistate'); ?>
                     <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-7-3-1'); ?>" target="_blank" rel="noopener noreferrer">
                         <strong><?php echo esc_html__('Nginx Configuration Guide ⚙️', 'optistate'); ?></strong>
@@ -1419,30 +1426,30 @@ class OPTISTATE {
                 <a href="#tab-performance" class="nav-tab"><span class="dashicons dashicons-performance"></span> <?php echo esc_html__('Performance', 'optistate'); ?></a>
                 <a href="#tab-settings" class="nav-tab"><span class="dashicons dashicons-admin-settings"></span> <?php echo esc_html__('Settings', 'optistate'); ?></a>
             </h2>
-            <div id="tab-backups" class="optistate-tab-content active">
-                <div class="optistate-card">
+    <div id="tab-backups" class="optistate-tab-content active">
+    <div class="optistate-card">
 <h2>
     <span>
         <span class="dashicons dashicons-database-export"></span> 
         <?php echo esc_html__("1. Create a Database Backup", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-4-1'); ?>" class="optistate-info-link" target="_blank" style="text-decoration: none;" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-4-1'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
-                    <p style="line-height: 1.7em;">
+        <p class="os-line-height-relaxed">
                         <?php echo '✔ ';
         echo esc_html__('Always backup your database before performing cleanup operations.', 'optistate'); ?><br>
                         <?php echo ' 🔄 ';
         echo esc_html__('You will be able to restore it if something goes wrong during cleanup.', 'optistate'); ?><br>
                         <?php echo ' 💾 ';
-        printf(esc_html__('Backups are securely stored in your %s folder.', 'optistate'), '<span style="color: #7C092E;"><code>' . esc_html('/wp-content/uploads/' . self::BACKUP_DIR_NAME) . '</code></span>'); ?>
+        printf(esc_html__('Backups are securely stored in your %s folder.', 'optistate'), '<span class="os-code-highlight"><code>' . esc_html('/wp-content/uploads/' . self::BACKUP_DIR_NAME) . '</code></span>'); ?>
                     </p>
-                    <div style="margin-bottom: 15px;">
-                        <label for="max_backups_setting" style="display: block; margin-bottom: 5px; font-weight: 600;">
+                    <div class="os-mb-15">
+                        <label for="max_backups_setting" class="os-label-block-bold-mb5">
                             <?php echo esc_html__("Maximum Backups to Keep:", "optistate"); ?>
                         </label>
-                        <select style="font-weight: bold; width: 100px;" name="max_backups_setting" id="max_backups_setting">
+                        <select class="os-select-bold-w100" name="max_backups_setting" id="max_backups_setting">
                             <?php
         $current_max_backups = $settings["max_backups"];
         for ($i = 1;$i <= 10;$i++) {
@@ -1450,12 +1457,12 @@ class OPTISTATE {
             echo '<option value="' . esc_attr($i) . '" ' . esc_attr($selected) . ">" . esc_html($i) . "</option>";
         }
 ?>
-        </select>
-        <button type="button" class="button" id="save-keep-backups" style="margin-left: 10px;" disabled>
-            <?php echo '✓ ';
+                        </select>
+                        <button type="button" class="button os-ml-10" id="save-max-backups-btn" disabled>
+                            <?php echo '✓ ';
         echo esc_html__("Save", "optistate"); ?>
-          </button><span style="margin-left: 10px; font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">➝ PRO VERSION ONLY</a></span>
-        <p style="margin-top: 5px; line-height: 1.7em;">
+                        </button><span style="margin-left: 10px; font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">➝ PRO VERSION ONLY</a></span>
+                        <p class="os-mt-5-lh-relaxed">
                             <?php echo '⚠️ ';
         echo esc_html__("Older backups will be automatically deleted when this limit is reached.", "optistate"); ?>
                             <br>
@@ -1463,16 +1470,16 @@ class OPTISTATE {
         echo esc_html__("Backups consume space: If you have limited storage capacity, keep only one or two backups.", "optistate"); ?>
                         </p>
                     </div>
-                    <button type="button" class="button button-primary button-large" id="create-backup-btn" style="font-weight:500;">
+                    <button type="button" class="button button-primary button-large os-font-weight-500" id="create-backup-btn">
                        <span class="dashicons dashicons-plus-alt"></span><?php echo esc_html__("Create Backup Now", "optistate"); ?>
                     </button>
-                    <hr style="margin: 35px 35px 25px;">
+                    <hr class="os-hr-separator">
 <h2>
     <span>
         <span class="dashicons dashicons-database-view"></span> 
         <?php echo esc_html__("1.1 Manage Existing Backups", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-4-3'); ?>" class="optistate-info-link" style="text-decoration: none;" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-4-3'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
@@ -1496,11 +1503,11 @@ class OPTISTATE {
                                     <tr data-file="<?php echo esc_attr($backup["filename"]); ?>" data-bytes="<?php echo esc_attr($backup["size_bytes"]); ?>">
                                         <td>
                                     <strong><?php echo esc_html($backup["filename"]); ?></strong>
-                                    <div style="margin-top: 5px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+                                    <div class="os-backup-meta-row">
                                     <?php if ($backup["verified"]) {
-                    echo '<span class="db-backup-verified optistate-integrity-info" style="cursor: pointer;" data-status="verified">✓ ' . esc_html__("Integrity", "optistate") . "</span>";
+                    echo '<span class="db-backup-verified optistate-integrity-info os-cursor-pointer" data-status="verified">✓ ' . esc_html__("Integrity", "optistate") . "</span>";
                 } else {
-                    echo '<span class="db-backup-unverified optistate-integrity-info" style="cursor: pointer;" data-status="unverified">⚠ ' . esc_html__("Integrity", "optistate") . "</span>";
+                    echo '<span class="db-backup-unverified optistate-integrity-info os-cursor-pointer" data-status="unverified">⚠ ' . esc_html__("Integrity", "optistate") . "</span>";
                 }
                 $b_type = isset($backup['type']) ? $backup['type'] : 'MANUAL';
                 $b_class = ($b_type === 'SCHEDULED') ? 'optistate-type-scheduled' : 'optistate-type-manual';
@@ -1530,21 +1537,21 @@ class OPTISTATE {
                         </tbody>
                     </table>
                     <div class="optistate-restore-file-section">
-                        <h3><span class="dashicons dashicons-upload" style="font-size: 20px;"></span> <?php echo esc_html__("Restore Database from File", "optistate"); ?></h3>
-                        <p style="line-height: 1.7em;"><?php echo '📤 ';
+                        <h3><span class="dashicons dashicons-upload os-font-20"></span> <?php echo esc_html__("Restore Database from File", "optistate"); ?></h3>
+                        <p class="os-line-height-relaxed"><?php echo '📤 ';
         echo esc_html__("Upload a database backup generated by WP Optimal State to restore your database (max. 3GB, .sql, .sql.gz).", "optistate"); ?><br>
                        <strong> <?php echo 'ℹ️ ';
         echo esc_html__("Please Note: ", "optistate"); ?></strong><?php echo esc_html__("This is not a website migration tool. It cannot replace your files, plugins, etc.", "optistate"); ?><br>
                        <strong><?php echo '⚠️ ';
         echo esc_html__("Extreme Caution: ", "optistate"); ?></strong><?php echo esc_html__("Restoring an incorrect or damaged database could ruin your website.", "optistate"); ?></p>
                             <div class="optistate-file-upload-area">
-       <input type="file" id="optistate-upload-input" class="optistate-file-input" accept="" disabled>
-        <label for="optistate-upload-input" class="optistate-file-label">
-            <span class="dashicons dashicons-upload"></span> <?php echo esc_html__("Choose Backup File", "optistate"); ?>
-        </label><br>
-        <div style="margin-top: 6px;"></div><span style="font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a>︎<span></div>
-    </div>
-    <div id="optistate-file-info" class="optistate-file-info" style="display: none;">
+                            <input type="file" id="optistate-file-input" class="optistate-file-input" accept=".sql,.sql.gz" disabled>
+                            <label for="optistate-file-input" class="optistate-file-label">
+                                <span class="dashicons dashicons-upload"></span> <?php echo esc_html__("Choose Backup File", "optistate"); ?>
+                            </label><br>
+                            <div style="margin-top: 6px;"></div><span style="font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a>︎<span></div>
+                        </div>
+                        <div id="optistate-file-info" class="optistate-file-info os-display-none">
                             <strong><?php echo esc_html__("Selected:", "optistate"); ?></strong> <span id="optistate-file-name"></span> 
                             (<span id="optistate-file-size"></span>)
                         </div>
@@ -1558,16 +1565,17 @@ class OPTISTATE {
                                 <span class="dashicons dashicons-upload"></span> <?php echo esc_html__("Restore from File", "optistate"); ?>
                             </button>
                         </div>
-                    <div class="optistate-advanced-security-wrapper" style="margin-top: 20px;">
+
+                    <div class="os-mt-20">
                         <?php $disable_security = isset($settings['disable_restore_security']) ? (bool)$settings['disable_restore_security'] : false; ?>
                         <label class="optistate-danger-zone">
-                            <input type="checkbox" id="disable_restore_security" name="disable_restore_security" value="1" <?php checked($disable_security, true); ?> style="margin-top: 2px;" disabled>
+                            <input type="checkbox" id="disable_restore_security" name="disable_restore_security" value="1" <?php checked($disable_security, true); ?> class="os-mt-2" disabled>
                             <div>
-                                <strong style="font-size: 1.1em; color: #B52F31;"><?php echo '🔓 ' . esc_html__("Disable Restore Security Checks", "optistate"); ?></strong>
-                                <p class="description" style="margin: 5px 0 0 0;">
+                                <strong class="os-danger-text-lg"><?php echo '🔓 ' . esc_html__("Disable Restore Security Checks", "optistate"); ?></strong>
+                                <p class="description os-m-5-0-0-0">
                                     <?php echo esc_html__("Check this if your restore fails due to false positives (e.g., suspicious code or disallowed SQL queries).", "optistate"); ?>
                                     <br>
-                                    <div style="padding-top: 5px; font-weight: 500; color: #B52F31;"><?php echo '⚠️ ' . esc_html__("Warning: This disables the SQL Firewall and Malicious Code Scanner. Only use with trusted backup files.", "optistate"); ?></div>
+                                    <div class="os-warning-text-danger"><?php echo '⚠️ ' . esc_html__("Warning: This disables the SQL Firewall and Malicious Code Scanner. Only use with trusted backup files.", "optistate"); ?></div>
                                     <div style="margin-top: 3px;"><span style="font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a>︎<span></div>
                                 </p>
                             </div>
@@ -1583,7 +1591,7 @@ class OPTISTATE {
         <?php echo '💥 ';
         echo esc_html__('2. One-Click Optimization', 'optistate'); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-3'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-3'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
@@ -1600,14 +1608,14 @@ class OPTISTATE {
         <?php echo '📊 ';
         echo esc_html__('3. Database Health Score', 'optistate'); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-1'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-1'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
                         <div id="optistate-health-score-loading" class="optistate-loading">
                             <?php echo esc_html__('🔎 Analyzing database health...', 'optistate'); ?>
                         </div>
-                        <div id="optistate-health-score-wrapper" style="display: none;">
+                        <div id="optistate-health-score-wrapper" class="os-display-none">
                             <div class="health-score-main">
                                 <div class="health-score-circle">
                                     <div class="health-score-value" id="health-score-value">0</div>
@@ -1636,80 +1644,79 @@ class OPTISTATE {
                                 <?php echo esc_html__('↻ Refresh Analysis', 'optistate'); ?>
                             </button>
                         </div>
-                       </div>
-                     </div>
-                <div class="optistate-card" style="margin-top: 20px;">
-                <h2 style="display: flex; justify-content: space-between; align-items: center; margin-top: -4px; margin-bottom: 15px;">
+                    </div>
+                </div>
+                <div class="optistate-card os-mt-20">
+                <h2 class="optistate-targeted-header-wrapper">
                     <span><?php echo '🎯 ' . esc_html__('Targeted Optimizations', 'optistate'); ?>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-4'); ?>" class="optistate-info-link" target="_blank" style="text-decoration: none;" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
-        <span class="dashicons dashicons-info" style="margin-left: 5px;"></span>
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-4'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+        <span class="dashicons dashicons-info os-ml-5"></span>
     </a></span>
-                    <button type="button" class="button button-secondary" style="font-weight: normal;" id="optistate-refresh-targeted-btn" title="<?php echo esc_attr__('Refresh Statistics', 'optistate'); ?>">
+                    <button type="button" class="button button-secondary os-font-normal" id="optistate-refresh-targeted-btn" title="<?php echo esc_attr__('Refresh Statistics', 'optistate'); ?>">
                         <?php echo esc_html__('⟲ Refresh', 'optistate'); ?>
                     </button>
                 </h2>
                 <div class="optistate-grid-targeted" id="optistate-targeted-ops">
                     <div class="optistate-card optistate-loading-placeholder">
                         <?php echo esc_html__('⟳ Loading advanced metrics...', 'optistate'); ?>
-                      </div>
                     </div>
+                </div>
                 <div align="center" style="margin-top: 8px;"><span style="font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a><span></div>
               </div>
-              </div>
+            </div>
             <div id="tab-stats" class="optistate-tab-content">
                 <div class="optistate-card">
 <h2>
     <span>
         <?php echo '📈 ' . esc_html__('4. Database Statistics', 'optistate'); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-2'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-2'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
                     <div id="optistate-stats-loading" class="optistate-loading"><?php echo esc_html__('Loading statistics...', 'optistate'); ?></div>
-                    <p style="line-height: 1.7em;">
+                    <p class="os-line-height-relaxed">
                         <?php echo '💡 ';
         echo esc_html__('Review your database statistics before and after cleanup and optimization operations.', 'optistate'); ?><br>
                     </p>
                     <div id="optistate-stats-container" class="optistate-stats-full">
                         <div id="optistate-stats" class="optistate-stats"></div>
                     </div>
-                    <div id="optistate-db-size" class="optistate-db-size" style="margin-top: 20px;">
+                    <div id="optistate-db-size" class="optistate-db-size os-mt-20">
                         <strong><?php echo esc_html__('Total Database Size:', 'optistate'); ?></strong> <span id="optistate-db-size-value"><?php echo esc_html__('Calculating...', 'optistate'); ?></span>
                     </div>
                     <button class="button optistate-refresh-health-score" id="optistate-refresh-stats"><?php echo esc_html__('⟲ Refresh Stats', 'optistate'); ?></button>
-                  </div>
-                <div class="optistate-card" style="margin-top: 20px;">
+                </div>
+<div class="optistate-card os-mt-20">
 <h2>
     <span>
         <span class="dashicons dashicons-dashboard"></span> 
 <?php echo esc_html__("4.1 Performance Metrics (PageSpeed)", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-7-5'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-7-5'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
-                <p style="line-height: 1.7em;">
+                <p class="os-line-height-relaxed">
                 <?php echo '🎚️ ';
         echo esc_html__('Analyze your site performance using Google PageSpeed Insights. Test different pages to identify bottlenecks.', 'optistate'); ?><br>
                 <?php echo '🔑 ';
         echo esc_html__('If you need an API key, you can get it here:', 'optistate'); ?> 
                 <a href="https://developers.google.com/speed/docs/insights/v5/get-started" target="_blank" rel="noopener noreferrer">PageSpeed Insights API</a>.
                 </p>
-    <div class="optistate-grid-2" style="grid-template-columns: 2fr 1fr; gap: 20px;">
+    <div class="optistate-grid-2 os-psi-grid-layout">
         <div class="optistate-psi-controls">
             <div>
-            <label for="optistate_pagespeed_key" style="font-weight: 600; display: block; margin-bottom: 5px;">
+            <label for="optistate_pagespeed_key" class="os-label-block-bold-mb5">
                     <?php echo esc_html__('Google API Key (Optional but Recommended)', 'optistate'); ?>
                 </label>
-                <div style="display: flex; gap: 10px;">
-                    <div style="position: relative; flex: 1;">
+                <div class="os-flex-gap-10">
+                    <div class="os-flex-1-relative">
                         <input type="password" id="optistate_pagespeed_key"
                                value="<?php echo esc_attr($settings['pagespeed_api_key']??''); ?>" 
-                               style="width: 100%; padding-right: 35px;" 
+                               class="os-input-password-padded"
                                placeholder="<?php echo esc_attr__('Enter API Key', 'optistate'); ?>">
-                        <span id="toggle-api-key-visibility" class="dashicons dashicons-visibility" 
-                              style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;"
+                        <span id="toggle-api-key-visibility" class="dashicons dashicons-visibility os-toggle-password-icon" 
                               title="<?php echo esc_attr__('Show/Hide API Key', 'optistate'); ?>">
                         </span>
                     </div>
@@ -1717,15 +1724,15 @@ class OPTISTATE {
                         <?php echo esc_html__('Save Key', 'optistate'); ?>
                     </button>
                 </div>
-                <p class="description" style="margin-top: 5px;">
+                <p class="description os-mt-5">
                     <?php echo esc_html__('Without a key, tests may fail due to public rate limits.', 'optistate'); ?>
                 </p>
             </div>
-            <div style="margin-top: 20px;">
-                <label for="optistate-test-url" style="font-weight: 600; display: block; margin-bottom: 5px;">
+            <div class="os-mt-20">
+                <label for="optistate-test-url" class="os-label-block-bold-mb5">
                     <?php echo esc_html__('Page to Test', 'optistate'); ?>
                 </label>
-                <select id="optistate-test-url" style="width: 100%; margin-bottom: 10px;">
+                <select id="optistate-test-url" class="os-w100-mb10">
                     <option value=""><?php echo esc_html__('🏠 Homepage (Default)', 'optistate'); ?></option>
                     <optgroup label="<?php echo esc_attr__('Recent Posts', 'optistate'); ?>">
                         <?php
@@ -1746,21 +1753,21 @@ class OPTISTATE {
                 </select>
                 <input type="text" id="optistate-custom-url" 
                        placeholder="<?php echo esc_attr__('Or enter custom URL...', 'optistate'); ?>" 
-                       style="width: 100%; margin-bottom: 10px;">
+                       class="os-w100-mb10">
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <select id="optistate-strategy" style="height: 36px;">
+            <div class="os-flex-center-gap-10">
+                <select id="optistate-strategy" class="os-h-36">
                     <option value="mobile"><?php echo esc_html__('📱 Mobile Device', 'optistate'); ?></option>
                     <option value="desktop"><?php echo esc_html__('💻 Desktop', 'optistate'); ?></option>
                 </select>
                 <button type="button" class="button button-primary button-large" id="run-pagespeed-btn">
-                    <span class="dashicons dashicons-performance" style="margin-top: 3px;"></span>
+                    <span class="dashicons dashicons-performance os-mt-3"></span>
                     <?php echo esc_html__('Run Audit', 'optistate'); ?>
                 </button>
             </div>
-            <p style="margin-top: 10px; color: #666; font-size: 13px;">
+            <p class="os-last-checked">
                 <?php echo esc_html__('Last checked:', 'optistate'); ?> <span id="psi-timestamp"><?php echo esc_html__('Never', 'optistate'); ?></span><br>
-                <span id="psi-tested-url" style="color: #2271b1;"></span>
+                <span id="psi-tested-url" class="os-color-link-blue"></span>
             </p>
         </div>
         <div class="optistate-psi-score-wrapper">
@@ -1770,40 +1777,40 @@ class OPTISTATE {
             <span class="optistate-psi-text"><?php echo '🚦' . esc_html__('Performance Score', 'optistate'); ?></span>
         </div>
     </div>
-    <div id="optistate-psi-metrics" class="optistate-grid-targeted" style="margin-top: 25px; opacity: 0.5; pointer-events: none;">
-        <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+    <div id="optistate-psi-metrics" class="optistate-grid-targeted os-psi-metrics-disabled">
+        <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>FCP (First Contentful Paint)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-fcp">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-fcp">--</div>
         </div>
-        <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+        <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>LCP (Largest Contentful Paint)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-lcp">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-lcp">--</div>
         </div>
-        <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+        <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>CLS (Cumulative Layout Shift)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-cls">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-cls">--</div>
         </div>
-        <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+        <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>TTFB (Time to First Byte)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-ttfb">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-ttfb">--</div>
         </div>
-       <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+       <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>TBT (Total Blocking Time)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-tbt">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-tbt">--</div>
         </div>
-        <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+        <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>SI (Speed Index)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-si">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-si">--</div>
         </div>
-        <div class="optistate-card optistate-targeted-card" style="min-height: auto; padding: 12px 15px 3px 15px;">
+        <div class="optistate-card optistate-targeted-card os-card-min-auto-p12">
             <div class="targeted-header"><h4>TTI (Time to Interactive)</h4></div>
-            <div class="targeted-stat" style="font-size: 1.1em; font-weight: bold;" id="psi-tti">--</div>
+            <div class="targeted-stat os-font-11em-bold" id="psi-tti">--</div>
         </div>
-        <div style="font-weight: bold; line-height: 1.6em; font-size: 0.95em;"><span style="color: #666;">🚦 COLOR KEY</span><br><span style="color: #28a745;">🟢 GOOD (90-100)</span><br><span style="color: #DD8C00;">🟠 AVERAGE (60-89)</span><br><span style="color: #dc3545">🔴 POOR (0-59)</span></div>
+        <div class="os-psi-legend"><span class="os-color-muted">🚦 COLOR KEY</span><br><span class="os-color-success">🟢 GOOD (90-100)</span><br><span class="os-color-average">🟠 AVERAGE (60-89)</span><br><span class="os-color-poor">🔴 POOR (0-59)</span></div>
     </div>
-    <div id="optistate-psi-recommendations" style="margin-top: 32px; display: none;">
-        <h3 style="margin-bottom: 15px; color: #1d2327;">
-            <span class="dashicons dashicons-lightbulb" style="color: #2271b1;"></span>
+    <div id="optistate-psi-recommendations" class="os-mt-32 os-display-none">
+        <h3 class="os-psi-rec-header">
+            <span class="dashicons dashicons-lightbulb os-color-link-blue"></span>
             <?php echo esc_html__('Recommended Actions', 'optistate'); ?>
         </h3>
         <div id="optistate-psi-recommendations-list"></div>
@@ -1817,32 +1824,32 @@ class OPTISTATE {
         <?php echo '🧹 ';
         echo esc_html__("5. Detailed Database Cleanup", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-5'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-5'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
-                <p style="line-height: 1.7em;">
+        <p class="os-line-height-relaxed">
             <?php echo '🔹 ';
         echo esc_html__('Items marked with this symbol ⚠️ are not included in the one-click optimization and should be reviewed carefully before deletion.', 'optistate'); ?><br>
-            </p>
-               <div class="optistate-cleanup-grid" id="optistate-cleanup-items"></div>
-            <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #f0f0f1; text-align: right;">
-                   <button type="button" class="button optistate-refresh-cleanup-btn">
-                       <span class="dashicons dashicons-update" style="vertical-align: middle; margin-top: -2px; margin-right: 4px;"></span> 
-                       <?php echo esc_html__('Refresh Cleanup Data', 'optistate'); ?>
-                   </button>
-                </div>
-            </div> </div> <div id="tab-advanced" class="optistate-tab-content"> <div class="optistate-card">
+        </p>
+        <div class="optistate-cleanup-grid" id="optistate-cleanup-items"></div>
+        <div class="optistate-cleanup-actions">
+            <button type="button" class="button optistate-refresh-cleanup-btn"><span class="dashicons dashicons-update os-icon-middle-adj"></span><?php echo esc_html__('Refresh Cleanup Data', 'optistate'); ?></button>
+        </div>
+    </div>
+</div>
+            <div id="tab-advanced" class="optistate-tab-content">
+                <div class="optistate-card">
 <h2>
     <span>
         <?php echo '🗄️ ';
         echo esc_html__("6. Advanced Database Optimization", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-6'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-6'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
-                    <p style="line-height: 1.7em;">
+                    <p class="os-line-height-relaxed">
                         <?php echo '🔹 ';
         echo esc_html__('Optimize and repair database tables to improve performance.', 'optistate'); ?><br>
                         <strong><?php echo '‼️ ';
@@ -1850,16 +1857,16 @@ class OPTISTATE {
                         <?php echo esc_html__('These operations may make your website unresponsive for a few minutes, especially if your database is large and has never been optimized!', 'optistate'); ?>
                     </p>
                     <div class="opstistate-adv-optimize">
-                        <button class="button optistate-refresh-stats optistate-advanced-op-btn" id="optistate-optimize-tables"><?php echo '⚡ ';
+                        <button class="button optistate-refresh-stats" id="optistate-optimize-tables"><?php echo '⚡ ';
         echo esc_html__("Optimize All Tables", "optistate"); ?></button>
-                        <button class="button optistate-refresh-stats optistate-advanced-op-btn" id="optistate-repair-table" disabled><?php echo '🛠️ ';
+                        <button class="button optistate-refresh-stats" id="optistate-analyze-repair-tables" disabled><?php echo '🛠️ ';
         echo esc_html__("Analyze & Repair Tables", "optistate"); ?><div style="font-size: 12px; font-weight: bold; margin-top: 0;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a></div></button>
-                        <button class="button optistate-refresh-stats optistate-advanced-op-btn" id="optistate-autoload" disabled><?php echo '⚙️ ';
+                        <button class="button optistate-refresh-stats" id="optistate-optimize-autoload" disabled><?php echo '⚙️ ';
         echo esc_html__("Optimize Autoloaded Options", "optistate"); ?><div style="font-size: 12px; font-weight: bold; margin-top: 0;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a></div></button>
                     </div>
                     <div id="optistate-table-results" class="optistate-results"></div>
-                    <div style="margin-top: 15px;">
-                        <p style="line-height: 1.7em;">
+                    <div class="os-mt-15">
+                        <p class="os-line-height-relaxed">
                             <strong><?php echo '⚡ ';
         echo esc_html__('Optimize Tables', 'optistate'); ?>:</strong> 
                             <?php echo esc_html__('Runs OPTIMIZE TABLE on all database tables to reclaim space and improve query speed.', 'optistate'); ?>
@@ -1873,14 +1880,14 @@ class OPTISTATE {
                             <?php echo esc_html__('Identifies large autoloaded options and sets them to non-autoload to boost site speed.', 'optistate'); ?>
                         </p>
                     </div>
-                    <div class="optistate-analyzer-section" style="margin-top: 30px;">
-                        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                    <div class="optistate-analyzer-section os-mt-30">
+                        <h3 class="os-flex-gap-8-mt0">
                             <?php echo '🧩 '; echo esc_html__('Database Structure Analysis', 'optistate'); ?>
-            <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-7'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+            <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-7'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
                         </h3>
-                        <p style="line-height: 1.7em; margin-bottom: 15px;">
+                        <p class="os-mb-15-lh-relaxed">
                             <?php echo '💡 ';
         echo esc_html__('Understand the architecture of your WordPress database better.', 'optistate'); ?><br>
                             <?php echo '✓ ';
@@ -1888,47 +1895,69 @@ class OPTISTATE {
                             <?php echo '⚠️ ';
         echo esc_html__('Third-party tables (from plugins/themes) are highlighted.', 'optistate'); ?>
                         </p>
-                        <button type="button" class="button button-secondary" id="optistate-analyze-tables-btn" style="margin-bottom: 15px;">
-                             <?php echo '🔍 ';
+                        <button type="button" class="button button-secondary os-mb-15" id="optistate-analyze-tables-btn">
+                             <?php echo '🔎 ';
         echo esc_html__("Analyze Database Structure", "optistate"); ?>
                         </button>
-                        <div id="optistate-table-analysis-loading" style="display: none; padding: 15px; text-align: center;">
+                        <div id="optistate-table-analysis-loading" class="os-loading-block-centered">
                             <span class="spinner is-active"></span>
-                            <span><?php echo esc_html__("⏳ Analyzing database structure...", "optistate"); ?></span>
+                            <span><?php echo esc_html__("⏳ Analyzing database structure...", "optistate"); ?>
                         </div>
-                        <div id="optistate-table-analysis-results" style="display: none;"></div>
+                        <div id="optistate-table-analysis-results" class="os-display-none"></div>
                     </div>
-<div class="optistate-analyzer-section" style="margin-top: 30px;">
-                        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+<div class="optistate-analyzer-section os-mt-30">
+                        <h3 class="os-flex-gap-8-mt0">
                        <?php echo '🔢 '; echo esc_html__('MySQL Index Manager', 'optistate'); ?>
-            <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-8'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+            <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-8'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
     </h3>
-    <p style="line-height: 1.7em; margin-bottom: 15px;">
+    <p class="os-mb-15-lh-relaxed">
         <?php echo '⊹ ';
         echo esc_html__('Scans your database for missing high-impact indexes that can drastically improve query performance.', 'optistate'); ?><br>
         <?php echo '⏲ ';
         echo esc_html__('Adding missing indexes to columns like `autoload` can reduce query time by up to 90%.', 'optistate'); ?>
     </p>
-    <button type="button" class="button button-secondary" id="optistate-analyze-indexes-btn" style="margin-bottom: 15px;">
-            <?php echo '🔎 ';
-        echo esc_html__("Scan for Missing Indexes", "optistate"); ?>
+    <button type="button" class="button button-secondary os-mb-15" id="optistate-analyze-indexes-btn">
+            <?php echo '🔎 '; echo esc_html__("Scan for Missing Indexes", "optistate"); ?>
     </button>
-    <div id="optistate-index-analysis-loading" style="display: none; padding: 10px;">
-        <span class="spinner is-active" style="float:none; margin:0;"></span> 
+    <div id="optistate-index-analysis-loading" class="os-loading-padded">
+        <span class="spinner is-active os-spinner-reset"></span> 
         <?php echo esc_html__('Analyzing database schema...', 'optistate'); ?>
     </div>
-    <div id="optistate-index-results" style="display: none;"></div>
+    <div id="optistate-index-results" class="os-display-none"></div>
 </div>
-                <div class="optistate-sr-form" style="margin-top: 30px;">
-    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: #d63638;">
-            <?php echo '↳↰ '; echo esc_html__('Database Search & Replace', 'optistate'); ?>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-9'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+<div class="optistate-analyzer-section os-mt-30">
+    <h3 class="os-flex-gap-8-mt0">
+        <?php echo '🛡️ ' . esc_html__('Referential Integrity Scanner', 'optistate'); ?>
+         <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-9'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
     </h3>
-    <div class="notice notice-warning inline" style="margin: 15px 0; padding: 1px 12px 3px 12px;">
+    <p class="os-mb-15-lh-relaxed">
+        <?php echo '👻 ' . esc_html__('Finds "Zombie Data": Rows in your database that point to content that no longer exists.', 'optistate'); ?><br>
+        <?php echo '🔗 ' . esc_html__('Example: Post Meta pointing to a Post ID that was deleted years ago. Standard cleanup often misses these.', 'optistate'); ?>
+    </p>
+    <div class="os-flex-gap-10-mb15">
+        <button type="button" class="button button-secondary" id="optistate-run-integrity-scan">
+            <?php echo '🔎 ' . esc_html__("Scan Database Integrity", "optistate"); ?>
+        </button>
+        <span id="optistate-integrity-loading" class="os-display-none">
+            <span class="spinner is-active os-spinner-reset"></span> 
+            <?php echo esc_html__('Scanning relationships...', 'optistate'); ?>
+        </span>
+    </div>
+    <div id="optistate-integrity-results" class="os-display-none">
+        </div>
+</div>
+                <div class="optistate-sr-form os-mt-30">
+    <h3 class="optistate-sr-header">
+            <?php echo '↳↰ '; echo esc_html__('Database Search & Replace', 'optistate'); ?>
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-5-10'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+        <span class="dashicons dashicons-info"></span>
+    </a>
+    </h3>
+    <div class="notice notice-warning inline os-warning-inline">
         <p><strong><?php echo '⚠️ ' . esc_html__('Advanced Feature - Use with Caution', 'optistate'); ?></strong></p>
         <p>
             <?php echo esc_html__('This tool searches your database for specific text and replaces it. It handles WordPress serialized data correctly.', 'optistate'); ?><br>
@@ -1936,37 +1965,36 @@ class OPTISTATE {
             <?php echo esc_html__('2. Create a fresh database backup before replacing.', 'optistate'); ?>
         </p>
     </div>
-   
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 300px;">
+    <div class="optistate-sr-inputs-wrapper">
+        <div class="optistate-sr-input-group">
             <label for="optistate-sr-search" class="sr-search"><?php esc_html_e('Search For:', 'optistate'); ?></label>
             <input type="text" id="optistate-sr-search" class="sr-search-2" placeholder="e.g. http://old-domain.com" maxlength="600">
         </div>
-        <div style="flex: 1; min-width: 300px;">
+        <div class="optistate-sr-input-group">
             <label for="optistate-sr-replace" class="sr-search"><?php esc_html_e('Replace With:', 'optistate'); ?></label>
             <input type="text" id="optistate-sr-replace" class="sr-search-2" placeholder="e.g. https://new-domain.com" maxlength="600">
         </div>
     </div>
-    <div style="margin-top: 15px;">
-        <label style="cursor: pointer;">
-            <input type="checkbox" id="optistate-sr-case-sensitive" style="margin-right: 4px;">
-            <span style="font-weight: 600;"><?php esc_html_e('🔎 Case Sensitive', 'optistate'); ?></span>
+    <div class="os-mt-15">
+        <label class="os-cursor-pointer">
+            <input type="checkbox" id="optistate-sr-case-sensitive" class="os-mr-4">
+            <span class="os-font-weight-600"><?php esc_html_e('🔎 Case Sensitive', 'optistate'); ?></span>
         </label>
-        <p class="description" style="margin-top: 5px; margin-left: 24px;">
+        <p class="description os-sr-desc-indent">
             <?php esc_html_e('If checked, "Apple" will not match "apple". Recommended for specific code replacements.', 'optistate'); ?>
         </p>
     </div>
-    <div style="margin-top: 10px;">
-        <label style="cursor: pointer;">
-            <input type="checkbox" id="optistate-sr-partial-match" style="margin-right: 4px;">
-            <span style="font-weight: 600;"><?php esc_html_e('🧩 Partial Match', 'optistate'); ?></span>
+    <div class="os-mt-10">
+        <label class="os-cursor-pointer">
+            <input type="checkbox" id="optistate-sr-partial-match" class="os-mr-4">
+            <span class="os-font-weight-600"><?php esc_html_e('🧩 Partial Match', 'optistate'); ?></span>
         </label>
-        <p class="description" style="margin-top: 5px; margin-left: 24px;">
+        <p class="description os-sr-desc-indent">
             <?php esc_html_e('If checked, searches for partial text anywhere in strings (e.g., "http://" in URLs). If unchecked, only matches complete words with boundaries.', 'optistate'); ?><br>
             <?php esc_html_e('ⓘ Usage example: "http://" ⮕ "https://"', 'optistate'); ?>
         </p>
     </div>
-    <div style="margin-top: 15px;">
+    <div class="os-mt-15">
         <label for="optistate-sr-tables" class="sr-tables"><?php esc_html_e('Select Tables (Optional):', 'optistate'); ?></label>
         <select id="optistate-sr-tables" multiple class="sr-tables-list">
             <option value="all" selected><?php esc_html_e('-- All Tables --', 'optistate'); ?></option>
@@ -1980,22 +2008,23 @@ class OPTISTATE {
         </select>
         <p class="description"><?php esc_html_e('Hold Ctrl/Cmd to select multiple specific tables. Leave as "All Tables" for a full site update.', 'optistate'); ?></p>
     </div>
-    <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
+    <div class="optistate-sr-actions">
         <button type="button" class="button button-secondary button-large" id="optistate-sr-dry-run">
             🔎️️ <?php esc_html_e('Perform Dry Run (Preview)', 'optistate'); ?>
         </button>
         <button type="button" class="button button-primary button-large" id="optistate-sr-execute" disabled>
             ↳↰ <?php esc_html_e('Execute Replacement', 'optistate'); ?>
         </button><span style="margin-left: 4px; font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">➝ PRO VERSION ONLY</a></span>
-        <span id="optistate-sr-loading" style="display: none; margin-left: 10px;">
-            <span class="spinner is-active" style="float: none; margin: 0;"></span> <span class="sr-status-text"><?php esc_html_e('Processing...', 'optistate'); ?></span>
+        <span id="optistate-sr-loading" class="os-sr-loading-span">
+            <span class="spinner is-active os-spinner-reset"></span> <span class="sr-status-text"><?php esc_html_e('Processing...', 'optistate'); ?></span>
         </span>
     </div>
-    <div id="optistate-sr-results" style="margin-top: 20px; display: none;">
+    <div id="optistate-sr-results" class="os-mt-20-hidden">
           </div>
        </div>
       </div>
     </div>
+   
             <div id="tab-automation" class="optistate-tab-content">
                 <div class="optistate-card">
 <h2>
@@ -2003,7 +2032,7 @@ class OPTISTATE {
         <span class="dashicons dashicons-clock"></span> 
         <?php echo esc_html__("7. Automatic Backup and Cleanup", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-6'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-6'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
@@ -2012,12 +2041,12 @@ class OPTISTATE {
                             <tr>
                                 <th><?php echo esc_html__("Run Tasks Automatically Every", "optistate"); ?></th>
                                 <td>
-                                    <input type="number" style="font-weight: bold; width: 80px;" id="auto_optimize_days" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[auto_optimize_days]" value="<?php echo esc_attr($auto_optimize_days); ?>" min="0" max="0"> 
+                                    <input type="number" class="os-input-days" id="auto_optimize_days" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[auto_optimize_days]" value="<?php echo esc_attr($auto_optimize_days); ?>" min="0" max="0" disabled> 
                                     <strong><?php echo esc_html__('DAYS', 'optistate'); ?></strong> 
                                     <?php echo esc_html__('(0 to disable)', 'optistate'); ?>
-                                    <span style="margin-left: 15px;">
+                                    <span class="os-ml-15">
                                         <?php echo esc_html__("at", "optistate"); ?>
-                                        <select style="margin-left: 5px; vertical-align: middle;" id="auto_optimize_time" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[auto_optimize_time]">
+                                        <select class="os-select-time" id="auto_optimize_time" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[auto_optimize_time]" disabled>
                                             <?php
         for ($hour = 0;$hour < 24;$hour++) {
             $time_value = sprintf("%02d:00", $hour);
@@ -2028,7 +2057,7 @@ class OPTISTATE {
 ?>
                                         </select>
                                     </span>
-                                    <p style="line-height: 1.7em;">
+                                    <p class="os-line-height-relaxed">
                                         <span id="auto-status-enabled" style="<?php echo $auto_optimize_days > 0 ? '' : 'display:none;'; ?>">
                                             <?php
         $task_description = $auto_backup_only ? esc_html__('Automated *backup only*', 'optistate') : esc_html__('Automated *backup & cleanup*', 'optistate');
@@ -2065,10 +2094,10 @@ class OPTISTATE {
                                 <th><?php echo esc_html__("Backup Only", "optistate"); ?></th>
                                 <td>
                                     <label>
-                                        <input type="checkbox" id="auto_backup_only" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[auto_backup_only]" value="1" <?php checked($auto_backup_only, true); ?>>
+                                        <input type="checkbox" id="auto_backup_only" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[auto_backup_only]" value="1" <?php checked($auto_backup_only, true); ?> disabled>
                                         <strong><?php echo esc_html__("Perform database backup ONLY (skip cleanup)", "optistate"); ?></strong>
                                     </label>
-                                    <p style="line-height: 1.7em;">
+                                    <p class="os-line-height-relaxed">
                                         <span id="auto-backup-only-status">
                                             <?php if ($auto_backup_only): ?>
                                                 ✅ <?php echo esc_html__("Backup Only mode is enabled.", "optistate"); ?>
@@ -2087,18 +2116,18 @@ class OPTISTATE {
                                 <th><?php echo esc_html__("Email Notifications", "optistate"); ?></th>
                                 <td>
                                     <label>
-                                        <input type="checkbox" id="email_notifications" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[email_notifications]" value="1" <?php checked($email_notifications, true); ?>>
+                                        <input type="checkbox" id="email_notifications" name="<?php echo esc_attr(OPTISTATE::OPTION_NAME); ?>[email_notifications]" value="1" <?php checked($email_notifications, true); ?> disabled>
                                         <?php echo esc_html__("Send completion email with backup and cleanup details", "optistate"); ?>
                                     </label>
-                                    <p style="line-height: 1.7em;">
+                                    <p class="os-line-height-relaxed">
                                         <?php if ($email_notifications): ?>
                                             <span id="email-status-enabled"><?php echo '✅ ';
             echo esc_html__("Email notifications are enabled.", "optistate"); ?></span>
-                                            <span id="email-status-disabled" style="display:none;"><?php echo '🔴 ';
+                                            <span id="email-status-disabled" class="os-display-none"><?php echo '🔴 ';
             echo esc_html__("Email notifications are disabled.", "optistate"); ?></span>
                                         <?php
         else: ?>
-                                            <span id="email-status-enabled" style="display:none;"><?php echo '✅ ';
+                                            <span id="email-status-enabled" class="os-display-none"><?php echo '✅ ';
             echo esc_html__("Email notifications are enabled.", "optistate"); ?></span>
                                             <span id="email-status-disabled"><?php echo '🔴 ';
             echo esc_html__("Email notifications are disabled.", "optistate"); ?></span>
@@ -2111,12 +2140,12 @@ class OPTISTATE {
                                 </td>
                             </tr>
                         </table>
-        <button type="submit" class="button button-primary" style="font-size: 1.1em; padding: 5px 16px; margin: 8px 0 20px 0;" id="auto-optimize" disabled>
-            <?php echo '✓ ';
+                        <button type="submit" class="button button-primary os-save-settings-btn" id="save-auto-optimize-btn" disabled>
+                            <?php echo '✓ ';
         echo esc_html__("Save Settings", "optistate"); ?>
-        </button><div style="font-size: 12px; font-weight: bold; margin-top: -10px;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a></div>
-    </div>
-    <div id="optistate-settings-log"></div>
+                        </button><div style="font-size: 12px; font-weight: bold; margin-top: -10px;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a></div>
+                    </div>
+                    <div id="optistate-settings-log"></div>
                 </div>
             </div>
             <div id="tab-performance" class="optistate-tab-content">
@@ -2126,12 +2155,12 @@ class OPTISTATE {
         <span class="dashicons dashicons-admin-settings"></span> 
         <?php echo esc_html__("8. Performance Features Manager", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-7'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-7'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
                     <div id="optistate-performance-content-wrapper">
-                        <p style="line-height: 1.7em;">
+                        <p class="os-line-height-relaxed">
                             <?php echo '🎯 ';
         echo esc_html__('Activate or deactivate WordPress features according to your needs for improved performance and lower server load.', 'optistate'); ?><br>
                             <strong><?php echo '⚠️ ';
@@ -2140,13 +2169,13 @@ class OPTISTATE {
                             <?php echo '✔ ';
         echo esc_html__('Click the Save button at the bottom of this list to confirm features activation/update.', 'optistate'); ?>
                         </p>
-                        <div id="optistate-performance-features-loading" style="text-align: center; padding: 20px;">
+                        <div id="optistate-performance-features-loading" class="os-loading-padded-center">
                             <span class="spinner is-active"></span>
                             <span><?php echo esc_html__('Loading performance features...', 'optistate'); ?></span>
                         </div>
-                        <div id="optistate-performance-features-container" style="display: none;"></div>
+                        <div id="optistate-performance-features-container" class="os-display-none"></div>
                         <div id="optistate-performance-features-actions" class="optistate-features-actions">
-                            <button type="button" class="button button-primary button-large" id="save-performance-features-btn" style="padding: 8px 20px; font-size: 1.1em; font-weight: 500;">
+                            <button type="button" class="button button-primary button-large os-save-perf-btn" id="save-performance-features-btn">
                                 <?php echo '✓ ';
         echo esc_html__('Save Performance Settings', 'optistate'); ?>
                             </button>
@@ -2161,12 +2190,12 @@ class OPTISTATE {
         <span class="dashicons dashicons dashicons-admin-generic"></span> 
         <?php echo esc_html__("9. Settings Export/Import & User Access", "optistate"); ?>
     </span>
-    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-9'); ?>" class="optistate-info-link" target="_blank" rel="noopener noreferrer" style="text-decoration: none;" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
+    <a href="<?php echo esc_url(plugin_dir_url(__FILE__) . 'manual/v1-2-0.html#ch-9'); ?>" class="optistate-info-link os-no-decoration" target="_blank" rel="noopener noreferrer" title="<?php echo esc_attr__('Read the Manual', 'optistate'); ?>">
         <span class="dashicons dashicons-info"></span>
     </a>
 </h2>
                     <div id="optistate-export-content-wrapper">
-                        <p style="line-height: 1.7em;">
+                        <p class="os-line-height-relaxed">
                             <?php echo '⛯ ';
         echo esc_html__('Backup your plugin settings in order to restore them later, or export them to another WordPress site.', 'optistate'); ?><br>
                             <strong><?php echo '⚠️ ';
@@ -2175,11 +2204,11 @@ class OPTISTATE {
                         </p>
                         <div class="optistate-grid-2">
                             <div class="optistate-file-export">
-                                <h3 style="margin-top: 0;">
+                                <h3 class="os-mt-0">
                                     <?php echo '📤 ';
         echo esc_html__('Export Settings', 'optistate'); ?>
                                 </h3>
-                                <p style="line-height: 1.7em;">
+                                <p class="os-line-height-relaxed">
                                     <?php echo esc_html__('Download a JSON file containing all your plugin settings.', 'optistate'); ?><br>
                                     <?php echo '✓ ';
         echo esc_html__('Includes: Backup limits, automation schedule, performance features, user access restrictions.', 'optistate'); ?>
@@ -2188,20 +2217,20 @@ class OPTISTATE {
                                     <span class="dashicons dashicons-download"></span> 
                                     <?php echo esc_html__('Export Settings', 'optistate'); ?>
                                 </button>
-                                <div id="optistate-export-status" style="margin-top: 10px;"></div>
+                                <div id="optistate-export-status" class="os-mt-10"></div>
                             </div>
                             <div class="optistate-file-import">
-                                <h3 style="margin-top: 0;">
+                                <h3 class="os-mt-0">
                                     <?php echo '📥 ';
         echo esc_html__('Import Settings', 'optistate'); ?>
                                 </h3>
-                                <p style="line-height: 1.7em;">
+                                <p class="os-line-height-relaxed">
                                     <?php echo esc_html__('Upload a settings file to replace current configuration.', 'optistate'); ?><br>
                                     <strong><?php echo '⚠️ ';
         echo esc_html__('Warning:', 'optistate'); ?></strong> 
                                     <?php echo esc_html__('This will overwrite your current settings!', 'optistate'); ?>
                                 </p>
-                                <div class="optistate-file-upload-area" style="margin-bottom: 10px;">
+                                <div class="optistate-file-upload-area os-mb-10">
                                     <input type="file" id="optistate-settings-file-input" class="optistate-file-input" accept=".json">
                                     <label for="optistate-settings-file-input" class="optistate-file-label">
                                         <span class="dashicons dashicons-upload"></span> 
@@ -2216,14 +2245,14 @@ class OPTISTATE {
                                     <span class="dashicons dashicons-upload"></span> 
                                     <?php echo esc_html__('Import Settings', 'optistate'); ?>
                                 </button>
-                                <div id="optistate-import-status" style="margin-top: 10px;"></div>
+                                <div id="optistate-import-status" class="os-mt-10"></div>
                             </div>
                         </div>
                         <div class="optistate-user-access">
-                            <h3 style="margin-top: 5px;">
+                            <h3 class="os-mt-5">
                                 <?php echo '🔐 ' . esc_html__('User Access Control', 'optistate'); ?>
                             </h3>
-                            <p style="line-height: 1.7em;">
+                            <p class="os-line-height-relaxed">
                                 <?php echo esc_html__('Enable only selected administrators to use the plugin. If no users are selected, all admins can use the plugin.', 'optistate'); ?><br>
                                 <strong><?php echo '⚠️ ' . esc_html__('Warning:', 'optistate'); ?></strong> 
                                 <?php echo esc_html__('Do not lock yourself out! Always include your own account in the list.', 'optistate'); ?>
@@ -2240,19 +2269,18 @@ class OPTISTATE {
                                 <?php
         else: ?>
                                     <?php foreach ($admin_users as $user): ?>
-                                        <label class="optistate-admin-list" style="<?php echo ($user->ID === $current_user_id) ? 'border: 2px solid #2271b1;' : ''; ?>">
+                                        <label class="optistate-admin-list <?php echo ($user->ID === $current_user_id) ? 'os-current-user-border' : ''; ?>">
                                             <input 
                                                 type="checkbox" 
-                                                class="optistate-allowed-user" 
+                                                class="optistate-allowed-user os-mr-8" 
                                                 value="<?php echo esc_attr($user->ID); ?>"
                                                 <?php checked(in_array($user->ID, $allowed_users)); ?>
-                                                style="margin-right: 8px;"
                                             >
                                             <strong><?php echo esc_html($user->display_name); ?></strong>
-                                            <span style="color: #666;">
+                                            <span class="os-color-muted">
                                                 (<?php echo esc_html($user->user_login); ?>)
                                                 <?php if ($user->ID === $current_user_id): ?>
-                                                    <span style="color: #2271b1; font-weight: bold;">← <?php echo esc_html__('You', 'optistate'); ?></span>
+                                                    <span class="os-current-user-tag">← <?php echo esc_html__('You', 'optistate'); ?></span>
                                                 <?php
                 endif; ?>
                                             </span>
@@ -2262,15 +2290,14 @@ class OPTISTATE {
                                 <?php
         endif; ?>
                             </div>
-                            <p style="margin-top: 10px; color: #666;">
+                            <p class="os-tip-text">
                                 <?php echo '💡 ' . esc_html__('Tip: Leave all checkboxes unchecked to allow all administrators.', 'optistate'); ?>
                             </p>
-    <button type="button" class="button button-primary" id="optistate-save-user-btn" style="margin-top: 10px; padding: 5px 15px;" disabled>
-        <?php echo '✓ ' . esc_html__('Save User Access Settings', 'optistate'); ?>
-    </button><div style="margin-top: 10px; font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a></div>
-    <div id="optistate-user-access-status" style="margin-top: 10px; margin-bottom: -10px;"></div>
-  </div>
-
+                            <button type="button" class="button button-primary os-save-user-access-btn" id="optistate-save-user-access-btn" disabled>
+                                <?php echo '✓ ' . esc_html__('Save User Access Settings', 'optistate'); ?>
+                            </button><div style="margin-top: 10px; font-size: 12px; font-weight: bold;"><a style="color: #007F6C;" href="https://payhip.com/b/AS3Pt" target="_blank">↑ PRO VERSION ONLY ↑</a></div>
+                            <div id="optistate-user-access-status" class="os-mt-10-mb-neg-10"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2672,9 +2699,10 @@ class OPTISTATE {
     }
     private function encrypt_data($data) {
         if (empty($data)) return '';
-        if (!function_exists('openssl_encrypt')) return $data; // Fallback
+        if (!function_exists('openssl_encrypt')) return $data;
         $method = 'AES-256-CBC';
-        $key = hash('sha256', (defined('AUTH_KEY') ? AUTH_KEY : 'optistate_fallback_key'));
+        $secret = defined('AUTH_KEY') ? AUTH_KEY : wp_salt();
+        $key = hash('sha256', $secret);
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($method));
         $encrypted = openssl_encrypt($data, $method, $key, 0, $iv);
         return 'enc:' . base64_encode($iv . $encrypted);
@@ -2684,7 +2712,8 @@ class OPTISTATE {
         if (strpos($data, 'enc:') !== 0) return $data;
         if (!function_exists('openssl_decrypt')) return $data;
         $method = 'AES-256-CBC';
-        $key = hash('sha256', (defined('AUTH_KEY') ? AUTH_KEY : 'optistate_fallback_key'));
+        $secret = defined('AUTH_KEY') ? AUTH_KEY : wp_salt();
+        $key = hash('sha256', $secret);
         $payload = base64_decode(substr($data, 4));
         $iv_length = openssl_cipher_iv_length($method);
         if (strlen($payload) < $iv_length) return '';
@@ -3778,7 +3807,7 @@ class OPTISTATE {
                     if (!in_array($query_mode, $allowed_query_modes, true)) {
                         $query_mode = 'include_safe';
                     }
-                    $validated_features[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => $query_mode, 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''),];
+                    $validated_features[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => $query_mode, 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''), ];
                 }
             } elseif (isset($feature_def['type']) && $feature_def['type'] === 'custom_bot_blocker') {
                 if (is_array($value)) {
@@ -4001,14 +4030,7 @@ class OPTISTATE {
         $recommendations = [];
         $redundant_indexes = [];
         $wc_lookup_table = $wpdb->prefix . 'wc_order_product_lookup';
-        $targets = [$wpdb->options => [[['autoload'], 'autoload', __('Speeds up your site\'s initial load time by organizing auto-loaded settings.', 'optistate')], [['autoload', 'option_name'], 'idx_autoload_option', __('Allows for much faster retrieval of specific settings without searching the entire table.', 'optistate')]],
-        $wpdb->postmeta => [[['post_id', 'meta_key'], 'idx_post_meta_composite', __('Crucial for speeding up how custom fields are loaded for your posts and pages.', 'optistate')], [['meta_key', 'meta_value(191)'], 'idx_meta_key_val', __('Optimizes searches that filter content by custom fields. (Uses a safe prefix length).', 'optistate')]],
-        $wpdb->posts => [[['post_type', 'post_status', 'post_date', 'ID'], 'idx_wp_query_optimization', __('A powerful index that speeds up the most common ways content is sorted and filtered on your site', 'optistate')], [['post_author'], 'idx_author', __('Improves performance when viewing author archives or filtering posts in the admin area.', 'optistate')]],
-        $wpdb->usermeta => [[['user_id', 'meta_key'], 'idx_user_meta_composite', __('Speeds up checks for user permissions and loading user profile information.', 'optistate')]],
-        $wpdb->commentmeta => [[['comment_id', 'meta_key'], 'idx_comment_meta_composite', __('Essential for e-commerce sites using reviews/ratings. Speeds up loading review metadata significantly.', 'optistate')]],
-        $wpdb->termmeta => [[['term_id', 'meta_key'], 'idx_term_meta_composite', __('Speeds up menus and category archives that use custom images, colors, or layout settings.', 'optistate')]],
-        $wpdb->comments => [[['comment_post_ID', 'comment_approved', 'comment_date_gmt'], 'idx_comment_feed_loading', __('Drastically improves load times for posts with many comments by optimizing the standard WordPress comment fetch query.', 'optistate')]],
-        $wc_lookup_table => [[['product_id', 'date_created'], 'idx_wc_prod_lookup', __('Speeds up sales reporting and product purchase history lookups.', 'optistate')]]];
+        $targets = [$wpdb->options => [[['autoload'], 'autoload', __('Speeds up your site\'s initial load time by organizing auto-loaded settings.', 'optistate') ], [['autoload', 'option_name'], 'idx_autoload_option', __('Allows for much faster retrieval of specific settings without searching the entire table.', 'optistate') ]], $wpdb->postmeta => [[['post_id', 'meta_key'], 'idx_post_meta_composite', __('Crucial for speeding up how custom fields are loaded for your posts and pages.', 'optistate') ], [['meta_key', 'meta_value(191)'], 'idx_meta_key_val', __('Optimizes searches that filter content by custom fields. (Uses a safe prefix length).', 'optistate') ]], $wpdb->posts => [[['post_type', 'post_status', 'post_date', 'ID'], 'idx_wp_query_optimization', __('A powerful index that speeds up the most common ways content is sorted and filtered on your site', 'optistate') ], [['post_author'], 'idx_author', __('Improves performance when viewing author archives or filtering posts in the admin area.', 'optistate') ]], $wpdb->usermeta => [[['user_id', 'meta_key'], 'idx_user_meta_composite', __('Speeds up checks for user permissions and loading user profile information.', 'optistate') ]], $wpdb->commentmeta => [[['comment_id', 'meta_key'], 'idx_comment_meta_composite', __('Essential for e-commerce sites using reviews/ratings. Speeds up loading review metadata significantly.', 'optistate') ]], $wpdb->termmeta => [[['term_id', 'meta_key'], 'idx_term_meta_composite', __('Speeds up menus and category archives that use custom images, colors, or layout settings.', 'optistate') ]], $wpdb->comments => [[['comment_post_ID', 'comment_approved', 'comment_date_gmt'], 'idx_comment_feed_loading', __('Drastically improves load times for posts with many comments by optimizing the standard WordPress comment fetch query.', 'optistate') ]], $wc_lookup_table => [[['product_id', 'date_created'], 'idx_wc_prod_lookup', __('Speeds up sales reporting and product purchase history lookups.', 'optistate') ]]];
         foreach ($targets as $table => $indexes) {
             $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
             if ($table_exists !== $table) {
@@ -4112,6 +4134,115 @@ class OPTISTATE {
         } else {
             wp_send_json_success(['status' => 'processing']);
         }
+    }
+    private function get_integrity_rules() {
+        return apply_filters('optistate_integrity_rules', ['postmeta' => ['label' => __('Post Meta (Orphaned)', 'optistate'), 'child_table' => 'postmeta', 'child_key' => 'post_id', 'parent_table' => 'posts', 'parent_key' => 'ID', 'context_col' => 'meta_key', 'pk' => 'meta_id'], 'commentmeta' => ['label' => __('Comment Meta (Orphaned)', 'optistate'), 'child_table' => 'commentmeta', 'child_key' => 'comment_id', 'parent_table' => 'comments', 'parent_key' => 'comment_ID', 'context_col' => 'meta_key', 'pk' => 'meta_id'], 'usermeta' => ['label' => __('User Meta (Orphaned)', 'optistate'), 'child_table' => 'usermeta', 'child_key' => 'user_id', 'parent_table' => 'users', 'parent_key' => 'ID', 'context_col' => 'meta_key', 'pk' => 'umeta_id'], 'termmeta' => ['label' => __('Term Meta (Orphaned)', 'optistate'), 'child_table' => 'termmeta', 'child_key' => 'term_id', 'parent_table' => 'terms', 'parent_key' => 'term_id', 'context_col' => 'meta_key', 'pk' => 'meta_id'], 'term_taxonomy' => ['label' => __('Zombie Taxonomies (No Term Def)', 'optistate'), 'child_table' => 'term_taxonomy', 'child_key' => 'term_id', 'parent_table' => 'terms', 'parent_key' => 'term_id', 'context_col' => 'taxonomy', 'pk' => 'term_taxonomy_id'], 'term_relationships' => ['label' => __('Broken Relationships (No Taxonomy)', 'optistate'), 'child_table' => 'term_relationships', 'child_key' => 'term_taxonomy_id', 'parent_table' => 'term_taxonomy', 'parent_key' => 'term_taxonomy_id', 'context_col' => 'object_id', 'pk' => false], 'child_posts' => ['label' => __('Orphaned Revisions (No Parent)', 'optistate'), 'child_table' => 'posts', 'child_key' => 'post_parent', 'parent_table' => 'posts', 'parent_key' => 'ID', 'context_col' => 'post_title', 'pk' => 'ID', 'extra_where' => "AND c.post_parent > 0 AND c.post_type != 'attachment'"], 'comments_on_deleted' => ['label' => __('Comments on Deleted Posts', 'optistate'), 'child_table' => 'comments', 'child_key' => 'comment_post_ID', 'parent_table' => 'posts', 'parent_key' => 'ID', 'context_col' => 'comment_content', 'pk' => 'comment_ID', 'extra_where' => "AND c.comment_post_ID > 0"]]);
+    }
+    public function ajax_scan_integrity() {
+        check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
+        $this->check_user_access();
+        if (!$this->check_rate_limit("scan_integrity", 10)) {
+            wp_send_json_error(['message' => __('Please wait 10 seconds before scanning again.', 'optistate') ], 429);
+            return;
+        }
+        global $wpdb;
+        $results = [];
+        $total_issues = 0;
+        $rules = $this->get_integrity_rules();
+        $start_time = microtime(true);
+        $max_exec = 20;
+        foreach ($rules as $type => $rule) {
+            if ((microtime(true) - $start_time) > $max_exec) {
+                $results[] = ['type' => 'timeout', 'label' => __('Scan paused (Time Limit)', 'optistate'), 'count' => 0, 'child_table' => '...', 'parent_table' => '...', 'samples' => []];
+                break;
+            }
+            $child_table = $wpdb->prefix . $rule['child_table'];
+            $parent_table = $wpdb->prefix . $rule['parent_table'];
+            if ($wpdb->get_var("SHOW TABLES LIKE '$child_table'") != $child_table) continue;
+            $extra_where = isset($rule['extra_where']) ? $rule['extra_where'] : '';
+            $sql = "SELECT COUNT(*) 
+        FROM $child_table c 
+        LEFT JOIN $parent_table p ON c.{$rule['child_key']} = p.{$rule['parent_key']} 
+        WHERE p.{$rule['parent_key']} IS NULL $extra_where";
+            $count = (int)$wpdb->get_var($sql);
+            if ($count > 0) {
+                $total_issues+= $count;
+                $context_col = $rule['context_col'];
+                $sample_sql = "SELECT c.{$rule['child_key']} as fk_id, SUBSTRING(c.$context_col, 1, 50) as context 
+                           FROM $child_table c 
+                           LEFT JOIN $parent_table p ON c.{$rule['child_key']} = p.{$rule['parent_key']} 
+                           WHERE p.{$rule['parent_key']} IS NULL $extra_where
+                           LIMIT 3";
+                $samples = $wpdb->get_results($sample_sql);
+                $results[] = ['type' => $type, 'label' => $rule['label'], 'count' => $count, 'child_table' => $rule['child_table'], 'parent_table' => $rule['parent_table'], 'samples' => $samples];
+            }
+        }
+        wp_send_json_success(['issues' => $results, 'total' => $total_issues]);
+    }
+    public function ajax_fix_integrity() {
+        check_ajax_referer(OPTISTATE::NONCE_ACTION, "nonce");
+        $this->check_user_access();
+        $type = isset($_POST['type']) ? sanitize_key($_POST['type']) : '';
+        $rules = $this->get_integrity_rules();
+        if (!isset($rules[$type])) {
+            wp_send_json_error(['message' => __('Invalid rule type.', 'optistate') ]);
+            return;
+        }
+        global $wpdb;
+        $rule = $rules[$type];
+        $child_table = $wpdb->prefix . $rule['child_table'];
+        $parent_table = $wpdb->prefix . $rule['parent_table'];
+        $extra_where = isset($rule['extra_where']) ? $rule['extra_where'] : '';
+        $limit = 2000;
+        $deleted_count = 0;
+        $wpdb->query("START TRANSACTION");
+        try {
+            if ($type === 'term_relationships') {
+                $sql_fetch = "SELECT tr.object_id, tr.term_taxonomy_id 
+                              FROM $child_table tr 
+                              LEFT JOIN $parent_table tt ON tr.{$rule['child_key']} = tt.{$rule['parent_key']} 
+                              WHERE tt.{$rule['parent_key']} IS NULL 
+                              LIMIT $limit";
+                $rows = $wpdb->get_results($sql_fetch);
+                if ($rows) {
+                    foreach ($rows as $row) {
+                        $wpdb->delete($child_table, ['object_id' => $row->object_id, 'term_taxonomy_id' => $row->term_taxonomy_id], ['%d', '%d']);
+                        $deleted_count++;
+                    }
+                }
+            } else {
+                $pk = $rule['pk'];
+                $ids_sql = "SELECT c.$pk 
+                            FROM $child_table c 
+                            LEFT JOIN $parent_table p ON c.{$rule['child_key']} = p.{$rule['parent_key']} 
+                            WHERE p.{$rule['parent_key']} IS NULL $extra_where
+                            LIMIT $limit";
+                $ids = $wpdb->get_col($ids_sql);
+                if (!empty($ids)) {
+                    $ids_string = implode(',', array_map('absint', $ids));
+                    $wpdb->query("DELETE FROM $child_table WHERE $pk IN ($ids_string)");
+                    $deleted_count = count($ids);
+                }
+            }
+            $wpdb->query("COMMIT");
+        }
+        catch(Exception $e) {
+            $wpdb->query("ROLLBACK");
+            wp_send_json_error(['message' => __('Database error during fix.', 'optistate') ]);
+            return;
+        }
+        $remaining_sql = "SELECT COUNT(c.{$rule['child_key']}) 
+                          FROM $child_table c 
+                          LEFT JOIN $parent_table p ON c.{$rule['child_key']} = p.{$rule['parent_key']} 
+                          WHERE p.{$rule['parent_key']} IS NULL $extra_where";
+        $remaining = (int)$wpdb->get_var($remaining_sql);
+        if ($deleted_count > 0) {
+            $this->log_optimization('manual', sprintf(__('🛡️ Integrity Fix: Removed %s orphaned rows from %s', 'optistate'), number_format_i18n($deleted_count), $rule['label']), '');
+            if ($remaining === 0 || $deleted_count > 100) {
+                wp_cache_flush();
+            }
+        }
+        wp_send_json_success(['count' => $deleted_count, 'remaining' => $remaining, 'message' => sprintf(__('Cleaned %s rows.', 'optistate'), number_format_i18n($deleted_count)) ]);
     }
     private function _performance_get_bot_rules($user_agents_string) {
         if (empty($user_agents_string)) {
@@ -4734,7 +4865,7 @@ class OPTISTATE {
             $feature_def = $this->performance_feature_definitions[$key];
             if (isset($feature_def['type']) && $feature_def['type'] === 'custom_caching' && $key === 'server_caching') {
                 if (is_array($value)) {
-                    $validated[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => in_array($value['query_string_mode']??'include_safe', ['ignore_all', 'include_safe', 'unique_cache'], true) ? $value['query_string_mode'] : 'include_safe', 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''), 'disable_cookie_check' => filter_var($value['disable_cookie_check']??false, FILTER_VALIDATE_BOOLEAN),];
+                    $validated[$key] = ['enabled' => filter_var($value['enabled']??false, FILTER_VALIDATE_BOOLEAN), 'lifetime' => min(max(absint($value['lifetime']??86400), HOUR_IN_SECONDS), 6 * MONTH_IN_SECONDS), 'query_string_mode' => in_array($value['query_string_mode']??'include_safe', ['ignore_all', 'include_safe', 'unique_cache'], true) ? $value['query_string_mode'] : 'include_safe', 'exclude_urls' => sanitize_textarea_field($value['exclude_urls']??''), 'disable_cookie_check' => filter_var($value['disable_cookie_check']??false, FILTER_VALIDATE_BOOLEAN), ];
                 }
             } elseif (isset($feature_def['type']) && $feature_def['type'] === 'custom_bot_blocker') {
                 if (is_array($value)) {
@@ -4954,12 +5085,8 @@ class OPTISTATE_DB_Wrapper {
     }
     public function get_connection() {
         if ($this->connection !== null) {
-            try {
-                if (@$this->connection->query("SELECT 1") !== false) {
-                    return $this->connection;
-                }
-            }
-            catch(Exception $e) {
+            if (@$this->connection->query("SELECT 1") !== false) {
+                return $this->connection;
             }
             @$this->connection->close();
             $this->connection = null;
@@ -5019,6 +5146,7 @@ class OPTISTATE_DB_Wrapper {
                     }
                     $mysqli->query("SET SESSION sql_mode='NO_ENGINE_SUBSTITUTION'");
                     $mysqli->query("SET SESSION wait_timeout=300");
+                    
                     $this->connection = $mysqli;
                     return $this->connection;
                 } else {
@@ -5084,12 +5212,11 @@ class OPTISTATE_Backup_Manager {
         $upload_dir = wp_upload_dir();
         $this->backup_dir = trailingslashit($upload_dir['basedir']) . OPTISTATE::BACKUP_DIR_NAME . '/';
         $this->log_file_path = $log_file_path ? : trailingslashit($upload_dir['basedir']) . OPTISTATE::SETTINGS_DIR_NAME . '/' . OPTISTATE::LOG_FILE_NAME;
-        $this->ensure_secure_backup_dir();
         $this->create_backup_metadata_table();
-        if (!$this->check_backup_directory_permissions()) {
+        if (!$this->ensure_secure_backup_dir()) {
             add_action("admin_notices", [$this, "display_backup_permission_warning"]);
         }
-        $this->max_backups = max(1, min(1, intval($max_backups_setting)));
+        $this->max_backups = max(1, min(10, intval($max_backups_setting)));
         add_action("wp_ajax_optistate_create_backup", [$this, "ajax_create_backup"]);
         add_action("wp_ajax_optistate_check_backup_status", [$this, "ajax_check_backup_status"]);
         add_action("optistate_run_manual_backup_chunk", [$this, "run_manual_backup_chunk_worker"], 10, 1);
@@ -5127,16 +5254,25 @@ class OPTISTATE_Backup_Manager {
         if ($gzip_path !== 'uninitialized') {
             return $gzip_path;
         }
+        $cached_path = get_transient('optistate_gzip_binary_path');
+        if ($cached_path !== false) {
+            $gzip_path = $cached_path;
+            return $gzip_path;
+        }
         if (!function_exists('exec') || @ini_get('safe_mode') || in_array('exec', array_map('trim', explode(',', @ini_get('disable_functions'))))) {
             return $gzip_path = false;
         }
         @exec('which gzip 2>/dev/null', $output, $return_var);
         if ($return_var === 0 && isset($output[0]) && @is_executable(trim($output[0]))) {
-            return $gzip_path = trim($output[0]);
+            $gzip_path = trim($output[0]);
+            set_transient('optistate_gzip_binary_path', $gzip_path, MONTH_IN_SECONDS);
+            return $gzip_path;
         }
         foreach (['/bin/gzip', '/usr/bin/gzip', '/usr/local/bin/gzip'] as $path) {
             if (@is_executable($path)) {
-                return $gzip_path = $path;
+                $gzip_path = $path;
+                set_transient('optistate_gzip_binary_path', $gzip_path, MONTH_IN_SECONDS);
+                return $gzip_path;
             }
         }
         return $gzip_path = false;
@@ -5393,7 +5529,7 @@ class OPTISTATE_Backup_Manager {
     }
     private function check_sufficient_disk_space($backup_filepath) {
         if (!$this->wp_filesystem) {
-            return ['success' => false, 'message' => esc_html__('Filesystem not initialized for space check.', 'optistate') ];
+            return ['success' => false, 'message' => esc_html__('Filesystem not initialized for space check.', 'optistate')];
         }
         $free_space = @disk_free_space(WP_CONTENT_DIR);
         if ($free_space === false) {
@@ -5401,7 +5537,19 @@ class OPTISTATE_Backup_Manager {
             return ['success' => true];
         }
         if (!$this->wp_filesystem->exists($backup_filepath)) {
-            return ['success' => false, 'message' => esc_html__('Backup file not found for space check.', 'optistate') ];
+            return ['success' => false, 'message' => esc_html__('Backup file not found for space check.', 'optistate')];
+        }
+        $backup_file_size = $this->wp_filesystem->size($backup_filepath);
+        $is_compressed = preg_match('/\.gz$/i', $backup_filepath);
+        if ($is_compressed) {
+            $estimated_decompressed_size = $backup_file_size * 5;
+            if ($estimated_decompressed_size > ($free_space * 0.9)) {
+                $message = sprintf(__('Insufficient Disk Space: Restore Aborted!<br>Estimated Decompressed Size: %s<br>Available Space: %s', 'optistate'),
+                    size_format($estimated_decompressed_size, 2),
+                    size_format($free_space, 2)
+                );
+                return ['success' => false, 'message' => $message];
+            }
         }
         $current_db_size = 0;
         $stats = get_transient(OPTISTATE::STATS_TRANSIENT);
@@ -5411,14 +5559,12 @@ class OPTISTATE_Backup_Manager {
         if ($current_db_size <= 0) {
             $current_db_size = $this->main_plugin->get_total_database_size(false);
         }
-        $backup_file_size = $this->wp_filesystem->size($backup_filepath);
-        $is_compressed = preg_match('/\.gz$/i', $backup_filepath);
         $estimated_backup_size = $is_compressed ? ($backup_file_size * 5) : ($backup_file_size * 1.1);
         $base_size = max($current_db_size, $estimated_backup_size);
         $required_space = $base_size * 2.5;
         $safety_buffer = 100 * 1024 * 1024;
         if ($free_space < ($required_space + $safety_buffer)) {
-            $message = sprintf(esc_html__('Insufficient Disk Space. Restore Aborted!', 'optistate') . '<br>' . esc_html__('Available: %s', 'optistate') . '<br>' . esc_html__('Required (Est): %s', 'optistate'), size_format($free_space, 2), size_format($required_space + $safety_buffer, 2));
+            $message = sprintf(esc_html__('Insufficient Disk Space: Restore Aborted!', 'optistate') . '<br>' . esc_html__('Available: %s', 'optistate') . '<br>' . esc_html__('Required (Est): %s', 'optistate'), size_format($free_space, 2), size_format($required_space + $safety_buffer, 2));
             return ['success' => false, 'message' => $message];
         }
         return ['success' => true];
@@ -5479,7 +5625,7 @@ class OPTISTATE_Backup_Manager {
         }
         $this->main_plugin->check_user_access();
         if (!$this->main_plugin->check_rate_limit("download_backup", 5)) {
-            wp_die(esc_html__("🕔 Please wait before downloading again.", "optistate"));
+            wp_die(esc_html__("🕔 Please wait a few seconds before downloading again.", "optistate"));
         }
         $filename = isset($_GET["file"]) ? basename(wp_unslash($_GET["file"])) : '';
         if (!preg_match('/\.sql(\.gz)?$/i', $filename)) {
@@ -6640,17 +6786,6 @@ class OPTISTATE_Backup_Manager {
             }
         }
     }
-    private function check_backup_directory_permissions() {
-        if (!$this->wp_filesystem) {
-            return false;
-        }
-        if (!$this->wp_filesystem->is_dir($this->backup_dir)) {
-            if (!$this->wp_filesystem->mkdir($this->backup_dir, FS_CHMOD_DIR)) {
-                return false;
-            }
-        }
-        return $this->wp_filesystem->is_writable($this->backup_dir);
-    }
     public function display_backup_permission_warning() {
         $screen = get_current_screen();
         if (!$screen || strpos($screen->id, "optistate") === false || !current_user_can("manage_options")) {
@@ -6919,7 +7054,7 @@ class OPTISTATE_Backup_Manager {
         check_ajax_referer("optistate_backup_nonce", "nonce");
         $this->ensure_required_tables_exist();
         $this->clear_all_integrity_caches();
-        if (!$this->check_backup_directory_permissions()) {
+        if (!$this->ensure_secure_backup_dir()) {
             wp_send_json_error(["message" => esc_html__("Backup directory is not writable. Please check file permissions.", "optistate") ]);
         }
         if (!$this->main_plugin->check_rate_limit("create_backup", 60)) {
@@ -7675,19 +7810,19 @@ class OPTISTATE_Backup_Manager {
             $dbh = $wpdb->dbh;
         }
         $row_values = [];
-        $use_native = ($dbh instanceof mysqli);
+        $use_mysqli = ($dbh instanceof mysqli);
         foreach ($row as $value) {
             if ($value === null) {
                 $row_values[] = "NULL";
             } elseif (is_int($value) || is_float($value)) {
                 $row_values[] = $value;
             } else {
-                if ($use_native) {
-                    $escaped_value = mysqli_real_escape_string($dbh, (string)$value);
+                $string_val = (string)$value;
+                if ($use_mysqli) {
+                    $row_values[] = "'" . mysqli_real_escape_string($dbh, $string_val) . "'";
                 } else {
-                    $escaped_value = esc_sql((string)$value);
+                    $row_values[] = "'" . esc_sql($string_val) . "'";
                 }
-                $row_values[] = "'" . $escaped_value . "'";
             }
         }
         return "(" . implode(",", $row_values) . ")";
@@ -8083,6 +8218,15 @@ class OPTISTATE_Backup_Manager {
                 return;
             }
             try {
+                if (empty($task_data['space_check_passed'])) {
+                    $space_check = $this->check_sufficient_disk_space($task_data['source_path']);
+                    
+                    if (!$space_check['success']) {
+                        throw new Exception($space_check['message']);
+                    }
+                    $task_data['space_check_passed'] = true;
+                    $this->set_process_state($decompression_key, $task_data, 2 * HOUR_IN_SECONDS);
+                }
                 $result = $this->_decompress_file($task_data['source_path'], $task_data['dest_path']);
                 if ($result === 'INCOMPLETE') {
                     $progress_key = 'optistate_decompress_' . md5($task_data['source_path']);
@@ -8097,18 +8241,13 @@ class OPTISTATE_Backup_Manager {
                     $this->set_process_state($decompression_key, $task_data, 2 * HOUR_IN_SECONDS);
                     wp_schedule_single_event(time() + 3, "optistate_run_decompression_chunk", [$decompression_key]);
                 } elseif ($result === true) {
-                    $final_sql_path = $task_data['dest_path'];
-                    $log_filename = $task_data['log_filename'];
-                    $button_selector = $task_data['button_selector'];
-                    $uploaded_file_info = $task_data['uploaded_file_info'];
-                    if (!empty($task_data['is_upload']) && !empty($task_data['uploaded_gz_path'])) {
-                        if ($this->wp_filesystem->exists($task_data['uploaded_gz_path'])) {
-                            $this->wp_filesystem->delete($task_data['uploaded_gz_path']);
-                        }
-                    }
-                    $settings = $this->main_plugin->get_persistent_settings();
-                    $security_active = empty($settings['disable_restore_security']);
-                    if ($security_active) {
+                   $final_sql_path = $task_data['dest_path'];
+                   $log_filename = $task_data['log_filename'];
+                   $button_selector = $task_data['button_selector'];
+                   $uploaded_file_info = $task_data['uploaded_file_info'];
+                   $settings = $this->main_plugin->get_persistent_settings();
+                   $security_active = empty($settings['disable_restore_security']);
+                   if ($security_active) {
                         $handle = @fopen($final_sql_path, 'r');
                         if (!$handle) {
                             throw new Exception(esc_html__("Failed to open decompressed file for security scan.", "optistate"));
@@ -8123,10 +8262,15 @@ class OPTISTATE_Backup_Manager {
                         }
                     }
                     $response = $this->_initiate_master_restore_process($final_sql_path, $log_filename, $button_selector, $uploaded_file_info);
-                    $task_data['status'] = 'restore_starting';
-                    $task_data['master_restore_key'] = $response['master_restore_key'];
-                    $this->set_process_state($decompression_key, $task_data, 10 * MINUTE_IN_SECONDS);
-                } else {
+                        if (!empty($task_data['is_upload']) && !empty($task_data['uploaded_gz_path'])) {
+                            if ($this->wp_filesystem->exists($task_data['uploaded_gz_path'])) {
+                                $this->wp_filesystem->delete($task_data['uploaded_gz_path']);
+                            }
+                        }
+                        $task_data['status'] = 'restore_starting';
+                        $task_data['master_restore_key'] = $response['master_restore_key'];
+                        $this->set_process_state($decompression_key, $task_data, 10 * MINUTE_IN_SECONDS);
+                    } else {
                     throw new Exception(esc_html__("Unknown decompression error.", "optistate"));
                 }
             }
@@ -8134,13 +8278,15 @@ class OPTISTATE_Backup_Manager {
                 $task_data['status'] = 'error';
                 $task_data['message'] = $e->getMessage();
                 $this->set_process_state($decompression_key, $task_data, 10 * MINUTE_IN_SECONDS);
-                if ($this->wp_filesystem->exists($task_data['source_path']) && !empty($task_data['is_upload'])) {
-                    $this->wp_filesystem->delete($task_data['source_path']);
+                if (!empty($task_data['is_upload']) && !empty($task_data['uploaded_gz_path'])) {
+                    if ($this->wp_filesystem->exists($task_data['uploaded_gz_path'])) {
+                        $this->wp_filesystem->delete($task_data['uploaded_gz_path']);
+                    }
                 }
                 if ($this->wp_filesystem->exists($task_data['dest_path'])) {
                     $this->wp_filesystem->delete($task_data['dest_path']);
                 }
-                $this->log_failed_restore_operation($task_data['log_filename'], "Decompression failed: " . $e->getMessage());
+                $this->log_failed_restore_operation($task_data['log_filename'], "Decompression/Restore Init failed: " . $e->getMessage());
             }
         }
         finally {
@@ -8461,7 +8607,9 @@ function optistate_deactivate() {
         $username = ($current_user && $current_user->exists()) ? $current_user->user_login : 'System';
         $instance->log_optimization('manual', '🔌 ' . sprintf(esc_html__('Plugin Deactivated by %s', 'optistate'), $username), '');
     }
+    wp_clear_scheduled_hook("optistate_scheduled_cleanup");
     wp_clear_scheduled_hook('optistate_daily_cleanup');
+    wp_clear_scheduled_hook('optistate_background_preload_batch');
     wp_clear_scheduled_hook('optistate_run_rollback_cron');
     if (method_exists($instance, '_performance_remove_caching')) {
         $instance->_performance_remove_caching();
@@ -8470,39 +8618,27 @@ function optistate_deactivate() {
     $store = new OPTISTATE_Process_Store();
     $store->drop_table();
     global $wpdb;
-    try {
-        $stray_tables_result = $wpdb->get_results($wpdb->prepare("SELECT TABLE_NAME FROM information_schema.TABLES 
+    $stray_tables_result = $wpdb->get_results($wpdb->prepare("SELECT TABLE_NAME FROM information_schema.TABLES 
              WHERE TABLE_SCHEMA = %s 
              AND (TABLE_NAME LIKE 'optistate_old_%%' OR TABLE_NAME LIKE 'optistate_temp_%%')", DB_NAME));
-        if ($stray_tables_result && !empty($stray_tables_result)) {
-            $tables_to_drop = [];
-            foreach ($stray_tables_result as $row) {
-                $tables_to_drop[] = '`' . esc_sql($row->TABLE_NAME) . '`';
-            }
-            if (!empty($tables_to_drop)) {
-                $wpdb->query("SET FOREIGN_KEY_CHECKS = 0");
-                $wpdb->query("DROP TABLE IF EXISTS " . implode(', ', $tables_to_drop));
-                $wpdb->query("SET FOREIGN_KEY_CHECKS = 1");
-            }
+    if ($stray_tables_result && !empty($stray_tables_result)) {
+        $tables_to_drop = [];
+        foreach ($stray_tables_result as $row) {
+            $tables_to_drop[] = '`' . esc_sql($row->TABLE_NAME) . '`';
+        }
+        if (!empty($tables_to_drop)) {
+            $wpdb->query("SET FOREIGN_KEY_CHECKS = 0");
+            $wpdb->query("DROP TABLE IF EXISTS " . implode(', ', $tables_to_drop));
+            $wpdb->query("SET FOREIGN_KEY_CHECKS = 1");
         }
     }
-    catch(Exception $e) {
-    }
-    try {
-        $options_to_delete = $wpdb->get_col($wpdb->prepare("SELECT option_name FROM {$wpdb->options} 
+    $options_to_delete = $wpdb->get_col($wpdb->prepare("SELECT option_name FROM {$wpdb->options} 
              WHERE option_name LIKE %s", '%optistate_%'));
-        if (!empty($options_to_delete)) {
-            $placeholders = implode(',', array_fill(0, count($options_to_delete), '%s'));
-            $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name IN ($placeholders)", ...$options_to_delete));
-        }
+    if (!empty($options_to_delete)) {
+        $placeholders = implode(',', array_fill(0, count($options_to_delete), '%s'));
+        $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name IN ($placeholders)", ...$options_to_delete));
     }
-    catch(Exception $e) {
-    }
-    try {
-        $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key = 'optistate_action_timestamps'");
-    }
-    catch(Exception $e) {
-    }
+    $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key = 'optistate_action_timestamps'");
     $wp_filesystem = optistate_ensure_filesystem();
     if ($wp_filesystem) {
         $upload_dir = wp_upload_dir();

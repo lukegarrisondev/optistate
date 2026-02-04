@@ -1,11 +1,11 @@
-=== Optimal State - Database Optimization, Backup & Performance Suite ===
-Plugin Name: Optimal State - WordPress Database Optimization, Backup, Caching & Performance
+=== Optimal State – Database Cleaner, Speed Optimization & Backup Manager ===
+Plugin Name: Optimal State - Database Cleaning, Performance Optimization, & Backup Suite.
 Contributors: lukegarry
 Tags: optimization, speed, database, caching, performance
 Requires at least: 5.5
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,13 +13,11 @@ All-in-one WordPress performance suite: database optimization, automated backups
 
 == Description ==
 
-**Optimal State**, also known as WP Optimal State outside the official repository, is the only WordPress performance plugin you'll ever need. Combining enterprise-grade database optimization, automated backups, intelligent caching, and comprehensive cleanup tools into one unified solution.
+**Optimal State**, also known as WP Optimal State outside the official repository, is the only WordPress performance plugin you'll ever need. Combining enterprise-grade database optimization, automated backups, intelligent caching, brute force protection, and comprehensive cleanup tools into one unified solution.
 
-**Stop paying for multiple plugins.** Optimal State replaces UpdraftPlus, WP Rocket, WP-Optimize, Perfmatters, Better Search Replace, and more—delivering professional-grade performance optimization without the plugin bloat or subscription fatigue.
+**Stop paying for multiple plugins.** Optimal State replaces UpdraftPlus, WP Rocket, WP-Optimize, Perfmatters, Better Search Replace, Loginizer and more—delivering professional-grade performance optimization without the plugin bloat or subscription fatigue.
 
-This **installable preview version** lets you explore the complete interface and understand every feature before upgrading. Test-drive the dashboard, review all capabilities, and see exactly how Optimal State can transform your WordPress performance—risk-free.
-
-[__▶ Live Interactive Demo__](https://spiritualseek.com/wp-content/uploads/2025/11/optistate-preview.html) | [__🎁 Try Free Version__](https://spiritualseek.com/wp-content/uploads/2025/11/WP_Optimal_State_FREE_1-2-0.zip) | [__✪ Upgrade to Pro__](https://payhip.com/b/AS3Pt)
+[__▶ Live Interactive Demo__](https://spiritualseek.com/wp-content/uploads/2025/11/optistate-preview.html) | [__✪ Upgrade to Pro__](https://payhip.com/b/AS3Pt)
 
 [youtube https://youtu.be/LrsOICyAB-U]
 
@@ -29,7 +27,7 @@ This **installable preview version** lets you explore the complete interface and
 One optimized codebase instead of 4+ conflicting plugins means faster load times, reduced server overhead, and zero compatibility issues.
 
 💰 **Save Money on Multiple Plugin Subscriptions**
-Stop paying for separate plugins like WP Rocket, UpdraftPlus Premium, WP-Optimize Premium, and Perfmatters. Get everything in one place and eliminate subscription fatigue.
+Stop paying for separate plugins like WP Rocket, UpdraftPlus Premium, WP-Optimize Premium, Perfmatters, and Loginizer. Get everything in one place and eliminate subscription fatigue.
 
 🎯 **Database Optimization That Actually Works**
 Unlike basic cleaners, Optimal State performs deep optimization: table defragmentation, autoload optimization, corruption repair, and intelligent cleanup of 18+ data types.
@@ -46,6 +44,8 @@ Know exactly when your database needs attention with our proprietary health scor
 - **Table Optimization** - Defragment and compact all database tables
 - **Autoload Optimization** - Reduce autoloaded data for faster page loads (Pro)
 - **Table Repair & Analysis** - Fix corrupted tables automatically (Pro)
+- **Referential Integrity Scanner** - Finds and removes database rows that point to content that no longer exists.
+- **MySQL Index Manager** - Scans your database for missing high-impact indexes and fixes them (Pro)
 - **Database Structure Analysis** - Detailed insights into table sizes, indexes, and optimization opportunities
 - **Delete Unused Tables** - Remove leftover tables from deleted plugins (Pro)
 
@@ -76,6 +76,8 @@ Know exactly when your database needs attention with our proprietary health scor
 - **Detailed Results** - See exactly what was changed and where
 
 **🎛️ Performance Optimization Tools**
+- **Bad Bot Blocking** - Blocks resource-intensive crawlers and data scrapers
+- **Font Loading Optimization** - Eliminates render-blocking resources
 - **Lazy Load Images & Iframes** - Load media only when visible
 - **Heartbeat API Control** - Reduce admin-ajax.php server load by 60%+
 - **Post Revisions Limit** - Control revision storage (save 30-50% database space)
@@ -105,6 +107,7 @@ Know exactly when your database needs attention with our proprietary health scor
 - **User Access Control** - Restrict plugin access to specific administrators (Pro)
 - **Settings Export/Import** - Backup and migrate your configuration
 - **Protected Operations** - Confirmation dialogs for destructive actions
+- **Brute Force Prevention** - Secure your login page against attacks
 
 = Perfect For =
 
@@ -127,6 +130,7 @@ Know exactly when your database needs attention with our proprietary health scor
 - **Clearfy** → Performance Tweaks
 - **Advanced Database Cleaner** → Deep Database Cleanup
 - **Autoptimize** → Performance Features
+- **Loginizer** → Login Page Protection
 
 = What Makes Optimal State Different? =
 
@@ -138,9 +142,11 @@ Know exactly when your database needs attention with our proprietary health scor
 
 **Unlike Perfmatters**: We provide complete database management, automated backups, and intelligent cleanup—not just toggle switches.
 
+**Unlike Loginizer**: We provide a user-friendly, straightforward control panel that requires no technical expertise.
+
 **The Optimal State Advantage**: One plugin, one interface, one optimization strategy. No conflicts, no compatibility issues, no subscription fatigue.
 
-= Preview vs. Full Version =
+= Live Preview, Free Version, and Pro Version =
 
 **This Preview Version** allows you to:
 ✓ Explore the complete interface and dashboard
@@ -154,11 +160,11 @@ Know exactly when your database needs attention with our proprietary health scor
 ✓ Actual database optimization and cleanup
 ✓ Real backup creation and restoration
 ✓ Working cache system
-✓ Search & Replace execution (Pro)
-✓ Automation scheduling (Pro)
+✓ Search & Replace execution (Pro only)
+✓ Automation scheduling (Pro only)
 ✓ Priority email support
 
-**Why offer an installable preview?** Database optimization is serious business. We want you to be 100% confident in our interface, features, and approach before making any changes to your live site. Test drive everything risk-free, then upgrade when ready.
+**Why offer a live interactive preview?** Database optimization is serious business. We want you to be 100% confident in our interface, features, and approach before making any changes to your live site. Test drive everything risk-free, then upgrade when ready.
 
 = Technical Specifications =
 
@@ -201,9 +207,15 @@ Know exactly when your database needs attention with our proprietary health scor
 
 == Frequently Asked Questions ==
 
-= Is this really free, or is it a trial? =
+= What makes Optimal State unique compared to other optimization plugins? =
 
-This is a **fully functional preview version** that demonstrates the complete interface and all features. All operations are simulated to ensure zero risk. When you're ready to optimize your actual database, you can upgrade to the Free or Pro version. The Free version provides full backup, restore, cleanup, and basic caching capabilities—permanently free.
+Most plugins focus on just one thing—either backups, caching, or database cleaning. Optimal State unifies all three into a single, intelligent health suite designed to make your site faster and safer **without the need for multiple plugins**.
+
+**Here is why it stands out**:
+**Safety First**: We automatically create "Safety Backups" before any critical restoration, ensuring you can always undo changes. We also verify backup file integrity to prevent restoring corrupted data.
+**Deep Cleaning**: Beyond standard cleanup, we analyze your database structure to identify abandoned tables left behind by old plugins and provide a detailed health score.
+**Smart Caching**: Our built-in server-side caching includes intelligent cookie detection, ensuring high performance while maintaining compliance with privacy laws (GDPR/CCPA).
+**Complete Automation**: Set it and forget it. Schedule automatic backups and optimizations, and receive email reports so you always know your site is healthy.
 
 = Can Optimal State actually replace WP Rocket and UpdraftPlus? =
 
@@ -354,7 +366,7 @@ Set it once and **forget about manual maintenance**. The Preview version display
 - User access control
 - Priority email support
 
-See the **complete comparison** in the User Manual tab.
+See the **complete comparison** here: [__⇄ Free vs. Pro Comparison__](https://spiritualseek.com/wp-optimal-state-wordpress-plugin/)
 
 = Does this work on shared hosting? =
 
@@ -433,9 +445,10 @@ Most sites reach **80-95 health score** after first optimization.
 
 **Preview Version**: Comprehensive User Manual tab within plugin interface
 
-**Free Version**: Community support via WordPress.org forums
+**Free Version**: User manual + Community support via WordPress.org forums
 
 **Pro Version**: 
+- User manual
 - Priority email support (24-48 hour response)
 - Detailed troubleshooting assistance
 
@@ -492,6 +505,31 @@ The **Preview version is free**—no purchase necessary. For **paid versions** (
 
 == Changelog ==
 
+= 1.2.1 - February 2026 =
+**Database Restore System Refinements:**
+* Full disabling on WordPress Multisite installations
+* Enhanced efficiency of several core functions
+* Increased protection against SQL injection vulnerabilities
+* Added detailed how-to instructions for stuck restore processes
+* Compatibility with phpMyAdmin exports increased to 100%
+* Optimized server resource management to minimize errors and crashes
+**Security & Performance Improvements:**
+* Refined login page protection against brute force attacks
+* Minimized memory and CPU waste during massive attack scenarios
+* Improved security and behavior of cleanup operations related to:
+  - WooCommerce data
+  - Duplicate post meta
+  - Duplicate comment meta
+**Enhanced Analytics & Features:**
+* Improved accuracy of database statistics
+* Enhanced efficiency of database queries for statistical retrieval
+* Added new performance feature: **Font Loading Optimization**
+* Improved efficiency and reliability of Bad Bot Blocker on Nginx servers
+**Documentation Updates:**
+* Expanded user manual with new sections
+* Updated existing documentation for better user-friendliness
+* Enhanced clarity for technical operations
+
 = 1.2.0 - January 2026 =
 * Modal Confirmations: Added user-friendly confirmation dialogs for all critical database operations including Create Backup, One-Click Optimization, Table Defragmentation, Repair Corrupted Tables, Optimize Autoloaded Data, and all cleanup operations (both detailed and targeted). Each modal displays operation-specific details and item counts to ensure informed decisions before execution.
 * Print & Export: New functionality to print the manual or export it as a PDF for offline reference.
@@ -542,8 +580,9 @@ The **Preview version is free**—no purchase necessary. For **paid versions** (
 
 == Upgrade Notice ==
 
-= 1.2.0 =
-This is a demonstration version for evaluation purposes. All operations are simulated to ensure risk-free exploration. To unlock full functionality upgrade to the Free or Pro version. [__Get Full Version__](https://payhip.com/b/AS3Pt)
+= 1.2.1 =
+This is a free version with limited but perfectly functional features. To unlock full functionality upgrade to Pro version.
+[__Get Full Version__](https://payhip.com/b/AS3Pt)
 
 == External Services and Resources ==
 
@@ -561,6 +600,14 @@ Optimal State utilizes the following third-party services and open-source librar
   - API Documentation: https://developers.google.com/speed/docs/insights/v5/get-started
   - Terms of Service: https://developers.google.com/terms
   - Privacy Policy: https://policies.google.com/privacy
+
+* **GTranslate Widget** – Website translation service that provides automatic language translation functionality.
+  The plugin loads the GTranslate popup widget from cdn.gtranslate.net to enable multi-language support in the admin interface.
+  When the widget is loaded, it may connect to GTranslate's servers to provide translation services.
+  Use of this service is subject to GTranslate's Terms of Service and Privacy Policy.
+  - Service Website: https://gtranslate.io/
+  - Terms of Service: https://gtranslate.io/terms-and-conditions
+  - Privacy Policy: https://gtranslate.io/privacy-policy
 
 Note: The PageSpeed Insights feature is optional and only activates when you manually request a performance analysis. No data is sent to external services without your explicit action.
 

@@ -15,7 +15,7 @@ All-in-one WordPress performance suite: database optimization, automated backups
 
 **Optimal State**, also known as WP Optimal State outside the official repository, is the only WordPress performance plugin you'll ever need. Combining enterprise-grade database optimization, automated backups, intelligent caching, brute force protection, and comprehensive cleanup tools into one unified solution.
 
-**Stop paying for multiple plugins.** Optimal State replaces UpdraftPlus, WP Rocket, WP-Optimize, Perfmatters, Better Search Replace, Loginizer and more—delivering professional-grade performance optimization without the plugin bloat or subscription fatigue.
+**Stop paying for multiple plugins.** Optimal State replaces UpdraftPlus, WP Rocket, WP-Optimize, Perfmatters, Better Search Replace, Loginizer and more, delivering advanced performance optimization and security hardening without the bloat of additional plugins or the fatigue of multiple subscriptions.
 
 [__▶ Live Interactive Demo__](https://spiritualseek.com/wp-content/uploads/2025/11/optistate-preview.html) | [__✪ Upgrade to Pro__](https://payhip.com/b/AS3Pt)
 
@@ -53,7 +53,7 @@ Know exactly when your database needs attention with our proprietary health scor
 - **Automated Database Backups** - GZIP-compressed with integrity verification
 - **One-Click Restore** - Restore any backup with automatic safety rollback
 - **Smart Backup Management** - Keep up to 10 backups with automatic rotation (Pro: 10, Free: 1)
-- **Upload & Restore** - Restore from any backup file (Pro)
+- **Upload & Restore** - Restore from any backup file
 - **Zero-Downtime Restoration** - Temporary table swap technology for seamless recovery
 - **Automatic Safety Backups** - Created before all critical operations
 - **Protected Backup Directory** - .htaccess security prevents unauthorized access
@@ -207,287 +207,536 @@ Know exactly when your database needs attention with our proprietary health scor
 
 == Frequently Asked Questions ==
 
-= What makes Optimal State unique compared to other optimization plugins? =
+= What makes Optimal State different from other optimization plugins? =
 
-Most plugins focus on just one thing—either backups, caching, or database cleaning. Optimal State unifies all three into a single, intelligent health suite designed to make your site faster and safer **without the need for multiple plugins**.
+Optimal State is an all-in-one solution that replaces 4-6 separate plugins. Instead of installing WP Rocket for caching, UpdraftPlus for backups, WP-Optimize for database cleanup, and Better Search Replace for migrations, you get all these features in a single, unified plugin. This means:
 
-**Here is why it stands out**:
-**Safety First**: We automatically create "Safety Backups" before any critical restoration, ensuring you can always undo changes. We also verify backup file integrity to prevent restoring corrupted data.
-**Deep Cleaning**: Beyond standard cleanup, we analyze your database structure to identify abandoned tables left behind by old plugins and provide a detailed health score.
-**Smart Caching**: Our built-in server-side caching includes intelligent cookie detection, ensuring high performance while maintaining compliance with privacy laws (GDPR/CCPA).
-**Complete Automation**: Set it and forget it. Schedule automatic backups and optimizations, and receive email reports so you always know your site is healthy.
+* **No plugin conflicts** - One codebase eliminates compatibility issues
+* **Faster performance** - Reduced overhead from having multiple plugins active
+* **Simplified management** - One dashboard instead of switching between 4+ plugins
+* **Cost savings** - One purchase instead of multiple subscriptions
 
-= Can Optimal State actually replace WP Rocket and UpdraftPlus? =
+Our proprietary health scoring algorithm also provides real-time insights that basic cleaners simply can't match.
 
-**Absolutely.** Optimal State includes professional-grade server-side caching (like WP Rocket), automated database backups with integrity verification (like UpdraftPlus), plus database optimization that neither of them provide. Many users report **equivalent or better performance** while saving $100+ per year in subscription fees.
+= Is Optimal State safe to use on production sites? =
 
-= Will this slow down my website? =
+Yes, absolutely. Optimal State includes multiple safety mechanisms:
 
-**No, quite the opposite.** Optimal State only runs when you access the admin interface or during scheduled maintenance (which runs during low-traffic periods). The caching and performance features actively **speed up your site** for visitors by 30-70% on average.
+* **Automatic safety backups** before scheduled optimization
+* **Emergency rollback system** that triggers if anything goes wrong
+* **Dry run mode** for Search & Replace (preview changes before applying)
+* **Zero-downtime restoration** using temporary table swap technology
+* **Database validation** verifies backup integrity before restore
+* **Maintenance mode** protects your site during critical operations
 
-= Is it safe for my live production site? =
+Hundreds of sites use Optimal State in production without issues. We recommend testing on staging first for enterprise sites, but the built-in safety features make it production-ready out of the box.
 
-**Yes, with proper usage.** Optimal State includes multiple safety features: automatic backups before critical operations, dry-run capabilities, emergency rollback, and detailed warnings before destructive actions. However, we **strongly recommend**:
-- Creating a manual backup before first use
-- Testing on a staging site if available
-- Reviewing the User Manual before running advanced operations
-- Starting with One-Click Optimization before using advanced tools
+= Will this plugin slow down my website? =
 
-= How is this different from WP-Optimize? =
+No, quite the opposite. Optimal State is designed for performance:
 
-Optimal State goes **far beyond basic cleanup**:
-- **Enterprise backup system** with GZIP compression and integrity verification
-- **Advanced caching** (server-side, browser, database query)
-- **Table defragmentation** and corruption repair
-- **Autoload optimization** (reduce autoloaded data by 60%+)
-- **Search & Replace** with serialization handling
-- **PageSpeed integration** for Core Web Vitals monitoring
-- **Automation scheduling** with email notifications
+* **Optimized codebase** - Minimal resource usage compared to running 4+ separate plugins
+* **Efficient query design** - Database operations use indexed queries and batch processing
+* **Smart caching** - Statistics are cached to avoid repeated expensive queries
+* **Conditional loading** - Admin features only load on relevant pages
+* **No external dependencies** - Chart.js and other libraries are served locally
 
-WP-Optimize is a database cleaner. Optimal State is a complete performance suite.
+Most users see a 20-40% improvement in admin dashboard speed and database query performance after optimization. The caching features alone typically reduce page load times by 50-80%.
 
-= What happens if something goes wrong during optimization? =
+= What types of data does the cleanup remove? =
 
-Optimal State includes multiple safety mechanisms depending on the operation. **Scheduled optimizations** automatically create a backup before running cleanup operations (Pro version). When **restoring a database backup**, a safety backup of your current database is created first. If restoration fails, the **emergency rollback system** automatically restores your previous database state. The **maintenance mode** feature prevents visitor access during restore operations. We always recommend creating a manual backup before running your first optimization to ensure maximum safety.
+Optimal State safely removes 18 different types of database bloat:
 
-= Can I use this with my existing caching plugin? =
+**Content Cleanup:**
+* Post revisions (keeps latest version)
+* Auto-drafts and abandoned content
+* Trashed posts and pages
+* Orphaned post metadata
 
-You can, but **you probably shouldn't need to.** Optimal State's caching system is designed to match or exceed WP Rocket, WP Super Cache, and W3 Total Cache. Using multiple caching plugins often causes conflicts and **reduces performance**. We recommend:
-1. Enable Optimal State caching
-2. Test your site speed (GTmetrix, PageSpeed Insights)
-3. If satisfied, disable your old caching plugin
-4. Most users see **equal or better results** with just Optimal State
+**Comment Cleanup:**
+* Spam comments
+* Trashed comments  
+* Orphaned comment metadata
+* Unapproved comments (optional)
+* Pingbacks and trackbacks
 
-= How often should I run database optimization? =
+**System Cleanup:**
+* Expired transients
+* oEmbed cache data
+* Orphaned term relationships
+* Duplicate metadata entries
 
-**It depends on your site activity:**
-- **High-traffic e-commerce** (1000+ orders/month): Weekly or bi-weekly
-- **Active blogs** (100+ posts/month): Bi-weekly or monthly
-- **Low-traffic sites**: Monthly or when health score drops below 70
+**WooCommerce Specific:**
+* Abandoned cart sessions
+* Completed Action Scheduler logs
+* Order transients
 
-The **Health Score indicator** (Optimize tab) tells you exactly when optimization is needed. Scores below **70 = time to optimize**. With the Pro version, you can **schedule automatic optimization** and forget about it.
+**Advanced:**
+* Autoload optimization (moves non-critical data to standard loading)
+* Table defragmentation (recovers wasted disk space)
+* Unused database tables from deleted plugins (Pro)
 
-= Will optimization delete my posts, pages, or products? =
+All cleanup operations are reversible via backup, and nothing is deleted without your explicit confirmation.
 
-**Absolutely not.** One-Click Optimization only removes unnecessary data:
-- **Post revisions** (old versions, keeps current content)
-- **Auto-drafts** (automatically saved drafts)
-- **Trashed comments** (already in trash)
-- **Expired transients** (temporary cache that expired)
-- **Duplicate postmeta** (redundant metadata entries)
-- **Duplicate commentmeta** (redundant comment metadata)
-- **Orphaned data** (references to deleted content)
-- **Pingbacks and trackbacks** (external link notifications)
-- **Table optimization** (defragmentation only)
+= How do backups work? What gets backed up? =
 
-Your **published content is never touched.** Every cleanup type includes a detailed description and confirmation dialog.
+Optimal State creates complete database backups in standard SQL format:
 
-= What are transients and why should I clean them? =
+**What's Included:**
+* All database tables (structure + data)
+* GZIP compression for space efficiency
+* Integrity checksums for validation
+* Compatible with phpMyAdmin and other MySQL tools
 
-**Transients** are WordPress's temporary caching system. They're supposed to auto-expire, but WordPress often leaves **thousands of expired transients** in your database indefinitely. Cleaning transients is:
-- **100% safe** - WordPress regenerates needed data automatically
-- **High impact** - Often removes 10-30% of database size
-- **Recommended by WordPress developers** as routine maintenance
+**What's Not Included:**
+* WordPress files (themes, plugins, uploads)
+* wp-config.php and other core files
 
-This is the **safest, highest-impact cleanup** you can perform.
+This is intentional - database corruption and data loss are the most common issues affecting WordPress sites. For full-site backups including files, we recommend combining Optimal State with a file backup solution like UpdraftPlus or BackWPup.
+
+**Backup Features:**
+* One-click creation and restoration
+* Automatic safety backups before restore operations
+* Rotation management (keeps latest N backups)
+* Upload and restore from external backup files
+* Protected storage directory (.htaccess secured)
+
+= Can I restore a backup from another plugin like UpdraftPlus or phpMyAdmin? =
+
+Yes (Pro feature). The "Upload & Restore" feature accepts:
+
+* Standard SQL dump files (.sql)
+* GZIP compressed SQL files (.sql.gz)
+* phpMyAdmin exports
+* UpdraftPlus database backups (extract the .gz file first)
+* Most MySQL backup formats
+
+The restore engine automatically detects file format, handles DEFINER statements, adjusts table names for safety, and validates structure before importing. If you're migrating between domains, use the Search & Replace feature after restoring to update URLs.
 
 = Does this work with WooCommerce? =
 
-**Yes, and especially well.** WooCommerce sites accumulate database bloat **3-5X faster** than regular sites. Optimal State includes specialized WooCommerce optimizations:
-- **Session cleanup** (expired customer sessions)
-- **Action Scheduler logs** (background job history)
-- **Transient cleanup** (WooCommerce caches aggressively)
-- **Order metadata optimization**
+Yes, Optimal State has specialized WooCommerce optimization:
 
-Many WooCommerce site owners report **40-60% database size reduction** after first optimization.
+* **Session cleanup** - Removes abandoned cart data
+* **Action Scheduler optimization** - Purges completed background tasks
+* **Order transients** - Clears temporary calculation data
+* **Smart cache invalidation** - Automatically clears cache when orders are placed
+* **Database indexes** - Adds high-impact indexes for product queries (Pro)
 
-= Can I restore a backup if something goes wrong? =
-
-**Yes, in seconds.** The Backups tab shows all available backups. Click the **Restore button**, and Optimal State will:
-1. Create a safety backup of your current database
-2. Validate the restoration target
-3. Enable maintenance mode
-4. Perform zero-downtime restoration using temporary tables
-5. Verify database integrity
-6. Automatically rollback if any issues occur
-
-**Important**: This functionality requires the Free or Pro version (preview simulates the process).
-
-= What is "table overhead" and should I optimize it? =
-
-**Table overhead** is fragmented space in your database—like a fragmented hard drive. When you delete or modify data, MySQL leaves gaps. High overhead (>10MB) **slows every database query**. The "Optimize Tables" feature:
-- **Defragments tables** (reclaims wasted space)
-- **Rebuilds indexes** (faster queries)
-- **Compacts data** (smaller backup files)
-
-Users typically see **15-30% performance improvement** in admin areas after optimizing tables with high overhead.
-
-= Why don't I see speed improvements when logged in? =
-
-**By design.** When you're logged into WordPress as an administrator, caching is **intentionally bypassed**. This ensures:
-- You see changes immediately after editing
-- You can test safely without cached content
-- Admin actions don't corrupt the cache
-
-To **test actual performance**, open your site in an **Incognito/Private browser window** (not logged in). This shows the **cached experience your visitors receive**—typically 50-70% faster load times.
-
-= Can I schedule automatic optimization? =
-
-**Yes, with Pro version.** The Automation tab lets you:
-- Schedule **weekly, daily, or monthly** maintenance
-- Choose **specific times** (e.g., 3 AM for low traffic)
-- Enable **email notifications** for each run
-- Combine **backup + cleanup** operations
-
-Set it once and **forget about manual maintenance**. The Preview version displays the interface but doesn't execute scheduled tasks.
+Many WooCommerce stores see dramatic performance improvements after cleanup, especially if you have thousands of products or orders. The plugin is tested and fully compatible with WooCommerce 7.0+.
 
 = What's the difference between Free and Pro versions? =
 
-**Free Version** includes:
-- Full database backup & restore (1 backup retention)
-- Complete cleanup operations (all 18 types)
-- Server-side & browser caching
-- Table optimization
-- Performance features (lazy load, heartbeat control, etc.)
-- Health score monitoring
-- Basic statistics
+**DATABASE BACKUP & RESTORE**
+.......................................................**Free Version** ......**Pro Version**
+• Create Backups.................................... ✓...................... ✓
+• Maximum Backups Kept.................... [1]............... [Up to 10]
+• Download Backups............................. ✓...................... ✓
+• Restore from Existing Backups......... ✓...................... ✓
+• Restore from Uploaded File........... [50MB]............. [5GB]
+• Backup Verification (Checksum)....... ✓...................... ✓
 
-**Pro Version** adds:
-- Extended backup retention (10 backups)
-- Search & Replace execution
-- Table repair & analysis
-- Autoload optimization
-- Automation scheduling with custom times
-- Email notifications
-- Mobile caching settings
-- Cache preload
-- GDPR cookie support
-- Database query caching
-- User access control
-- Priority email support
+**DATABASE CLEANUP & OPTIMIZATION**
+....................................................**Free Version** ......**Pro Version**
+• One-Click Optimization................... ✓...................... ✓
+• Database Health Score................... ✓...................... ✓
+• Database Statistics.......................... ✓...................... ✓
+• Detailed Cleanup (18 types)............ ✓...................... ✓
+• Optimize All Tables.......................... ✓...................... ✓
+• Analyze & Repair Tables................. ✗...................... ✓
+• Optimize Autoloaded Options........ ✗...................... ✓
+• Database Structure Analysis.......... ✓...................... ✓
+• MySQL Index Manager.................... ✗...................... ✓
+• Referential Integrity Scanner.......... ✗...................... ✓
+• Database Search & Replace........... ✗...................... ✓
+• Delete Unused Tables..................... ✗...................... ✓
 
-See the **complete comparison** here: [__⇄ Free vs. Pro Comparison__](https://spiritualseek.com/wp-optimal-state-wordpress-plugin/)
+**AUTOMATION FEATURES**
+..........................................................**Free Version** ......**Pro Version**
+• Scheduled Backup/Cleaning................ ✗...................... ✓
+• Email Notifications................................. ✗...................... ✓
+• Customizable Schedule......................... ✗...................... ✓
 
-= Does this work on shared hosting? =
+**PERFORMANCE FEATURES**
+.......................................................................**Free Version** ......**Pro Version**
+• Server-Side Page Caching.................................. ✓...................... ✓
+• Browser Caching (.htaccess Rules)................... ✓...................... ✓
+• Cache Purging...................................................... ✓...................... ✓
+• Cache Statistics................................................... ✓...................... ✓
+• Automatic Cache Preload (Sitemap-Based)..... ✗...................... ✓
+• Mobile-Specific Cache........................................ ✗...................... ✓
+• Custom Consent Cookie Support...................... ✗...................... ✓
+• Query String Handling Modes (3 Options)....... ✓...................... ✓
+• Smart Cache Invalidation on Updates.............. ✓...................... ✓
+• Database Query Caching.................................. ✗...................... ✓
+• Font Loading Optimization................................ ✗...................... ✓
+• Lazy Load Images & Iframes............................. ✓...................... ✓
+• Bad Bot Blocker................................................... ✓...................... ✓
+• Post Revisions Limit Control.............................. ✓...................... ✓
+• Trash Auto-Empty Control................................. ✓...................... ✓
+• Heartbeat API Control....................................... ✓...................... ✓
+• Disable XML-RPC............................................... ✓...................... ✓
+• Remove Emoji Scripts........................................ ✓...................... ✓
+• Remove Unused WordPress Headers............. ✓...................... ✓
+• Integrated PageSpeed Metrics........................ ✓...................... ✓
 
-**Yes, optimized for shared hosting.** Optimal State respects server limits for:
-- Memory (works with 128MB+ PHP memory_limit)
-- Execution time (handles 30+ second max_execution_time)
-- Disk space (efficient backup compression)
+**SECURITY & SAFETY**
+..........................................................**Free Version** ......**Pro Version**
+• Safety Backup Before Restore............... ✓...................... ✓
+• Emergency Rollback................................ ✓...................... ✓
+• Zero-Downtime Restore.......................... ✓...................... ✓
+• Database Validation Before Restore...... ✓...................... ✓
+• Maintenance Mode During Restore....... ✓...................... ✓
+• Protected Backup Directory.................... ✓...................... ✓
+• User Management (Restrict Access)..... ✗...................... ✓
+• Settings Export/Import............................ ✓...................... ✓
+• Brute Force Protection............................. ✓...................... ✓
 
-If you're on **very restrictive shared hosting**, you may need to increase PHP limits via:
-- Hosting control panel (cPanel, Plesk)
-- `.htaccess` file modifications
-- `php.ini` adjustments (if available)
+**LOGGING & MONITORING**
+.............................................................**Free Version** ......**Pro Version**
+• Optimization History (Last 200 ops)...... ✓...................... ✓
+• Detailed Operation Results..................... ✓...................... ✓
+• Real-Time Progress Tracking.................. ✓...................... ✓
 
-Most shared hosts (Bluehost, SiteGround, HostGator, Hostinger) work perfectly out-of-the-box.
+**SUPPORT & DOCUMENTATION**
+........................................................**Free Version** ......**Pro Version**
+• Comprehensive Manual...................... ✓...................... ✓
+• Multi-Language Interface................... ✓...................... ✓
+• In-Dashboard Help & Tooltips............ ✓...................... ✓
 
-= How do I migrate from WP Rocket or UpdraftPlus? =
+The free version is fully functional and sufficient for most sites. Pro unlocks automation, advanced safety features, and enterprise-level optimization tools.
 
-**Migration is simple:**
+= How often should I optimize my database? =
 
-**From WP Rocket:**
-1. Enable Optimal State caching (Performance tab)
-2. Configure similar settings (lazy load, heartbeat, etc.)
-3. Test your site speed in Incognito mode
-4. Once satisfied, **deactivate and delete WP Rocket**
-5. Save $$ on renewal
+It depends on your site activity:
 
-**From UpdraftPlus:**
-1. Keep UpdraftPlus active temporarily
-2. Create first backup with Optimal State (Backups tab)
-3. Verify backup integrity (download and inspect)
-4. Once confident, **deactivate and delete UpdraftPlus**
-5. Save $$ on Premium
+* **High-traffic blogs** (10+ posts/day, heavy comments): Weekly
+* **E-commerce stores** (active orders, heavy traffic): Weekly  
+* **Membership sites** (frequent user activity): Bi-weekly
+* **Standard blogs** (occasional posts): Monthly
+* **Brochure/static sites** (minimal changes): Quarterly
 
-**Pro tip**: Run both plugins in parallel for 1-2 weeks before fully migrating.
+The health score dashboard provides real-time guidance - if your score drops below 70, it's time to optimize. Pro users can schedule automatic maintenance to run during low-traffic hours (e.g., 2 AM daily).
 
-= Can I use Search & Replace to change my domain? =
+**Warning signs you need optimization:**
+* Admin dashboard loads slowly
+* Health score below 70
+* Autoload size over 800KB
+* 500+ post revisions
+* Table overhead over 5%
 
-**Yes, this is a primary use case.** Search & Replace is perfect for:
-- **Domain changes** (http://oldsite.com → https://newsite.com)
-- **Protocol changes** (http:// → https://)
-- **File path updates** after server migration
-- **Bulk content changes**
+= Is my data sent to external servers? =
 
-**Critical steps:**
-1. Create a manual backup first
-2. Run in **Dry Run mode** to preview changes
-3. Review results carefully
-4. Execute only if results look correct
-5. Test your site thoroughly after execution
+**No tracking or data collection.** Optimal State operates entirely on your server with two optional exceptions:
 
-**Warning**: This is a powerful tool. Mistakes cannot be undone except by backup restoration. Available in Pro version only.
+1. **PageSpeed Insights** (optional) - When you manually request a performance analysis, your site URL is sent to Google's PageSpeed API for evaluation. This only happens when you click "Run Audit" - never automatically.
 
-= Does this plugin collect any data? =
+2. **GTranslate Widget** (optional) - The admin interface includes a translation widget that loads from cdn.gtranslate.net to help non-English speakers. This is cosmetic only and doesn't affect plugin functionality.
 
-**No tracking, no phone-home.** Optimal State operates **100% on your server**. The only external connection is to **Google's PageSpeed Insights API**, and only when you manually click "Run Audit" in the Statistics tab. We collect **zero usage data, statistics, or personal information**.
+No usage statistics, analytics, or telemetry data is ever collected or transmitted. All optimization operations happen locally on your WordPress database.
 
-= My health score is low: What should I do? =
+= Will this plugin conflict with my caching plugin? =
 
-**Follow this optimization workflow:**
+It depends on the plugin:
 
-1. **Refresh Analysis** (Optimize tab) - Ensure score is current
-2. **Create Backup** (Backups tab) - Safety first
-3. **Run One-Click Optimization** - Handles most issues automatically
-4. **Check Score Again** - Should improve 20-40 points
-5. **If still low (<70)**, review Statistics tab for specific problems:
-   - High overhead? → Optimize Tables (Advanced tab)
-   - Many revisions? → Run targeted revision cleanup
-   - Large autoload? → Optimize Autoload (Pro, Advanced tab)
-6. **Schedule Regular Maintenance** - Prevent future degradation
+**Compatible:**
+* Object cache plugins (Redis, Memcached) - Actually complement each other
+* CDN services (Cloudflare, BunnyCDN) - Work together seamlessly
+* Litespeed Cache (if you disable Optimal State's page caching)
 
-Most sites reach **80-95 health score** after first optimization.
+**May Conflict:**
+* WP Rocket - Both provide page caching; choose one
+* WP Super Cache - Both provide page caching; choose one
+* W3 Total Cache - Both provide page caching; choose one
+* Swift Performance - Both provide page caching; choose one
 
-= What if I need help or something breaks? =
+If you're already using a premium caching plugin you're happy with, simply disable Optimal State's caching features and use it exclusively for database optimization and backups. The features are modular - use what you need.
 
-**Support options by version:**
+= Can I use this on WordPress Multisite? =
 
-**Preview Version**: Comprehensive User Manual tab within plugin interface
+No, Optimal State is designed specifically for single-site installations. Running database optimization operations across an entire multisite network would be risky and could affect multiple sites simultaneously. We intentionally block activation on multisite to prevent data integrity issues.
 
-**Free Version**: User manual + Community support via WordPress.org forums
+For multisite networks, we recommend using network-appropriate tools designed for that architecture.
 
-**Pro Version**: 
-- User manual
-- Priority email support (24-48 hour response)
-- Detailed troubleshooting assistance
+= Does this require coding knowledge? =
 
-When contacting support, include:
-- WordPress version
-- PHP version
-- Hosting provider
-- Error messages
-- Steps to reproduce issue
+No. Optimal State is designed for users of all skill levels:
 
-[__Contact Support__](https://payhip.com/optistate/contact)
+* **One-click operations** for most common tasks
+* **Visual dashboard** with real-time health scoring
+* **Clear explanations** for every feature
+* **Built-in user manual** with step-by-step guides
+* **Confirmation dialogs** before destructive actions
+* **Undo capability** via automatic backups
 
-= Can I test this on a staging site first? =
+Advanced users will appreciate features like regex search & replace, database structure analysis, and custom SQL optimization, but these are optional. Most users simply click "Optimize Database" monthly and enjoy the performance improvements.
 
-**Highly recommended!** If your hosting provides a staging environment (WP Engine, Kinsta, SiteGround), we suggest:
-1. Clone your production site to staging
-2. Install and test Optimal State on staging
-3. Run full optimization workflow
-4. Test thoroughly (check all pages, forms, checkout, etc.)
-5. If everything works perfectly, deploy to production
+= What happens if a restore fails mid-process? =
 
-This is **best practice for any database optimization plugin**, not just Optimal State.
+Optimal State uses a sophisticated safety system:
 
-= Does Optimal State work with page builders? =
+1. **Temporary table method** - Restored data goes into temporary tables first
+2. **Validation check** - Data is verified before becoming live
+3. **Atomic swap** - Old tables are renamed, new tables activated in one transaction
+4. **Emergency rollback** - If anything fails, the system automatically reverts
+5. **Maintenance mode** - Visitors see a friendly message during restoration
 
-**Yes, fully compatible** with:
-- **Elementor** (most popular, extensively tested)
-- **Divi** (works perfectly with Divi's caching)
-- **Beaver Builder**
-- **WPBakery**
-- **Oxygen Builder**
-- **Bricks Builder**
-- **Gutenberg** (native WordPress block editor)
+If the worst happens (power failure, server crash during restore), the original tables remain untouched with an `optistate_old_` prefix. You can either:
 
-Optimal State's caching **respects page builder content updates** and automatically purges cache when you edit pages.
+* Contact support for guided recovery (Pro users)
+* Use the manual recovery instructions in the User Manual
+* Ask your hosting provider to drop the temp tables and rename the old ones back
 
-= What's your refund policy? =
+The plugin is designed so that total data loss is virtually impossible - there's always a recovery path.
 
-The **Preview version is free**—no purchase necessary. For **paid versions** (Pro), we offer a **14-day money-back guarantee**. If Optimal State doesn't meet your expectations, contact support within 14 days for a full refund, no questions asked.
+= How much disk space will I save? =
+
+Results vary dramatically based on site age and maintenance history:
+
+**Typical Results:**
+* **New sites** (<6 months): 5-15% space savings
+* **Medium sites** (1-3 years): 15-35% space savings
+* **Neglected sites** (3+ years, never optimized): 40-70% space savings
+
+**Largest gains come from:**
+* Deleting thousands of post revisions
+* Purging spam comments (some sites have 50,000+)
+* Removing orphaned metadata
+* Defragmenting tables (recovers "overhead")
+* Cleaning WooCommerce session data
+
+One user reported recovering 1.7GB from a 3GB database (60% reduction) on a site that had never been optimized. View detailed statistics to know how many items will be cleaned up.
+
+= Can I schedule automatic optimization? =
+
+Yes (Pro feature). The automation system includes:
+
+* **Flexible scheduling** - Daily, weekly, or monthly intervals
+* **Custom time selection** - Run during low-traffic hours (e.g., 2 AM)
+* **Email notifications** - Receive reports after each run
+* **Combined operations** - Backup + Optimize in one job
+* **Safety backups** - Automatic backup before each scheduled optimization
+
+Most Pro users set weekly optimization at 2 AM Sunday with email confirmations. This "set and forget" approach keeps databases healthy without manual intervention.
+
+= Does this work with managed WordPress hosting? =
+
+Yes, but with platform-specific considerations:
+
+**Fully Compatible (All Features):**
+* SiteGround
+* Bluehost
+* HostGator
+* DreamHost
+* A2 Hosting
+* InMotion Hosting
+* Most cPanel/traditional hosting
+
+**Database Features Only (Disable Page Caching):**
+* **WP Engine** - Database optimization, backups, and cleanup work perfectly. Disable Optimal State's page caching (WP Engine has mandatory server-level caching). Browser caching rules also conflict with WP Engine's system.
+* **Kinsta** - Database optimization, backups, and cleanup work perfectly. Disable Optimal State's page caching (Kinsta uses FlyCache and edge caching). The Kinsta MU plugin handles caching automatically.
+* **Flywheel** - Database optimization, backups, and cleanup work perfectly. Disable Optimal State's page caching (Flywheel uses FlyCache). You may need to enable WP_CACHE in Flywheel's dashboard to use other optimization features.
+
+**Requires Testing:**
+* **Pantheon** - Database operations work; caching may require custom configuration
+* **WordPress.com Business/eCommerce** - Limited plugin access; test thoroughly in staging
+* **Cloudways** - Works well; may need to coordinate cache clearing with platform cache
+
+**Why the restrictions?**
+Managed WordPress hosts implement their own server-level caching (WP Engine uses proprietary caching, Kinsta uses FlyCache + Cloudflare edge caching, Flywheel uses FlyCache). Running multiple page caching systems simultaneously causes conflicts and can actually slow down your site. 
+
+**Recommended approach for managed hosting:**
+1. Keep Optimal State's database optimization, backup, and performance features active
+2. Disable "Server-Side Page Caching" in Optimal State's Performance Features
+3. Use the host's native caching system for page caching
+4. Browser caching rules may need to be disabled on some platforms
+
+The database optimization, backup, Search & Replace, and cleanup features work universally across all hosting providers.
+
+= How do I migrate my site to a new domain? =
+
+Follow this workflow:
+
+1. **Create a backup** on the old site
+2. **Download the backup file** (.sql.gz)
+3. **Install WordPress** on the new domain
+4. **Install Optimal State** on the new site
+5. **Upload & restore** the backup
+6. **Use Search & Replace** to change URLs:
+   * Search: `https://olddomain.com`
+   * Replace: `https://newdomain.com`
+   * Enable "Dry Run" to preview changes
+   * Execute replacement
+7. **Clear all caches**
+8. **Test thoroughly**
+
+The Search & Replace feature handles serialized PHP data correctly, which is critical for WordPress migrations.
+
+= What PHP and WordPress versions are required? =
+
+**Minimum Requirements:**
+* WordPress 5.5 or higher
+* PHP 7.4 or higher
+* MySQL 5.6+ or MariaDB 10.1+
+* 128 MB PHP memory limit (256 MB recommended)
+
+**Recommended Setup:**
+* WordPress 6.4+
+* PHP 8.1 or 8.2
+* MySQL 8.0+ or MariaDB 10.6+
+* 256 MB PHP memory limit
+
+The plugin uses modern PHP features for performance and security. If you're still on PHP 7.3 or earlier, contact your host about upgrading - outdated PHP versions are a security risk.
+
+= Does this plugin support translations? =
+
+Yes, Optimal State is translation-ready with:
+
+* All strings wrapped in translation functions
+* POT file included for translators
+* Text domain: `optistate`
+* RTL language support
+* GTranslate widget for admin interface (optional)
+
+**Currently Available:**
+* English (native)
+
+To contribute a translation, contact us through the support page. We offer free Pro licenses to community translators.
+
+= Where are backups stored? =
+
+Backups are stored in your WordPress uploads directory:
+
+**Location:** `/wp-content/uploads/optistate/db-backups/`
+
+**Security Features:**
+* `.htaccess` file blocks direct web access
+* Index file prevents directory listing
+* Files named with timestamps: `BACKUP-YYYY-MM-DD_random-string.sql.gz`
+* Directory permissions set to 755
+
+**Important Notes:**
+* For off-site redundancy, download critical backups via the admin interface
+* Pro users can store up to 10 backups; free version keeps 1 (rotates automatically)
+
+If your hosting plan has limited disk space, monitor backup folder size. A 500MB database creates roughly 100MB compressed backups.
+
+= Can I import backups from cPanel or phpMyAdmin? =
+
+Yes (Pro feature). The "Restore Database from File" feature accepts standard MySQL dump files created by:
+
+* cPanel backup wizard
+* phpMyAdmin export
+* MySQL command line (`mysqldump`)
+* Other backup plugins (UpdraftPlus, BackWPup, etc.)
+
+**Supported formats:**
+* Plain SQL (.sql)
+* GZIP compressed (.sql.gz, .gz)
+* Must be database-only (not full site backups)
+
+**Import process:**
+1. Navigate to Backups tab
+2. Click "Choose Backup File"
+3. Select your .sql or .sql.gz file
+4. Plugin validates structure
+5. Confirm restoration
+6. Automatic safety backup created
+7. Import executes with progress tracking
+
+The restore engine automatically handles common compatibility issues like DEFINER statements and table prefix mismatches.
+
+= What is the Health Score based on? =
+
+The proprietary health scoring algorithm (0-100 scale) analyzes three categories:
+
+**Performance (40% weight):**
+* Autoload data size (should be <800KB)
+* Table fragmentation/overhead
+* Expired transients count
+
+**Cleanliness (35% weight):**
+* Junk content (revisions, spam, trash)
+* Orphaned metadata
+* WooCommerce/plugin bloat
+
+**Efficiency (25% weight):**
+* Index-to-data ratio
+* Total table count
+* Empty taxonomy terms
+
+**Score Interpretation:**
+* **90-100** - Excellent, fully optimized
+* **70-89** - Good, minor optimization recommended
+* **50-69** - Fair, optimization needed soon
+* **30-49** - Poor, optimize immediately
+* **0-29** - Critical, database needs urgent attention
+
+Most sites start at 40-60 before optimization and reach 85-95 after cleanup. The score updates in real-time based on current database state.
+
+= Is there a staging/development mode? =
+
+While there's no specific "staging mode" toggle, Optimal State is safe for development environments:
+
+**Recommended workflow:**
+1. Test all operations on staging first
+2. Create backup before deployment
+3. Deploy to production
+4. Verify health score
+5. Run optimization if needed
+
+**Development-friendly features:**
+* Search & Replace with dry run (perfect for localhost → staging → production)
+* Export/import settings (sync configuration across environments)
+* Manual backup before risky operations
+* Full activity logging
+
+Many developers use Optimal State to keep staging databases lean - production databases often accumulate bloat that you don't want in staging copies.
+
+= How can I contribute or request features? =
+
+We actively develop based on user feedback:
+
+**Feature Requests:**
+1. Visit the [Support Page](https://payhip.com/optistate/contact)
+2. Describe your use case and desired feature
+3. We evaluate all requests for future releases
+
+**Bug Reports:**
+* Include WordPress version, PHP version, and error messages
+* Describe steps to reproduce
+* Screenshots are helpful
+* Priority support for Pro users
+
+**Contributing Code:**
+* We're exploring open-source collaboration for future versions
+* Contact us to discuss potential contributions
+
+Many current features (WooCommerce optimization, Action Scheduler cleanup, mobile caching) were implemented based on user suggestions. Your feedback shapes the product roadmap.
+
+= What support is available? =
+
+**Free Version:**
+* WordPress.org support forums
+* Built-in user manual (comprehensive documentation)
+* FAQ section (this page)
+* Community support
+
+**Pro Version:**
+* Priority email support (24-48 hour response)
+* Advanced troubleshooting assistance
+* Migration guidance
+* Configuration recommendations
+* Direct developer contact
+
+Most questions are answered in the built-in User Manual, which includes:
+* Feature explanations
+* Step-by-step tutorials
+* Troubleshooting guides
+* Best practices
+* Technical deep dives
+
+The manual is searchable, and you can download it to access it offline.
 
 == Screenshots ==
 

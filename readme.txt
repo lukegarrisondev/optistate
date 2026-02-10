@@ -347,7 +347,7 @@ Many WooCommerce stores see dramatic performance improvements after cleanup, esp
 • Optimize Autoloaded Options........ ✗...................... ✓
 • Database Structure Analysis.......... ✓...................... ✓
 • MySQL Index Manager.................... ✗...................... ✓
-• Referential Integrity Scanner.......... ✗...................... ✓
+• Referential Integrity Scanner.......... ✓...................... ✓
 • Database Search & Replace........... ✗...................... ✓
 • Delete Unused Tables..................... ✗...................... ✓
 

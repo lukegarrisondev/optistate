@@ -47,6 +47,7 @@ Know exactly when your database needs attention with our proprietary health scor
 - **Referential Integrity Scanner** - Finds and removes database rows that point to content that no longer exists.
 - **MySQL Index Manager** - Scans your database for missing high-impact indexes and fixes them (Pro)
 - **Database Structure Analysis** - Detailed insights into table sizes, indexes, and optimization opportunities
+- **Remove Old Plugin Data** - Get rid of leftover traces from uninstalled plugins
 - **Delete Unused Tables** - Remove leftover tables from deleted plugins (Pro)
 
 **💾 Enterprise-Grade Backup & Restore**
@@ -341,7 +342,7 @@ Many WooCommerce stores see dramatic performance improvements after cleanup, esp
 • One-Click Optimization................... ✓...................... ✓
 • Database Health Score................... ✓...................... ✓
 • Database Statistics.......................... ✓...................... ✓
-• Detailed Cleanup (18 types)............ ✓...................... ✓
+• Detailed Cleanup (20 types)............ ✓...................... ✓
 • Optimize All Tables.......................... ✓...................... ✓
 • Analyze & Repair Tables................. ✗...................... ✓
 • Optimize Autoloaded Options........ ✗...................... ✓
@@ -349,6 +350,7 @@ Many WooCommerce stores see dramatic performance improvements after cleanup, esp
 • MySQL Index Manager.................... ✗...................... ✓
 • Referential Integrity Scanner.......... ✓...................... ✓
 • Database Search & Replace........... ✗...................... ✓
+• Legacy Plugin Data Scanner.......... ✗...................... ✓
 • Delete Unused Tables..................... ✗...................... ✓
 
 **AUTOMATION FEATURES**

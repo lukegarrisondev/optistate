@@ -30,7 +30,7 @@ One optimized codebase instead of 4+ conflicting plugins means faster load times
 Stop paying for separate plugins like WP Rocket, UpdraftPlus Premium, WP-Optimize Premium, Perfmatters, and Loginizer. Get everything in one place and eliminate subscription fatigue.
 
 🎯 **Database Optimization That Actually Works**
-Unlike basic cleaners, Optimal State performs deep optimization: table defragmentation, autoload optimization, corruption repair, and intelligent cleanup of 18+ data types.
+Unlike basic cleaners, Optimal State performs deep optimization: table defragmentation, autoload optimization, corruption repair, and intelligent cleanup of 20 data types.
 
 📊 **Real-Time Health Monitoring**
 Know exactly when your database needs attention with our proprietary health scoring algorithm—no guesswork, just data-driven optimization.
@@ -40,14 +40,14 @@ Know exactly when your database needs attention with our proprietary health scor
 **🗄️ Database Optimization & Cleanup**
 - **One-Click Optimization** - Comprehensive cleanup in seconds
 - **Real-Time Health Score** - Visual dashboard showing database efficiency (0-100 scale)
-- **18 Cleanup Types** - Post revisions, spam comments, transients, orphaned data, trashed items, auto-drafts, expired transients, oEmbed cache, WooCommerce sessions, Action Scheduler logs, and more
+- **20 Cleanup Types** - Post revisions, spam comments, transients, orphaned data, trashed items, auto-drafts, expired transients, oEmbed cache, WooCommerce sessions, Action Scheduler logs, and more
 - **Table Optimization** - Defragment and compact all database tables
 - **Autoload Optimization** - Reduce autoloaded data for faster page loads (Pro)
 - **Table Repair & Analysis** - Fix corrupted tables automatically (Pro)
-- **Referential Integrity Scanner** - Finds and removes database rows that point to content that no longer exists.
+- **Referential Integrity Scanner** - Finds and removes database rows that point to content that no longer exists
 - **MySQL Index Manager** - Scans your database for missing high-impact indexes and fixes them (Pro)
 - **Database Structure Analysis** - Detailed insights into table sizes, indexes, and optimization opportunities
-- **Remove Old Plugin Data** - Get rid of leftover traces from uninstalled plugins
+- **Remove Old Plugin/Themes Data** - Get rid of leftover traces from uninstalled plugins and themes
 - **Delete Unused Tables** - Remove leftover tables from deleted plugins (Pro)
 
 **💾 Enterprise-Grade Backup & Restore**
@@ -246,23 +246,28 @@ Most users see a 20-40% improvement in admin dashboard speed and database query 
 
 = What types of data does the cleanup remove? =
 
-Optimal State safely removes 18 different types of database bloat:
+Optimal State safely removes 20 different types of database bloat:
 
 **Content Cleanup:**
 * Post revisions (keeps latest version)
 * Auto-drafts and abandoned content
 * Trashed posts and pages
 * Orphaned post metadata
+* Duplicate Post Meta
 
 **Comment Cleanup:**
 * Spam comments
 * Trashed comments  
+* Duplicate Comment Meta
 * Orphaned comment metadata
-* Unapproved comments (optional)
+* Orphaned User Meta
+* Unapproved comments
 * Pingbacks and trackbacks
 
 **System Cleanup:**
+* Action Logs
 * Expired transients
+* Empty Taxonomies
 * oEmbed cache data
 * Orphaned term relationships
 * Duplicate metadata entries
@@ -350,7 +355,7 @@ Many WooCommerce stores see dramatic performance improvements after cleanup, esp
 • MySQL Index Manager.................... ✗...................... ✓
 • Referential Integrity Scanner.......... ✓...................... ✓
 • Database Search & Replace........... ✗...................... ✓
-• Legacy Plugin Data Scanner.......... ✗...................... ✓
+• Legacy Plugin Data Scanner........... ✓...................... ✓
 • Delete Unused Tables..................... ✗...................... ✓
 
 **AUTOMATION FEATURES**
@@ -757,6 +762,10 @@ The manual is searchable, and you can download it to access it offline.
 == Changelog ==
 
 = 1.2.1 - February 2026 =
+**New Feature: Legacy Plugin Data Scanner**
+* Detects data left behind by plugins/themes you have uninstalled
+* Includes accurate security measures to avoid false positives
+* The most powerful and comprehensive tool available in this category
 **Database Restore System Refinements:**
 * Full disabling on WordPress Multisite installations
 * Enhanced efficiency of several core functions
@@ -795,7 +804,7 @@ The manual is searchable, and you can download it to access it offline.
 
 = 1.1.9 - January 2026 =
 * Added comprehensive user manual with detailed feature explanations
-* Expanded cleanup operations to 18 distinct types
+* Expanded cleanup operations to 20 distinct types
 * Improved performance metrics display with Core Web Vitals
 * Enhanced toast notification system with detailed operation results
 * Replaced remote Font Awesome dependency with local Dashicons for faster loading

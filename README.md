@@ -5,7 +5,7 @@ Tags: optimization, speed, database, caching, performance
 Requires at least: 5.5
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -760,6 +760,19 @@ The manual is searchable, and you can download it to access it offline.
 11. User Manual with detailed descriptions and explanations of each feature
 
 == Changelog ==
+
+= 1.2.2 - February 2026 =
+* The JavaScript code has been completely rewritten for better efficiency and reliability.
+* Improved Legacy Plugin Data Scanner for deeper scanning.
+* Expanded the database of plugins and themes detected by Legacy Plugin Data Scanner.
+* Improved the scan depth of the Database Search & Replace functionality.
+* Fixed a bug in the database statistics retrieval that caused an error when refreshing.
+* Optimized the integration of Performance Metrics (PageSpeed) for faster and more accurate reporting.
+* Expanded the capabilities of the Database Structure Analysis tool, which now displays plugin/theme names alongside their corresponding database table names.
+* The Bad Bot Blocker tool has been upgraded and now works perfectly and efficiently on Nginx servers as well.
+* The Login Page Protection tool has been revised to increase its efficiency against massive brute force attacks, while still being completely reliable.
+* The user manual has been updated, expanded, and is now more user-friendly.
+
 
 = 1.2.1 - February 2026 =
 **New Feature: Legacy Plugin Data Scanner**

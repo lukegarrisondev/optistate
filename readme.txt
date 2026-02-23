@@ -1,5 +1,5 @@
-=== Optimal State – Database Cleaner, Speed Optimization & Backup Manager ===
-Plugin Name: Optimal State - Database Cleaning, Performance Optimization, & Backup Suite.
+=== Optimal State – WordPress Cleaner, Optimizer, Caching Engine, Backup Manager & Security Enhancer ===
+Plugin Name: Optimal State - Replaces 5 Plugins: WP-Optimize, WP Rocket, UpdraftPlus, Loginizer, Better Search Replace
 Contributors: lukegarry
 Tags: optimization, speed, database, caching, performance
 Requires at least: 5.5

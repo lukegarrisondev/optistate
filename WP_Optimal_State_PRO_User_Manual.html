@@ -586,10 +586,10 @@ define('FS_METHOD', 'direct');</code></pre>
       <h2 id="ch-4" class="h2title">💾 4. The Database Backup &amp; Restore Manager (Section 1)</h2>
       <p>This is the plugin's most critical feature. It allows you to create, manage, download, and restore your database with a focus on security and integrity.</p>
       <h3 id="ch-4-1" class="h3title">📥 4.1. Creating a Database Backup</h3>
-      <p>The backup process in WP Optimal State PRO relies on a specialized "Chunked Processing Engine." This allows it to back up large databases without timing out or crashing your server.</p>
+      <p>The backup process relies on an asynchronous chunked engine that runs entirely in the background, making it resilient on any hosting environment — including shared hosting with low PHP time limits.</p>
       <ol class="ol-std">
          <li class="li-std">
-            <strong>📊 Maximum Backups to Keep:</strong> This setting (1-10) works as a rolling limit. When a new backup is created that exceeds this limit, the system automatically deletes the <em>oldest</em> file to save disk space.
+            <strong>📊 Maximum Backups to Keep:</strong> This setting (1–10) enforces a rolling limit. After a backup completes, the engine sorts all existing backups by last-modified timestamp (oldest first) and deletes the excess. Only <code>.sql</code> and <code>.sql.gz</code> files are counted — internal <code>SAFETY-RESTORE-*</code> backups created during the restore process are explicitly excluded from this limit.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -599,31 +599,45 @@ define('FS_METHOD', 'direct');</code></pre>
             </ul>
          </li>
          <li class="li-std">
-            <strong>🔄 Create Backup Now Button:</strong> Clicking this starts a secure background process:
+            <strong>🔄 Create Backup Now Button:</strong> Clicking this initializes a secure multi-step background process:
             <ul class="toc-sublist">
-               <li class="li-sm"><strong>🚀 Initialization:</strong> The plugin locks the backup directory and calculates the optimal "chunk size" based on your server's available resources.</li>
-               <li class="li-sm"><strong>📦 Streamed Compression:</strong> Data is read from the database and streamed directly into a compressed <code>.sql.gz</code> file. This method is faster and uses less memory than traditional zip archiving.</li>
-               <li class="li-sm"><strong>🔒 Metadata Locking:</strong> Instead of creating vulnerable sidecar files (like .meta or .txt), the plugin records the backup's precise <strong>file size</strong> and <strong>creation timestamp</strong> directly into a protected internal database table (<code>wp_optistate_backup_metadata</code>).</li>
-               <li class="li-sm"><strong>✅ Integrity Verification:</strong> Finally, the system performs a "Gzip Consistency Check" to ensure the file is valid and readable, confirming that the physical file matches the locked metadata record.</li>
+               <li class="li-sm"><strong>🔒 Collision-Safe Filename:</strong> Each backup filename is suffixed with 14 random hex bytes (<code>random_bytes(7)</code>), making filename collisions statistically impossible. If a file at the target path already exists, the process throws an exception rather than overwriting.</li>
+               <li class="li-sm"><strong>🔑 PID Lock File:</strong> A <code>.lock</code> file is written with the current PHP process ID before any data is touched. If the lock cannot be created, the backup is aborted immediately. This prevents two concurrent backups from writing to the same file.</li>
+               <li class="li-sm"><strong>📋 Table Discovery:</strong> The engine runs <code>SHOW FULL TABLES</code> to enumerate every table, including its type (<code>BASE TABLE</code> vs. <code>VIEW</code>). Internal plugin tables (<code>wp_optistate_processes</code>, <code>wp_optistate_backup_metadata</code>, <code>wp_optistate_login_protect</code>, and any stray <code>optistate_old_*</code> tables) are silently excluded from the backup to avoid self-referential loops.</li>
+               <li class="li-sm"><strong>⚙️ Worker Coordination:</strong> Before processing each chunk, the engine atomically registers itself as the <em>active worker</em> in the process store. If another worker process is already active and has sent a heartbeat within the last 45 seconds, the new worker skips its chunk and exits cleanly, preventing parallel writes to the same file.</li>
+               <li class="li-sm"><strong>📦 Streamed gzip Writing:</strong> Data is written chunk by chunk directly into a <code>.sql.gz</code> file opened in append mode (<code>ab6f</code>), meaning no full SQL file is ever held in memory. If PHP crashes mid-chunk, the partial gzip file is cleaned up on the next request.</li>
+               <li class="li-sm"><strong>🔒 Metadata Storage:</strong> On successful completion, the backup's filename, file size, creation timestamp, and database name are written to the protected <code>wp_optistate_backup_metadata</code> database table. This is intentionally a database table, not a sidecar file — it cannot be tampered with by uploading a file to the backup directory.</li>
+               <li class="li-sm"><strong>✅ SHA-256 Integrity Seal:</strong> A SHA-256 checksum of the completed file is generated and stored separately. Every subsequent action on that backup (download, restore) re-verifies this checksum before proceeding. A failed checksum aborts the action entirely.</li>
             </ul>
          </li>
       </ol>
       <h3 id="ch-4-2" class="h3title">🔧 4.2. Under the Hood: The Backup &amp; Verification Process</h3>
-      <p>The backup mechanism is designed to be <strong>server-timeout proof</strong> using an asynchronous, chunked process. The plugin executes a series of timed AJAX requests, ensuring reliability on any hosting environment.</p>
+      <p>The backup mechanism is <strong>server-timeout proof</strong> using an asynchronous, chunked process. The plugin executes a series of timed AJAX requests, each running for a fixed window before saving state and yielding — ensuring reliability on any hosting environment including aggressively time-limited shared hosts.</p>
       <ol class="ol-std">
-         <li class="li-std"><strong>🔓 Lock File:</strong> When you start a backup, a temporary lock is created to prevent concurrent operations.</li>
-         <li class="li-std"><strong>🏗️ Structure Dump:</strong> The plugin retrieves the <code>SHOW CREATE TABLE</code> command for every table, ensuring the database structure is perfectly preserved.</li>
+         <li class="li-std"><strong>🔓 Concurrency Lock:</strong> When a chunk starts, the engine atomically claims the <code>active_worker</code> slot in the process store with a unique worker ID and a <code>worker_ping</code> timestamp. If another process already holds the slot with a fresh ping (&lt;45 seconds old), the new chunk exits immediately without touching the file. If the existing worker has gone stale, the slot is stolen and processing continues.</li>
          <li class="li-std">
-            <strong>🧠 Adaptive Resource Management (AI Tiering):</strong> Before processing data, the engine scans your server's available resources (CPU cores via <code>shell_exec</code> and PHP Memory Limit). It assigns a <strong>Performance Tier</strong> to optimize speed without crashing:
+            <strong>🧠 Adaptive Resource Tiering:</strong> Before the first chunk, the engine detects your server's available resources (CPU cores via <code>shell_exec</code>, PHP memory limit) and assigns a performance tier that controls how long each chunk runs and how quickly subsequent chunks are scheduled:
             <ul class="toc-sublist">
-               <li class="li-sm"><strong>High Tier:</strong> (High RAM/CPU) Processes 5 chunks per request with short delays.</li>
-               <li class="li-sm"><strong>Medium Tier:</strong> Processes 3 chunks per request.</li>
-               <li class="li-sm"><strong>Low Tier:</strong> (Shared Hosting) Processes 2 chunks with longer cooldowns to prevent resource exhaustion.</li>
+               <li class="li-sm"><strong>High Tier:</strong> High RAM/CPU — longer chunk windows with minimal delays between requests.</li>
+               <li class="li-sm"><strong>Medium Tier:</strong> Standard VPS — balanced chunk windows.</li>
+               <li class="li-sm"><strong>Low Tier:</strong> Shared hosting — short chunk windows with longer cooldowns to avoid triggering resource abuse limits.</li>
             </ul>
          </li>
-         <li class="li-std"><strong>📦 Data Dump (Chunked):</strong> It selects data in batches (<code>SELECT * FROM ... LIMIT ... OFFSET ...</code>) and streams it to the file. The "Chunk Size" is dynamically calculated based on the average row length of each table.</li>
-         <li class="li-std"><strong>✅ Verification:</strong> The plugin generates a secure SHA-256 checksum of the final file and stores it in the <code>wp_optistate_backup_metadata</code> table.</li>
-         <li class="li-std"><strong>🗜 Compression:</strong> The file is compressed using GZIP (or PIGZ if available on the server for multi-core compression) to reduce size by ~80%.</li>
+         <li class="li-std"><strong>🏗️ Structure Dump:</strong> For each table the engine first emits <code>DROP TABLE IF EXISTS</code> followed by the full <code>SHOW CREATE TABLE</code> output (or <code>SHOW CREATE VIEW</code> for views). The AUTO_INCREMENT value is read from <code>SHOW TABLE STATUS</code> and explicitly written into the CREATE statement, ensuring auto-increment counters are preserved exactly. Generated columns are detected and excluded from the column list to avoid restore errors.</li>
+         <li class="li-std">
+            <strong>📐 Pagination Method Selection:</strong> After dumping the structure, the engine examines each table's primary key to choose the safest pagination method:
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>Keyset (primary):</strong> Single numeric PK → <code>WHERE pk &gt; last_seen LIMIT N</code>. Zero drift, no performance degradation at scale.</li>
+               <li class="li-sm"><strong>Unique index fallback:</strong> If no PK exists, the engine scans <code>SHOW INDEX … WHERE Non_unique = 0</code> and uses the first numeric unique column for keyset pagination.</li>
+               <li class="li-sm"><strong>OFFSET fallback:</strong> Composite PKs, non-numeric PKs, or no PK at all → standard <code>LIMIT N OFFSET M</code>, with batch size reduced to 65% of normal to compensate for offset overhead.</li>
+            </ul>
+         </li>
+         <li class="li-std">
+            <strong>📦 Adaptive Batch Sizing &amp; Streaming:</strong> For each table, <code>AVG_ROW_LENGTH</code> is fetched from <code>information_schema</code> (with <code>SHOW TABLE STATUS</code> as fallback) and cached in memory (up to 160 entries) and as a transient (10-minute TTL). The batch limit is calculated as <code>floor(2MB / avg_row_length)</code>, clamped between 10 and 2,000 rows. Rows are buffered in memory up to 2MB, then flushed as a single <code>INSERT INTO … VALUES (…),(…)</code> block directly into the gzip stream. Oversized single rows that exceed the 2MB buffer are flushed individually. Memory usage is monitored every 1,000 rows — if usage exceeds 80% of the PHP memory limit, <code>gc_collect_cycles()</code> is called and the buffer is flushed immediately.
+         </li>
+         <li class="li-std"><strong>📄 phpMyAdmin-Compatible Header &amp; Footer:</strong> The output SQL begins with a full phpMyAdmin-style header (version, host, generation time, server version, database name, charset/collation) and wraps all data in <code>START TRANSACTION … COMMIT</code>. This ensures the file is importable by phpMyAdmin, MySQL CLI, or any standard SQL tool without modification.</li>
+         <li class="li-std"><strong>✅ SHA-256 Checksum:</strong> After all tables are written and the file is finalized, a SHA-256 checksum of the completed gzip file is computed and stored in the <code>wp_optistate_backup_metadata</code> table alongside the filename, file size, database name, and creation timestamp.</li>
+         <li class="li-std"><strong>🗜️ Compression:</strong> Data is written into the gzip stream in real time using PHP's <code>gzopen/gzwrite</code> (level 6 by default). On servers where <code>pigz</code> (parallel gzip) is available and <code>shell_exec</code> is enabled, the decompression step during restore uses pigz for multi-core performance — backup creation always uses the streaming PHP path for safety.</li>
       </ol>
       <h5>Database Connection Refresh During Long Operations</h5>
       <p>For large databases (500MB+), backup/restore operations may exceed the standard connection lifecycle limits. The plugin automatically handles this:</p>
@@ -681,8 +695,8 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
          <li class="li-std">
             <strong>✅ File Integrity:</strong> This is the most important column.
             <ul class="toc-sublist">
-               <li class="li-sm"><strong>✅ File integrity:</strong> The plugin has just performed an on-the-fly checksum of the backup file and confirmed that it <strong>exactly matches</strong> the "fingerprint" saved in the <code>.checksum</code> file. The backup is 100% valid and safe to restore.</li>
-               <li class="li-sm"><strong>⚠️ File integrity:</strong> The live checksum <em>does not</em> match the saved fingerprint. This means the backup file has been modified, truncated, or corrupted since it was created. <strong>🚫 DO NOT RESTORE THIS FILE.</strong> Delete it immediately and create a new backup.</li>
+               <li class="li-sm"><strong>✅ File integrity:</strong> The plugin has re-computed the SHA-256 checksum of the backup file on-the-fly and confirmed it exactly matches the fingerprint stored in the <code>wp_optistate_backup_metadata</code> table at the time of creation. The backup is 100% valid and safe to restore.</li>
+               <li class="li-sm"><strong>⚠️ File integrity:</strong> The live checksum does <em>not</em> match the stored fingerprint. The backup file has been modified, truncated, or corrupted since it was created. <strong>🚫 DO NOT RESTORE THIS FILE.</strong> Delete it immediately and create a new backup.</li>
             </ul>
          </li>
          <li class="li-std">
@@ -694,30 +708,41 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
          <li class="li-std"><strong>🗑️ Delete:</strong> This permanently deletes the backup file and all associated integrity data from your server. A confirmation modal will appear.</li>
          <li class="li-std"><strong>🔄 Restore:</strong> This is the most powerful action. It will <strong>completely replace your current database</strong> with the data from this backup file. Please read the next section <em>carefully</em>.</li>
       </ul>
-      <h3 id="ch-4-4" class="h3title">🛡️ 4.4. The Chunked, 4-Phase Safety Restore)</h3>
-      <p>Restoring a database backup is the most critical operation the plugin performs. To ensure <strong>zero-risk data integrity</strong> against server timeouts, crashes, or corrupted files, the restore is broken down into four transactional, asynchronous phases.</p>
-      <p><strong class="txt-purple">🔐 Phase 1: Preemptive Safety Backup & Validation</strong></p>
+      <h3 id="ch-4-4" class="h3title">🛡️ 4.4. The Chunked, 4-Phase Safety Restore</h3>
+      <p>Restoring a database backup is the most critical operation the plugin performs. To guarantee <strong>zero data loss</strong> against server timeouts, crashes, or corrupted files, the restore is broken into four distinct phases — each resumable, each with its own safety gate.</p>
+
+      <p><strong class="txt-purple">🔐 Phase 1: Pre-Flight Validation &amp; Safety Backup</strong></p>
       <ol class="ol-std">
-         <li class="li-sm"><strong>✅ Validation:</strong> The plugin verifies the selected backup file's SHA-256 checksum against its saved fingerprint. If the file is corrupted or tampered with, the process is aborted.</li>
-         <li class="li-sm"><strong>💾 Safety Backup (Chunked):</strong> A complete, real-time <code>SAFETY-RESTORE-*.sql.gz</code> is created in a reliable, chunked manner. This is your guaranteed rollback point.</li>
-         <li class="li-sm"><strong>🚧 Maintenance Mode:</strong> The site is put into a brief, non-WordPress maintenance mode to prevent data inconsistencies while the database tables are being swapped.</li>
+         <li class="li-sm"><strong>🔒 Global MySQL Advisory Lock:</strong> First of all, the engine acquires a MySQL-level advisory lock (<code>GET_LOCK('optistate_master_restore_global', 5)</code>). This prevents two concurrent restore operations from running simultaneously — even across different browser tabs or server requests. If the lock cannot be acquired within 5 seconds, the restore is refused with a clear error message. A PHP shutdown handler is registered to release this lock automatically if the process crashes.</li>
+         <li class="li-sm"><strong>📄 SQL File Validation:</strong> The restore target file is opened and its first 8KB is scanned for a <code>-- Database: dbname</code> header comment. If the database name in the file does not match your current WordPress database name (compared with <code>hash_equals()</code> to prevent timing attacks), the restore is blocked immediately. This prevents accidentally restoring a backup from a different site.</li>
+         <li class="li-sm"><strong>💾 Automatic Safety Backup:</strong> Before the target database is touched, the plugin creates a complete, real-time <code>SAFETY-RESTORE-{date}.sql.gz</code> backup of your current live database using the same chunked engine described in section 4.2. This backup is your guaranteed rollback point — if anything goes wrong during the restore, it will be used to recover your original data automatically.</li>
+         <li class="li-sm"><strong>✅ Safety Backup Integrity Validation:</strong> After the safety backup completes, the engine verifies it is readable and its gzip stream is valid before proceeding. If the safety backup is missing, smaller than 1KB, or its gzip stream is unreadable, the restore is aborted. A restore that begins without a verified safety backup is never allowed to proceed.</li>
+         <li class="li-sm"><strong>🚧 Maintenance Mode:</strong> Only after the safety backup is verified does the site enter a brief maintenance mode (<code>optistate_maintenance_mode_active</code> option set to <code>true</code>). This blocks new front-end database writes while tables are being swapped. Maintenance mode is always deactivated — even if the restore fails — via the same shutdown handler that releases the advisory lock.</li>
       </ol>
-      <p><strong class="txt-purple">⚙️ Phase 2: Isolated & Chunked Staging</strong></p>
+
+      <p><strong class="txt-purple">⚙️ Phase 2: Staged Import to Temporary Tables</strong></p>
       <ol class="ol-std">
-         <li class="li-sm"><strong>📊 Temporary Tables:</strong> The restore process begins by creating temporary tables (e.g., <code>optistate_temp_wp_posts</code>) instead of directly overwriting your live tables.</li>
-         <li class="li-sm"><strong>📦 Chunked Import:</strong> The backup file is imported asynchronously. The script runs for ~25 seconds, imports a chunk of SQL data into the temporary tables, saves the file position, and initiates the next request. This process runs until the entire backup is staged.</li>
+         <li class="li-sm"><strong>🗄️ Shadow Table Naming:</strong> Every <code>CREATE TABLE</code> statement in the backup is rewritten on-the-fly by the SQL parser to target a shadow table instead of the live table. For example, <code>wp_posts</code> becomes <code>optistate_temp_wp_posts_{hash}</code>. Your live tables are never touched during the import phase.</li>
+         <li class="li-sm"><strong>📦 Chunked Streaming Import:</strong> The backup file is parsed and executed asynchronously. Each AJAX chunk runs for approximately 18 seconds, processes as many SQL statements as possible, commits its transaction, saves the file pointer position, and initiates the next request. If the server times out, the next request resumes from the exact byte offset where the previous one stopped — nothing is lost or re-executed.</li>
+         <li class="li-sm"><strong>🏗️ Deferred Index Building:</strong> When a <code>CREATE TABLE</code> statement is parsed, the engine strips secondary indexes from the <code>CREATE</code> statement and stores the corresponding <code>ALTER TABLE … ADD INDEX</code> queries separately. The table is created with only its primary key, all data is inserted at full speed (no index maintenance overhead), and the indexes are built in a single pass after the data is loaded. This mirrors what professional database import tools like <code>mysqldump --disable-keys</code> achieve.</li>
+         <li class="li-sm"><strong>🔒 Charset &amp; Collation Safety:</strong> Before the first statement executes, the engine reads the current database charset and compares it against the backup's charset (detected from the backup's <code>SET NAMES</code> header). A <code>utf8mb4</code> backup into a <code>utf8</code> database is blocked with a clear error: this would cause data corruption (emoji and 4-byte characters would be silently truncated). A <code>utf8</code> backup into a <code>utf8mb4</code> database is allowed and handled correctly.</li>
+         <li class="li-sm"><strong>🛡️ Statement Security Filter:</strong> Every SQL statement passes through a whitelist filter before execution. Statements that are blocked regardless of file source include: <code>SET GLOBAL</code>, <code>SET USER</code>, <code>GTID_NEXT/GTID_PURGED</code>, <code>CREATE PROCEDURE/FUNCTION/TRIGGER/EVENT</code>, <code>CREATE DATABASE</code>, <code>USE dbname</code>, and <code>LOCK TABLES/UNLOCK TABLES</code>. This ensures a maliciously crafted backup file cannot escalate privileges or alter server-level settings.</li>
+         <li class="li-sm"><strong>🔁 Connection Resilience:</strong> Every 100 queries the engine sends a <code>SELECT 1</code> heartbeat. If the connection has gone stale (MySQL <code>wait_timeout</code> disconnection), the engine automatically reconnects, re-applies all session settings, and resumes without loss. If the statement that failed was an INSERT, the transaction is reopened and the statement is retried.</li>
       </ol>
-      <p><strong class="txt-purple">🔍 Phase 3: Critical Data Verification</strong></p>
+
+      <p><strong class="txt-purple">🔍 Phase 3: Staged Table Verification</strong></p>
       <ul class="ul-std">
-         <li class="li-sm"><strong>✨ Sanity Check:</strong> The plugin performs a fast check on the temporary tables to ensure key WordPress tables exist. It recognizes custom table prefixes by verifying that the table names end with the standard WordPress core suffixes (e.g., <code>_options</code>, <code>_posts</code>, <code>_users</code>), ensuring compatibility with any WordPress installation.</li>
+         <li class="li-sm"><strong>✨ Core Table Existence Check:</strong> The engine confirms that temporary tables for <code>*_options</code>, <code>*_posts</code>, and <code>*_users</code> were all created successfully (matched by suffix to support any non-standard table prefix).</li>
+         <li class="li-sm"><strong>📊 Data Integrity Checks:</strong> The temporary <code>*_options</code> table is checked for: a non-empty row count, the presence of the <code>siteurl</code> option, all four required columns (<code>option_id</code>, <code>option_name</code>, <code>option_value</code>, <code>autoload</code>), and an intact <code>PRIMARY KEY</code>. A backup that passes structure validation but has an empty or structurally invalid options table is rejected before the atomic swap.</li>
       </ul>
-      <p><strong class="txt-purple">⚡ Phase 4: Atomic Swap & Rollback Guarantee</strong></p>
+
+      <p><strong class="txt-purple">⚡ Phase 4: Atomic Swap &amp; Instant Rollback Guarantee</strong></p>
       <ol class="ol-std">
-         <li class="li-sm"><strong>🔄 Atomic Transaction:</strong> The swap is executed as a single, all-or-nothing database transaction. The live tables are instantly renamed to `_old` and the temporary tables are renamed to the live prefix.</li>
-         <li class="li-sm"><strong>🛟 Safety Rollback:</strong> If the atomic transaction fails (or if a fatal PHP error occurs), the database engine automatically rolls back all renames. Furthermore, the script is guaranteed to trigger an asynchronous rollback to the `SAFETY-RESTORE` backup created in Phase 1, ensuring zero data loss.</li>
+         <li class="li-sm"><strong>🔄 Atomic RENAME TABLE:</strong> The swap is executed as a single <code>RENAME TABLE</code> statement that renames all live tables to <code>optistate_old_*</code> and all temporary tables to the live names simultaneously. MySQL guarantees this operation is atomic — either all renames succeed, or none do. There is no moment when your live tables are missing or partially replaced. Table names longer than 64 characters are automatically handled with a hash-based truncation strategy.</li>
+         <li class="li-sm"><strong>🔴 Instant Rollback Map:</strong> Immediately before executing the RENAME, the engine writes a map of <code>live_table → optistate_old_table</code> pairs to the process store. If anything fails after the swap — including a PHP fatal error, memory exhaustion, or server crash — a subsequent request can call <code>perform_rollback()</code> which executes a reverse atomic RENAME to restore the original tables. This rollback itself is wrapped in a transaction, so it either succeeds completely or leaves the <code>optistate_old_*</code> tables intact for manual recovery.</li>
+         <li class="li-sm"><strong>🧹 Post-Swap Cleanup:</strong> On successful swap, deferred indexes are applied to the now-live tables, the <code>optistate_old_*</code> tables are dropped, the safety backup file is deleted (it's no longer needed), and maintenance mode is deactivated. <code>wp_cache_flush()</code> is called to ensure no stale object cache entries survive the restored data.</li>
       </ol>
-      <p>Upon successful completion, the old tables are cleaned up, the safety backup is deleted, and maintenance mode is deactivated.</p>
-      <p>This "Safety Restore" mechanism is your ultimate protection against a failed restore process, which could otherwise leave your site in a broken, half-restored state.</p>
+      <p>This architecture means that at no point during a restore operation is your site left in an undefined state. Either you have your original data, the restored data, or (in the rare event of a catastrophic failure) an automatic revert to the safety backup created in Phase 1.</p>
       <h3 id="ch-4-5" class="h3title">📤 4.5. How to Restore Database from an Uploaded File</h3>
       <p>This feature is designed to upload a <code>.sql</code> or <code>.sql.gz</code> file. You can upload a compressed backup downloaded from this plugin or an export from phpMyAdmin.</p>
       <blockquote class="niceblock">
@@ -733,23 +758,28 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
          <li class="li-std"><strong>⏳ Execution:</strong> The time required to complete the restore will vary significantly depending on both the size of the database and the available server resources (<strong>from a few seconds to 30-60 minutes</strong>).</li>
       </ol>
       <h3 id="ch-4-6" class="h3title">🔒 4.6. Security-First: The Upload Validation Process</h3>
-      <p>When you upload a <code>.sql</code> or <code>.sql.gz</code> file, it undergoes a rigorous security scan <em>before</em> it is ever used.</p>
+      <p>When you upload a <code>.sql</code> or <code>.sql.gz</code> file, it undergoes a rigorous multi-step security scan <em>before</em> it is ever used. Every check that fails results in the uploaded file being deleted from the server immediately.</p>
       <ol class="ol-std">
-         <li class="li-std"><strong>📄 File Type Check:</strong> Verifies the file extension is <code>.sql</code> or <code>.sql.gz</code>. It also verifies the MIME type (e.g., <code>text/plain</code>, <code>application/sql</code>, <code>application/gzip</code>) to prevent file type spoofing.</li>
-         <li class="li-std"><strong>📏 File Size Check:</strong> Enforces a 5GB maximum file size (Free version: 50MB).</li>
+         <li class="li-std"><strong>📄 Extension &amp; MIME Check:</strong> The file extension must be <code>.sql</code> or <code>.sql.gz</code>. The MIME type (e.g., <code>text/plain</code>, <code>application/sql</code>, <code>application/gzip</code>, <code>application/x-gzip</code>) is also verified independently to prevent file-type spoofing via renamed extensions.</li>
+         <li class="li-std"><strong>📏 File Size Limit:</strong> Enforces a 5GB maximum (Free tier: 50MB). Files exceeding this limit are rejected before decompression.</li>
          <li class="li-std">
-            <strong>🛡️ Malicious Content Scan:</strong> If the file is compressed (<code>.sql.gz</code>), it is first securely decompressed. The plugin then reads the <em>content</em> of the <code>.sql</code> file, scanning for:
+            <strong>🛡️ Content Security Scan:</strong> If the file is compressed, it is first decompressed into a secure temporary path. The plugin reads the SQL content and scans for:
             <ul class="toc-sublist">
-               <li class="li-sm">PHP tags (<code>&lt;?php</code>, <code>&lt;?=</code>)</li>
-               <li class="li-sm">Suspicious functions (<code>eval(</code>, <code>system(</code>, <code>exec(</code>, <code>base64_decode</code>)</li>
+               <li class="li-sm">PHP code injection: <code>&lt;?php</code>, <code>&lt;?=</code></li>
+               <li class="li-sm">Server-side code execution functions: <code>eval(</code>, <code>system(</code>, <code>exec(</code>, <code>base64_decode</code></li>
             </ul>
+            Any match causes immediate rejection and deletion of the upload.
          </li>
-         <li class="li-std"><strong>🗄️ Database Name Check:</strong> The plugin (during the restore phase) reads the header of the SQL file and looks for the <code>-- Database: dbname</code> comment. If the database name in the file does <em>not</em> match your current WordPress database name, the restore is aborted. This is a critical check that prevents you from accidentally restoring a backup from a different website.</li>
+         <li class="li-std"><strong>🗄️ Database Name Verification:</strong> During the restore phase, the SQL file's first 8KB is read and searched for a <code>-- Database: dbname</code> comment (the standard phpMyAdmin export header). If found and the name does not match your current WordPress database name, the restore is blocked. The comparison uses <code>hash_equals()</code> (constant-time comparison) to prevent timing-based enumeration of your database name. A random microsleep of 3–18ms is also inserted at this check point to further frustrate automated probing.</li>
+         <li class="li-std">
+            <strong>📋 WordPress Table Structure Validation:</strong> Beyond the database name check, the validator scans up to 5,000 SQL statements looking for <code>CREATE TABLE</code> or <code>INSERT INTO</code> statements targeting tables with the core WordPress suffixes (<code>_options</code>, <code>_posts</code>, <code>_users</code>). A file that passes the MIME and size checks but contains no recognizable WordPress tables is rejected as "not a valid SQL database backup."
+         </li>
       </ol>
-      <p>If any of these checks fail, the file is deleted, and the restore is aborted.</p>
+      <p>If any of these checks fail, the file is deleted from the server and the restore is aborted with a specific error message identifying which check failed.</p>
       <div class="rec-box">
-         <strong>🛑 FALSE POSITIVES</strong> (security risks detected)<br> In some cases, the security scan may detect issues that do not pose a real threat.<br>
-         If you are sure that your backup is secure, select <span class="txt-992729">Disable Restore Security Checks</span> just below the database upload function in section 1.1. 
+         <strong>🛑 FALSE POSITIVES</strong> (security risks detected)<br>
+         In some cases, the security scan may flag content that is not actually dangerous — for example, a plugin whose settings contain base64-encoded data stored in <code>wp_options</code>.<br>
+         If you are certain your backup is from a trusted source, you can select <span class="txt-992729">Disable Restore Security Checks</span> directly below the upload area in Section 1.1.
       </div>
       <h3 id="ch-4-6-1" class="h3title">🚨 4.6.1. Emergency Recovery: What Happens When Things Go Wrong</h3>
       <p>WP Optimal State PRO has a sophisticated emergency recovery system that activates during PHP shutdown to prevent database corruption.</p>
@@ -1136,15 +1166,45 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
         <li class="li-std"><strong>Multisite Support:</strong> Includes both network-activated and site-specific plugins in the protected list</li>
     </ul>
       <h3 id="ch-5-5" class="h3title">🎯 5.5. Targeted Optimizations</h3>
-      <p>Located directly under the Database Health Score, this section offers four specialized cleanup tools that target specific areas of database bloat often missed by general cleaners.</p>
+      <p>Located directly under the Database Health Score, this section offers four specialized cleanup tools that target specific areas of database bloat often missed by general cleaners. Each tool uses a multi-pass, JOIN-based approach to find orphaned data through actual referential checks — not just pattern matching.</p>
       <ul class="ul-std">
-         <li class="li-std"><strong>🗓️ Action Logs:</strong> Cleans up completed, failed, and canceled actions from the <code>wp_actionscheduler</code> logs. These tables often grow rapidly (especially with WooCommerce), leaving behind thousands of rows of old log data.</li>
-         <li class="li-std"><strong>🎥 Embed Cache:</strong> Clears cached oEmbed data (like YouTube videos, Tweets, or Spotify tracks) stored in your post meta. This forces WordPress to refresh the external content, which is useful if embeds are broken or outdated.</li>
-         <li class="li-std"><strong>🛒 WooCommerce Cleanup:</strong> Specifically targets WooCommerce bloat by clearing customer sessions and transient logs. This helps reduce the size of the <code>wp_options</code> table in active stores.</li>
-         <li class="li-std"><strong>🏷️ Empty Taxonomies:</strong> Scans for and deletes taxonomy terms (categories, tags, or custom attributes) that are empty (count = 0) and not assigned to any posts or products.</li>
+         <li class="li-std">
+            <strong>🗓️ Action Logs:</strong> Cleans up completed, failed, and canceled entries from the Action Scheduler tables (<code>wp_actionscheduler_actions</code>, <code>_logs</code>, <code>_claims</code>, <code>_groups</code>). These tables grow rapidly on any site using WooCommerce, WP Mail SMTP, or similar plugins.
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>Two-phase deletion:</strong> First removes all finished actions (status <code>complete</code>, <code>failed</code>, <code>canceled</code>) in 2,000-row batches. Then runs a second pass to remove <em>orphaned log, claim, and group rows</em> that point to deleted actions — using <code>LEFT JOIN … IS NULL</code> queries rather than guessing by name or ID range.</li>
+               <li class="li-sm"><strong>Time-aware:</strong> On AJAX requests, the cleaner monitors execution time against your server's <code>max_execution_time</code> limit and stops safely when nearing it, preserving all data processed so far.</li>
+            </ul>
+         </li>
+         <li class="li-std">
+            <strong>🎥 Embed Cache:</strong> Clears oEmbed cache data (YouTube, Spotify, Twitter embeds, etc.) stored in your database. This forces WordPress to re-fetch fresh embed HTML from the source — useful when embeds are broken or displaying outdated previews.
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>Two-table cleanup:</strong> Removes <code>_oembed_*</code> rows from <code>wp_postmeta</code> (per-post embed cache) AND clears matching transient pairs (<code>_transient_oembed_*</code> + <code>_transient_timeout_oembed_*</code>) from <code>wp_options</code>. Most tools only clean one location, leaving the other behind.</li>
+               <li class="li-sm"><strong>Keyset-paginated:</strong> Uses <code>meta_id &gt; last_id</code> / <code>option_id &gt; last_id</code> pagination so cleanup of tens of thousands of rows never stalls or drifts.</li>
+            </ul>
+         </li>
+         <li class="li-std">
+            <strong>🛒 WooCommerce Cleanup:</strong> Runs six targeted passes against WooCommerce-specific bloat in <code>wp_options</code> and the native sessions table. Generic cleanup tools typically miss most of this data.
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>Pass 1 — Expired WC transient pairs:</strong> Finds <code>_transient_timeout_wc_*</code> records whose stored timestamp is in the past, then deletes both the timeout record and its matching <code>_transient_wc_*</code> value in a single query.</li>
+               <li class="li-sm"><strong>Pass 2 — Orphaned WC timeout records:</strong> Removes timeout records that have no matching value entry (LEFT JOIN orphan detection).</li>
+               <li class="li-sm"><strong>Pass 3 — Orphaned WC value records:</strong> Removes value records that have no matching timeout entry.</li>
+               <li class="li-sm"><strong>Pass 4 — Expired session pairs:</strong> Same atomic pair-deletion for <code>_wc_session_expires_*</code> + <code>_wc_session_*</code> records past their expiry timestamp.</li>
+               <li class="li-sm"><strong>Pass 5 — Orphaned session values:</strong> Removes session data with no matching expiry record.</li>
+               <li class="li-sm"><strong>Pass 6 — Native sessions table:</strong> If the <code>wp_woocommerce_sessions</code> table exists, removes expired rows directly from it.</li>
+               <li class="li-sm">Each pass runs in 2,000-row batches with a 20ms pause between batches to avoid locking the options table under load.</li>
+            </ul>
+         </li>
+         <li class="li-std">
+            <strong>🏷️ Empty Taxonomies:</strong> Scans for and removes taxonomy terms that have a count of 0 and are not assigned to any content. Unlike simpler tools that just delete any zero-count term, this cleaner first classifies all taxonomies into three buckets:
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>Registered taxonomies</strong> (e.g., <code>category</code>, <code>post_tag</code>, custom plugin taxonomies): Deleted using <code>wp_delete_term()</code> — the correct WordPress API call that fires all hooks, updates counts, and cleans relationships correctly.</li>
+               <li class="li-sm"><strong>Unregistered taxonomies with active relationships</strong> (from deactivated but not uninstalled plugins): <strong>Skipped entirely</strong> to avoid breaking live data.</li>
+               <li class="li-sm"><strong>Orphan taxonomies</strong> (unregistered AND with no relationships): Deleted via direct SQL since <code>wp_delete_term()</code> cannot process unknown taxonomies. Cleans <code>term_relationships</code>, <code>term_taxonomy</code>, <code>terms</code>, and <code>termmeta</code> in one pass. After cleanup, <code>wp_update_term_count_now()</code> is called on all remaining taxonomies to keep counts accurate.</li>
+            </ul>
+         </li>
       </ul>
       <h3 id="ch-5-6" class="h3title">🔪 5.6. Detailed Database Cleanup</h3>
-      <p>This section provides a button for <em>every single</em> item listed in the Database Statistics. It allows you to clean items one by one.</p>
+      <p>This section provides a button for <em>every single</em> item listed in the Database Statistics. It allows you to clean items one by one with full control.</p>
       <blockquote class="niceblock">
          <strong class="block-title-warn">⚠️ IMPORTANT: Safe vs. Unsafe (Review First)</strong>
          <p class="mt-5">Most items are "safe" to clean. However, some items are marked with a <strong>⚠️ Warning Icon</strong>. These are "unsafe" because they involve deleting data you might want to review first.</p>
@@ -1153,17 +1213,64 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
             <li class="li-std"><strong>⚠️ Unsafe (Review First):</strong> <strong>*🗑️ Trashed Posts:</strong> This will <em>permanently empty</em> your posts trash bin. <strong>*💬 Spam Comments:</strong> This will <em>permanently delete</em> comments marked as spam. <strong>*⏳ Unapproved Comments:</strong> This will <em>permanently delete</em> all comments awaiting moderation. <strong>*💾 All Transients:</strong> This will clear <em>all</em> cached data, including non-expired. While generally safe, it can temporarily break parts of your site that rely on active cache.</li>
          </ul>
       </blockquote>
+      <h4 class="h4title">⚙️ How the Cleanup Engine Works</h4>
+      <p>Every cleanup operation in this section shares the same underlying architecture, which sets it apart from standard database plugins:</p>
+      <ul class="ul-std">
+         <li class="li-std">
+            <strong>🔑 Keyset Pagination (No Drift):</strong> All deletions use <code>WHERE id &gt; last_seen_id ORDER BY id ASC LIMIT N</code> rather than <code>LIMIT / OFFSET</code>. This means the cleanup never loses rows or re-processes already-deleted data, even on tables with hundreds of thousands of rows.
+         </li>
+         <li class="li-std">
+            <strong>📦 Transactional Batches:</strong> Every batch of up to 2,000 rows is wrapped in <code>START TRANSACTION … COMMIT</code>. If anything fails mid-batch, the entire batch rolls back cleanly. There are no partial deletes or half-cleaned states.
+         </li>
+         <li class="li-std">
+            <strong>🌊 Cascade-Aware Deletion:</strong> The cleaner understands parent-child relationships in your database and always cleans children before parents. For example:
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>Post Revisions &amp; Auto Drafts:</strong> Deletes matching rows from <code>wp_postmeta</code> AND <code>wp_term_relationships</code> for the post IDs in each batch <em>before</em> deleting from <code>wp_posts</code>. Most other plugins skip this step, leaving thousands of orphaned meta rows behind after a revision cleanup.</li>
+               <li class="li-sm"><strong>Trashed Posts:</strong> Goes further — also fetches all comments on those posts, walks the full comment <em>reply tree</em> (BFS traversal to collect all descendants), deletes <code>wp_commentmeta</code> for all collected comment IDs, then the comments themselves, then postmeta, then term relationships, then the posts. A single trashed post cleanup can touch six tables correctly.</li>
+               <li class="li-sm"><strong>Spam &amp; Trashed Comments:</strong> Performs the same BFS reply-tree traversal to collect all descendant comments before deleting, ensuring no orphaned child comments or commentmeta are left dangling.</li>
+            </ul>
+         </li>
+         <li class="li-std">
+            <strong>🔗 JOIN-Based Orphan Detection:</strong> Orphaned metadata cleanup (postmeta, commentmeta, usermeta) uses <code>LEFT JOIN … WHERE parent.id IS NULL</code> queries to find records whose parent no longer exists. This finds orphans that were created by buggy plugins or direct SQL deletes — not just records from the WordPress trash.
+         </li>
+         <li class="li-std">
+            <strong>🧬 Duplicate Meta via Self-Join:</strong> The duplicate metadata cleaner uses a SQL self-join (<code>m1 INNER JOIN m2 ON same parent + same key + same value WHERE m1.id &gt; m2.id</code>) to find exact duplicates across all four meta tables (post, comment, user, term). It always retains the record with the <em>lowest</em> ID (oldest), and deletes the newer duplicates.
+         </li>
+         <li class="li-std">
+            <strong>🛡️ Parameter Whitelisting:</strong> Internal cleanup methods validate every table name and column against a hardcoded allowlist before executing any query. Even if called with wrong parameters internally, the methods reject the call entirely — a defense-in-depth measure that prevents any misconfiguration from touching unintended tables.
+         </li>
+         <li class="li-std">
+            <strong>⏱️ Time-Aware:</strong> On AJAX requests, each loop monitors your server's <code>max_execution_time</code> and stops safely when approaching the limit, preserving all committed work. A 20ms micro-pause between batches prevents table lock contention on busy servers.
+         </li>
+      </ul>
       <h3 id="ch-5-7" class="h3title">⚡ 5.7. Advanced Database Optimization</h3>
       <p>These are powerful tools for database maintenance. <strong>💾 Always create a backup</strong> before using them.</p>
       <ul class="ul-std">
-         <li class="li-std"><strong>⚡ Optimize All Tables:</strong> This runs the <code>OPTIMIZE TABLE</code> SQL command. It's like defragmenting your hard drive. It re-organizes tables and reclaims "Database Overhead" (empty space). This is safe to run and is included in the One-Click Optimization.</li>
-         <li class="li-std"><strong>🛠️ Analyze &amp; Repair Tables:</strong> This is a diagnostic and repair tool. It runs <code>CHECK TABLE</code> to find errors or corruption. If it finds any, it automatically runs <code>REPAIR TABLE</code> to fix them. If your site is experiencing strange database errors, run this.</li>
          <li class="li-std">
-            <strong>⚙️ Optimize Autoloaded Options:</strong> This is a highly advanced performance tool.
+            <strong>⚡ Optimize All Tables:</strong> Defragments your database tables and reclaims wasted space ("overhead"). Unlike standard optimization that blindly runs <code>OPTIMIZE TABLE</code> on everything, this tool applies a different strategy per storage engine:
             <ul class="toc-sublist">
-               <li class="li-sm"><strong>❓ What is Autoloaded Data?</strong> In your <code>wp_options</code> table, some settings (<code>autoload='yes'</code>) are loaded on <em>every single page load</em>. If plugins store large amounts of data here (e.g., 1MB+), it can severely slow down your site.</li>
-               <li class="li-sm"><strong>🔧 What This Tool Does:</strong> This tool scans for large autoloaded options. It uses a "skip list" to ignore essential WordPress core options (like <code>active_plugins</code>, <code>siteurl</code>) and options from major plugins (WooCommerce, Elementor, Yoast, etc.). For other large options it finds, it changes them from <code>autoload='yes'</code> to <code>autoload='no'</code>.</li>
-               <li class="li-sm"><strong>🎯 The Result:</strong> The data is still safely in your database, but it's only loaded by its plugin when it's actually <em>needed</em>, not on every single page of your site. This can provide a major performance boost.</li>
+               <li class="li-sm"><strong>InnoDB tables (most WordPress tables):</strong> Attempts <code>ALTER TABLE … ENGINE=InnoDB, ALGORITHM=INPLACE, LOCK=NONE</code> first. This is an <strong>Online DDL</strong> operation — it defragments the table without any table lock, meaning your site remains fully readable and writable during the operation. Only if the server does not support online DDL does it fall back to standard <code>OPTIMIZE TABLE</code>.</li>
+               <li class="li-sm"><strong>MyISAM tables:</strong> Uses standard <code>OPTIMIZE TABLE</code> (the only available option for this engine).</li>
+               <li class="li-sm"><strong>Smart skipping:</strong> Tables with less than 1KB of overhead, zero rows, MEMORY engine tables, or non-base tables (views) are automatically skipped to avoid unnecessary locking.</li>
+               <li class="li-sm"><strong>Resumable:</strong> On AJAX requests, the process saves its position every 5 seconds. If the page is closed or times out, re-running it picks up where it left off rather than starting from scratch.</li>
+            </ul>
+         </li>
+         <li class="li-std"><strong>🛠️ Analyze &amp; Repair Tables:</strong> A multi-phase diagnostic and repair tool. It runs <code>CHECK TABLE</code> in batches of 20, identifies any tables with corruption or crash markers, then runs <code>REPAIR TABLE</code> on those specifically. A final optimization pass is also applied to all large tables (&gt;1,000 rows) as part of the same workflow. If your site is experiencing strange database errors, run this.</li>
+         <li class="li-std">
+            <strong>⚙️ Optimize Autoloaded Options:</strong> A highly advanced performance tool that intelligently reduces the amount of data loaded on every single page request.
+            <ul class="toc-sublist">
+               <li class="li-sm"><strong>❓ What is Autoloaded Data?</strong> In your <code>wp_options</code> table, options marked <code>autoload='yes'</code> are loaded on <em>every page request</em>. If plugins store large data here (1MB+), it can severely slow your Time to First Byte (TTFB).</li>
+               <li class="li-sm">
+                  <strong>🧠 Multi-Layer Safety System:</strong> This tool does <em>not</em> simply set everything to <code>autoload='no'</code>. It uses a layered decision tree to determine what is safe to optimize:
+                  <ul class="ul-disc">
+                     <li><strong>Layer 1 — Hardcoded Essential List:</strong> Core WordPress options (<code>active_plugins</code>, <code>siteurl</code>, <code>cron</code>, <code>rewrite_rules</code>, <code>widget_*</code>, <code>theme_mods_*</code>) and known critical options from WooCommerce, Elementor, Yoast SEO, and Wordfence are <em>always skipped</em>.</li>
+                     <li><strong>Layer 2 — Credential Protection:</strong> Any option whose name contains <code>license</code>, <code>api_key</code>, <code>secret_key</code>, or <code>password</code> is always skipped.</li>
+                     <li><strong>Layer 3 — Name Pattern Analysis:</strong> Options containing <code>settings</code>, <code>config</code>, or <code>options</code> in their name are treated as plugin configurations and skipped unless they are very large.</li>
+                     <li><strong>Layer 4 — Size + Pattern Combo:</strong> Known cache/temp patterns (<code>_transient_</code>, <code>_oembed_</code>, <code>jetpack_sync_</code>, <code>wc_session_</code>) are safe-listed at any size. Generic large options (&gt;200KB) that don't match any settings pattern are optimized regardless.</li>
+                  </ul>
+               </li>
+               <li class="li-sm"><strong>📐 Dynamic Thresholds:</strong> Size thresholds scale with your database size. A database over 100MB uses tighter thresholds (lower size before optimizing) because autoload overhead matters more at scale.</li>
+               <li class="li-sm"><strong>🎯 The Result:</strong> The data is still safely in your database, but is only loaded when actually needed. This can significantly reduce TTFB, especially on sites with accumulated plugin data.</li>
             </ul>
          </li>
       </ul>
@@ -1182,15 +1289,16 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
          </li>
       </ul>
       <h3 id="ch-5-9" class="h3title">🔢 5.9. MySQL Index Manager</h3>
-      <p>The MySQL Index Manager is an powerful diagnostic tool that analyzes your database for missing or redundant indexes. Unlike standard cleanup tools, this module uses <strong>Prefix-Matching Analysis</strong> to ensure your database structure is optimized for high-traffic environments and complex queries, such as those generated by WooCommerce.</p>
+      <p>The MySQL Index Manager is a powerful diagnostic tool that analyzes your database for missing or redundant indexes. Unlike standard cleanup tools, this module uses <strong>Prefix-Matching Analysis</strong> to ensure your database structure is optimized for high-traffic environments and complex queries, such as those generated by WooCommerce.</p>
       <div class="info-box-mb20"> ℹ️ <strong class="txt-blue">ENTERPRISE APPROACH:</strong> The manager does not simply look for index names. It analyzes the actual columns and their order. If a "Super-Index" (e.g., columns A, B, and C) already exists, the plugin is smart enough to know that a "Sub-Index" (e.g., column A) is redundant and can be safely removed to save disk space and speed up write operations. </div>
       <h4 class="h4title">🔍 Analysis Categories</h4>
       <ul class="ul-std">
          <li class="li-12">
             <strong class="txt-f59e0b">🔴 Missing Indexes:</strong> These are critical structural optimizations identified for core WordPress and WooCommerce tables. 
             <ul class="ul-sm-mb0">
-               <li class="li-sm"><strong>Core Targets:</strong> Optimizes <code>wp_options</code> (autoloaded settings), <code>wp_postmeta</code> (custom field lookups), and <code>wp_usermeta</code>.</li>
+               <li class="li-sm"><strong>Core Targets:</strong> Optimizes <code>wp_options</code> (autoloaded settings), <code>wp_postmeta</code> (custom field lookups), <code>wp_posts</code> (content queries), <code>wp_usermeta</code>, <code>wp_commentmeta</code>, and <code>wp_termmeta</code>.</li>
                <li class="li-sm"><strong>WooCommerce Targets:</strong> Automatically detects and fixes missing indexes on high-traffic tables like <code>wc_order_product_lookup</code> to speed up sales analytics and reporting.</li>
+               <li class="li-sm"><strong>Column Validation:</strong> Before suggesting any index, the plugin verifies that every required column actually exists in your table. If a plugin removed or renamed a column, the suggestion is silently skipped rather than throwing an error.</li>
             </ul>
          </li>
          <li class="li-12">
@@ -1198,23 +1306,32 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
             <ul class="ul-sm-mb0">
                <li class="li-sm"><strong>Definition:</strong> If Index A covers <code>(post_id)</code> and Index B covers <code>(post_id, meta_key)</code>, Index A is <strong>redundant</strong> because Index B can handle all queries that Index A would.</li>
                <li class="li-sm"><strong>Benefit:</strong> Removing these reduces the time the database spends updating indexes during every <code>INSERT</code> or <code>UPDATE</code>, improving overall site responsiveness.</li>
+               <li class="li-sm"><strong>Safety:</strong> The engine will <strong>never</strong> flag a <code>UNIQUE</code> index as redundant when the covering index is non-unique, preserving data integrity constraints even if the column overlap looks identical.</li>
             </ul>
          </li>
       </ul>
       <h4 class="h4title">🚀 Workflow: Scan & Apply</h4>
       <ol class="ol-std">
-         <li class="li-std"><strong>Initiate Scan:</strong> Click the <strong>"Scan for Missing Indexes"</strong> button. The plugin dynamically resolves your table prefixes (even if they are non-standard) and performs a deep schema audit.</li>
+         <li class="li-std"><strong>Initiate Scan:</strong> Click the <strong>"Scan for Missing Indexes"</strong> button. The plugin reads all index metadata for your entire database from <code>information_schema.STATISTICS</code> in a single query, then performs analysis in PHP — minimizing database load during the scan.</li>
          <li class="li-std">
             <strong>Review Recommendations:</strong> 
             <ul class="ul-xs">
                <li>Recommendations will display the <strong>Table</strong>, <strong>Column(s)</strong>, and a detailed <strong>Reason</strong> explaining the performance benefit.</li>
             </ul>
          </li>
-         <li class="li-std"><strong>Apply Fixes:</strong> Click <strong>"Fix Index"</strong> to add a missing index or <strong>"Remove Bloat"</strong> to remove a redundant one.</li>
+         <li class="li-std"><strong>Apply Fixes:</strong> Click <strong>"Fix Index"</strong> to add a missing index or <strong>"Remove Bloat"</strong> to remove a redundant one. All index operations run in a <strong>background worker</strong> (via WP-Cron) so they never block your browser or time out regardless of table size.</li>
       </ol>
+      <h4 class="h4title">🔒 Lock-Free Index Operations</h4>
+      <p>Adding or removing indexes on large tables can be a risky operation on busy sites. The Index Manager handles this intelligently:</p>
+      <ul class="ul-std">
+         <li class="li-std"><strong>Online DDL First:</strong> For each operation, the plugin first attempts <code>ALTER TABLE … ALGORITHM=INPLACE, LOCK=NONE</code>. This is MySQL's online DDL mode — the table remains fully readable and writable during the entire index build. No downtime, no locked pages.</li>
+         <li class="li-std"><strong>Automatic Fallback:</strong> If the server does not support online DDL for that specific operation (e.g., certain older MySQL versions or MyISAM tables), it automatically falls back to a standard <code>ALTER TABLE</code>.</li>
+         <li class="li-std"><strong>Disk Space Pre-Check:</strong> Before starting any index operation, the engine checks available disk space. Building an index requires approximately 2× the table's current size as temporary space. If there is insufficient space, the operation is blocked with a clear message showing available vs. required space.</li>
+         <li class="li-std"><strong>Result Verification:</strong> After the operation completes, the plugin queries <code>SHOW INDEX FROM table</code> to confirm the index was actually added or removed — and marks the task as failed if the schema did not change as expected.</li>
+      </ul>
       <blockquote class="niceblock">
          <strong class="block-title-warn">⚠️ CAUTION: LARGE TABLES</strong> 
-         <p class="mb-0 mt-5">Adding or dropping indexes on tables with millions of rows can take several minutes and may temporarily lock the table. If your site has a very large database, it is recommended to perform these operations during low-traffic periods.</p>
+         <p class="mb-0 mt-5">Adding or dropping indexes on tables with millions of rows can take several minutes. Thanks to Online DDL, your site remains accessible during the operation. However, it is still recommended to perform these operations during low-traffic periods on very large databases.</p>
       </blockquote>
       <h3 id="ch-5-10" class="h3title">🛡️ 5.10. Referential Integrity Scanner</h3>
       <p>The Referential Integrity Scanner is a specialized sanitation tool designed to find "Zombie Data"—rows in your database that point to parent data that no longer exists.</p>
@@ -1259,41 +1376,52 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
          <li class="li-std"><strong>Constraint Protection:</strong> The logic is programmed to <strong>never</strong> suggest dropping a <code>UNIQUE</code> index or a <code>PRIMARY KEY</code>, even if it appears redundant, to preserve data integrity.</li>
       </ul>
       <h3 id="ch-5-11" class="h3title">↳↰ 5.11. Database Search &amp; Replace</h3>
-      <p>Located in the "Advanced" tab, this professional-grade tool allows you to find and replace text strings across your entire database. It is essential for tasks like migrating domains (http to https), updating shortcodes, or fixing bulk content errors.</p>
+      <p>Located in the "Advanced" tab, this professional-grade tool allows you to find and replace text strings across your entire database. It is essential for tasks like migrating domains (http → https), updating shortcodes, or fixing bulk content errors.</p>
       <blockquote class="niceblock">
          <strong class="block-title-warn">🚨 CRITICAL WARNING</strong>
          <p class="mt-5"><strong>This is a destructive operation</strong>. Changes made here cannot be "undone" without restoring a backup.<br>💾 You must create a fresh database backup (Section 1) immediately before running this tool.</strong></p>
       </blockquote>
       <p><strong>🌟 Key Features:</strong></p>
       <ul class="ul-std">
-         <li class="li-std"><strong>📦 Serialized Data Support:</strong> Unlike standard SQL queries, this tool safely handles WordPress "serialized data" (PHP arrays stored as text strings). It deserializes the data, performs the replacement, and reserializes it, ensuring your widgets and plugin settings don't break.</li>
-         <li class="li-std"><strong>👁️ Dry Run (Preview):</strong> Scan your database without changing anything. See exactly how many matches are found and preview the changes in context.</li>
-         <li class="li-std"><strong>🎯 Target Specific Tables:</strong> Choose to run on "All Tables" or select specific ones (e.g., just <code>wp_posts</code>) to limit the scope.</li>
-         <li class="li-std"><strong>🔎 Case Sensitivity:</strong> When enabled, the tool uses SQL <code>BINARY</code> operators to ensure maximum performance and 100% accuracy in matching exact character casings (e.g., "Apple" vs "apple").</li>
          <li class="li-std">
-            <strong>🔗 Partial Match:</strong> Choose between two matching modes:
+            <strong>📦 Deep Serialized Data Support:</strong> Unlike standard SQL search-and-replace approaches, this tool handles WordPress serialized data (PHP objects and arrays stored as strings in the database) correctly. It uses a recursive unserialize → replace → re-serialize strategy that understands the full structure of PHP serialized strings — including nested arrays, objects, and incomplete class instances. String length metadata within serialized strings is recalculated correctly after every replacement, preventing broken widget settings or plugin configuration data. The serialized data parser is Unicode-aware and handles multibyte characters properly throughout.
+         </li>
+         <li class="li-std"><strong>👁️ Dry Run (Preview):</strong> Scan your entire database without making any changes. Every match is shown with table name, column, row ID, and a highlighted excerpt with the matched text in context. The preview is capped at 500 entries or 512KB of preview data — whichever comes first — to prevent browser slowdown on very large datasets.</li>
+         <li class="li-std"><strong>🎯 Scoped Table Selection:</strong> Run on all tables or select specific ones. The engine validates every table name against <code>SHOW TABLES</code> before executing — no user-supplied table name is ever directly interpolated into SQL.</li>
+         <li class="li-std"><strong>🔎 Case-Sensitive Mode:</strong> When enabled, the SQL scan clause uses <code>BINARY</code> operators to find exact character-case matches. The regex replacement also switches to a non-insensitive pattern. Case sensitivity applies independently to both the scan and the replacement phases.</li>
+         <li class="li-std">
+            <strong>🔗 Two Matching Modes:</strong>
             <ul class="ul-disc">
-               <li><strong>Word Boundary (Default):</strong> Matches complete words only. Searching for "test" will find "This is a test" but NOT "testing" or "latest".</li>
-               <li><strong>Partial Match:</strong> Matches text anywhere within strings. Perfect for URL updates like <code>http://</code> → <code>https://</code>, domain changes, or path updates.</li>
+               <li><strong>Word Boundary (Default):</strong> Uses Unicode-aware regex (<code>\p{L}</code> lookbehind/lookahead) rather than simple <code>\b</code> word boundaries, so it correctly handles accented characters and non-ASCII text. Searching for "test" finds "This is a test" but not "testing" or "latest".</li>
+               <li><strong>Partial Match:</strong> Uses <code>str_replace</code> / <code>str_ireplace</code> for maximum speed. Matches text anywhere within strings — required for URL updates, path changes, or domain migrations.</li>
             </ul>
          </li>
+         <li class="li-std">
+            <strong>🛡️ Protected Options:</strong> The <code>wp_options</code> table is given special treatment. Two categories of options are handled differently:
+            <ul class="ul-disc">
+               <li><strong>Permanently protected (never modified):</strong> <code>active_plugins</code>, <code>wp_user_roles</code>, <code>cron</code>, <code>db_version</code>, <code>optistate_settings</code>, and the plugin's own search-replace session transients.</li>
+               <li><strong>Deferred options (updated last, in a separate transaction):</strong> <code>siteurl</code> and <code>home</code>. These are applied only after all other tables complete successfully, minimizing the window of URL inconsistency on a running site.</li>
+            </ul>
+         </li>
+         <li class="li-std"><strong>🔐 Concurrency Lock:</strong> Each operation (dry run and execute) is protected by a token-based lock stored as a WordPress transient. When you start an operation, a 32-character random hex token is returned. Every subsequent chunk of that operation must present this token. If two requests arrive simultaneously (e.g., accidental double-click), the second is rejected with a 409 Conflict response. Locks expire automatically after 10 minutes.</li>
+         <li class="li-std"><strong>⏱️ Rate Limiting:</strong> Dry runs are rate-limited to one per 5 seconds per user; execute operations to one per 10 seconds. Repeated rapid requests receive a 429 Too Many Requests response.</li>
       </ul>
       <p><strong>🛠️ How to Use:</strong></p>
       <ol class="ol-std">
          <li class="li-std"><strong>Input Terms:</strong> Enter the text you want to find (e.g., <code>http://old-site.com</code>) and the text to replace it with (e.g., <code>https://new-site.com</code>).</li>
-         <li class="li-std"><strong>🔡 Case Sensitivity:</strong> By default, searches are "Case Insensitive" (searching for <em>'WordPress'</em> will find <em>'wordpress'</em> as well). Check the <strong>"Case Sensitive"</strong> box if you need an exact match (e.g., replacing a specific variable name or brand capitalization).</li>
+         <li class="li-std"><strong>🔡 Case Sensitivity:</strong> By default, searches are case-insensitive. Check <strong>"Case Sensitive"</strong> for exact-case matching (e.g., replacing a specific variable name or brand capitalization).</li>
          <li class="li-std">
-            <strong>🔗 Partial Match:</strong> 
+            <strong>🔗 Partial Match:</strong>
             <ul class="ul-disc">
-               <li><strong>Unchecked:</strong> Matches complete words with boundaries. Use this for most text replacements.</li>
-               <li><strong>Checked:</strong> Matches text anywhere in strings. <strong>Essential for URL updates, domain changes, and partial text replacements.</strong></li>
+               <li><strong>Unchecked (default):</strong> Unicode word-boundary matching. Use this for replacing standalone words in content.</li>
+               <li><strong>Checked:</strong> Substring matching anywhere in the string. <strong>Required for URL updates, domain changes, and any partial text replacements.</strong></li>
             </ul>
          </li>
-         <li class="li-std"><strong>Select Tables:</strong> Leave as "All Tables" for a full site update, or use Ctrl/Cmd+Click to select specific tables.</li>
-         <li class="li-std"><strong>🔎 Step 1: Perform Dry Run:</strong> Click this button first. The plugin will scan your database and show you a table of results, including the Column, ID, and a highlighted preview of the found text.</li>
-         <li class="li-std"><strong>↳↰ Step 2: Execute Replacement:</strong> Once you have verified the Dry Run results, click this button to perform the actual replacement.</li>
+         <li class="li-std"><strong>Select Tables:</strong> Leave as "All Tables" for a full-site update, or use Ctrl/Cmd+Click to select specific tables.</li>
+         <li class="li-std"><strong>🔎 Step 1 — Dry Run:</strong> Click this button first. The plugin scans your database in 4-second AJAX chunks and shows a highlighted preview of every match found. Review carefully before proceeding.</li>
+         <li class="li-std"><strong>↳↰ Step 2 — Execute Replacement:</strong> Once you have verified the dry run results, click this to perform the actual replacement. Execution also runs in 4-second AJAX chunks with keyset pagination (<code>WHERE pk &gt; last_seen LIMIT 300</code>) so it is resumable and never re-processes already-updated rows. Each batch of 300 rows is wrapped in a <code>START TRANSACTION … COMMIT</code> block. A failed batch triggers a <code>ROLLBACK</code> and logs the error — subsequent tables continue processing.</li>
       </ol>
-      <h4 class="h4title">📋 Common Use Cases & Examples</h4>
+      <h4 class="h4title">📋 Common Use Cases &amp; Examples</h4>
       <div class="card-box">
          <div class="example-header">
             <span class="example-icon">🔒</span>
@@ -2143,13 +2271,44 @@ if (method_exists($wpdb, 'remove_placeholder_escape')) {
          <li class="li-std"><strong>Automatic Refresh:</strong> The JavaScript frontend automatically refreshes nonces when they approach expiration</li>
       </ul>
       <h4 id="ch-7-4-5" class="h4title">7.4.5. Login Protection System</h4>
-      <p>The plugin includes a sophisticated brute-force protection system (see Section 9.4 for full details):</p>
+      <p>The plugin includes a full brute-force protection system that tracks failed login attempts by IP address and blocks repeat offenders for a configurable period. It is designed to be both accurate and very fast — the critical path on login page loads is optimized to avoid database queries whenever possible.</p>
+      <h5>Configuration Options</h5>
       <ul class="ul-sm">
-         <li class="li-std"><strong>Rate Limiting:</strong> IP-based tracking of failed login attempts</li>
-         <li class="li-std"><strong>Progressive Delays:</strong> Exponentially increasing delays after failed attempts</li>
-         <li class="li-std"><strong>Dedicated Table:</strong> Stores attempt data in <code>wp_optistate_login_protect</code> with automatic cleanup of old entries</li>
-         <li class="li-std"><strong>IPv6 Support:</strong> Properly handles both IPv4 and IPv6 addresses</li>
+         <li class="li-std"><strong>Max Attempts:</strong> Choose 1–6 failed attempts before a block is applied (default: 3).</li>
+         <li class="li-std"><strong>Block Duration:</strong> Choose 1, 3, 6, 12, 24, or 48 hours (default: 6 hours). Only these exact values are accepted — arbitrary input is clamped to the nearest valid option.</li>
+         <li class="li-std"><strong>Cloudflare Mode:</strong> When enabled, the IP is read from the <code>HTTP_CF_CONNECTING_IP</code> header instead of <code>REMOTE_ADDR</code>, but only if the request is arriving from a verified Cloudflare IP range (all 21 IPv4 and IPv6 Cloudflare CIDR ranges are built in and cached for one week).</li>
       </ul>
+      <h5>Three-Layer Check Sequence (Critical Path)</h5>
+      <p>When a visitor hits the login page, the block check runs in this exact sequence, stopping at the first result to minimize overhead:</p>
+      <ol class="ol-sm">
+         <li class="li-std"><strong>Request-level cache:</strong> A PHP static variable caches the result for the current request. If <code>is_access_blocked()</code> is called twice in the same request (once for <code>login_init</code>, once for <code>authenticate</code>), the second call returns instantly with no transient or database read.</li>
+         <li class="li-std"><strong>Transient fast-path (block):</strong> Checks <code>optistate_block_{ip_hash}</code>. If the transient exists and its stored <code>blocked_until</code> timestamp is still in the future, the visitor is blocked immediately — no database query.</li>
+         <li class="li-std"><strong>Transient fast-path (clean):</strong> Checks <code>optistate_clean_{ip_hash}</code>. If this transient exists, the IP was recently confirmed as not blocked — return clean immediately. This 60-second clean cache eliminates database reads for legitimate repeated login attempts.</li>
+         <li class="li-std"><strong>Database query (cold path):</strong> Only if both transients are absent does the engine query the <code>wp_optistate_login_protect</code> table. On a hit, the result is immediately cached back into the block transient for the duration of the remaining block period. On a miss (legitimate user), the clean transient is set for 60 seconds.</li>
+      </ol>
+      <h5>Recording Failed Attempts</h5>
+      <p>When a login fails, the engine uses a single <code>INSERT … ON DUPLICATE KEY UPDATE</code> query to either create a new record or atomically increment the attempt counter for the existing IP. The block timestamp is set in the same query using an <code>IF(attempts_count &gt;= max, blocked_until, 0)</code> expression — making the transition from "tracking" to "blocked" a single atomic SQL operation with no race condition. The user agent is also stored (truncated to 255 bytes, UTF-8 safe) for audit purposes. A successful login from the same IP immediately deletes its record and clears both transients.</p>
+      <h5>IP Address Resolution</h5>
+      <p>The IP resolution logic correctly handles proxy chains:</p>
+      <ul class="ul-sm">
+         <li class="li-std"><strong>Standard requests:</strong> Uses <code>REMOTE_ADDR</code> directly.</li>
+         <li class="li-std"><strong>Behind a trusted proxy:</strong> When the connecting IP is in the trusted proxy list, the engine walks the <code>X-Forwarded-For</code> chain from right to left and selects the first non-proxy IP as the real client address.</li>
+         <li class="li-std"><strong>Cloudflare:</strong> When Cloudflare mode is enabled and the request arrives from a verified Cloudflare IP, the real client IP is read from <code>HTTP_CF_CONNECTING_IP</code>.</li>
+         <li class="li-std"><strong>IPv4-mapped IPv6:</strong> Addresses like <code>::ffff:1.2.3.4</code> are automatically converted to their IPv4 form before storage and comparison.</li>
+         <li class="li-std"><strong>IPv6 CIDR matching:</strong> Full IPv6 CIDR range matching with bit-level precision (not just string prefix comparison).</li>
+         <li class="li-std"><strong>Validation:</strong> After resolution, the final IP is validated with <code>FILTER_VALIDATE_IP</code> and stripped of any non-IP characters. If validation fails, it falls back to <code>REMOTE_ADDR</code>.</li>
+      </ul>
+      <h5>Blocking Scope</h5>
+      <p>Blocking applies to all three WordPress login surfaces simultaneously:</p>
+      <ul class="ul-sm">
+         <li class="li-std"><strong>Standard login form:</strong> Checked via <code>login_init</code> (before the form renders) and <code>authenticate</code> filter (before credentials are verified). A blocked IP sees a custom 403 page instead of the login form — they cannot even attempt a password.</li>
+         <li class="li-std"><strong>XML-RPC:</strong> Returns a well-formed XML fault response with code 403.</li>
+         <li class="li-std"><strong>REST API:</strong> Returns a JSON error response with HTTP 403.</li>
+      </ul>
+      <h5>Automatic Record Cleanup</h5>
+      <p>The table is self-maintaining. A scheduled cleanup routine runs automatically and deletes: expired block records (blocks whose <code>blocked_until</code> timestamp has passed), and casual attempt records (IPs with no block that have had no activity in the last 24 hours). If more than 100 records are deleted in a single cleanup pass and the table has more than 1MB of overhead, <code>OPTIMIZE TABLE</code> is automatically run to reclaim space.</p>
+      <h5>Dedicated Database Table</h5>
+      <p>Attempt data is stored in a dedicated <code>wp_optistate_login_protect</code> table with a <code>UNIQUE KEY</code> on <code>ip_address</code> (enabling the atomic INSERT/UPDATE), and compound indexes on <code>(blocked_until, updated_at)</code> and <code>updated_at</code> for fast cleanup queries. The table is never included in plugin backups and is recreated automatically on plugin reactivation.</p>
       <div class="success-box">
          <strong class="txt-green">✅ Security Audit Result:</strong> These combined protections make WP Optimal State PRO resistant to common WordPress vulnerabilities including:
          <ul class="ul-inner-25b">
@@ -2560,23 +2719,11 @@ if ($http_user_agent ~* (MJ12bot|AhrefsBot|SemrushBot|DotBot|PetalBot|Bytespider
                      <strong>A:</strong> This is a critical but recoverable error. Your site is likely broken and showing a database error.
                      <ol class="ol-sm">
                         <li class="li-sm">Find the <strong>💾 Safety Backup</strong> file. Use FTP or your host's File Manager to navigate to <code>wp-content/uploads/optistate/db-backups/</code>.</li>
-                     </ol>
-                     <ol class="ol-sm" start="2">
                         <li class="li-sm">Find the file named <code>SAFETY-RESTORE-....sql.gz</code> that was just created. Download it.</li>
-                     </ol>
-                     <ol class="ol-sm" start="3">
                         <li class="li-sm">Go to <strong>phpMyAdmin</strong> (or your database tool).</li>
-                     </ol>
-                     <ol class="ol-sm" start="4">
                         <li class="li-sm">Select your WordPress database.</li>
-                     </ol>
-                     <ol class="ol-sm" start="5">
                         <li class="li-sm">Click the <strong>"Import"</strong> tab.</li>
-                     </ol>
-                     <ol class="ol-sm" start="6">
                         <li class="li-sm">Choose the <code>SAFETY-RESTORE-....sql.gz</code> file you just downloaded and run the import.</li>
-                     </ol>
-                     <ol class="ol-sm" start="7">
                         <li class="li-sm">This will manually complete the rollback and fix your site.</li>
                      </ol>
                   </li>

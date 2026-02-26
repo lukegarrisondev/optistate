@@ -2052,78 +2052,61 @@ brotli_types text/plain text/html text/css text/xml text/javascript
          <li class="li-std"><strong>Browser Caching:</strong> Open your browser's Developer Tools (F12), go to the Network tab, and reload your site. Check the response headers for static files - you should see <code>Cache-Control</code> and <code>Expires</code> headers.</li>
          <li class="li-std"><strong>Directory Security:</strong> Try accessing <code>https://yoursite.com/wp-content/uploads/optistate-settings/</code> - you should get a 403 Forbidden error.</li>
       </ul>
-      <h3 id="ch-7-4" class="h3title">🏗️ 7.4. Feature: WordPress Core Optimizations (A-Z)</h3>
-      <p>This is a list of toggles and dropdowns to disable or modify non-essential WordPress features that can slow down your site. These are all <strong>safe to use</strong> even with other caching plugins.</p>
+<h3 id="ch-7-4" class="h3title">🏗️ 7.4. Feature: WordPress Core Optimizations (A-Z)</h3>
+      <p>This is a comprehensive suite of toggles and configurations designed to disable or optimize non-essential WordPress features that can slow down your site.<br>These are all <strong>safe to use</strong> alongside other third-party caching plugins.</p>
       <ul class="ul-std">
          <li class="li-xl">
-            <strong>🗄️ Database Query Caching:</strong> Reduces database load by storing the results of complex queries in your persistent object cache (Redis or Memcached). This is highly effective for read-heavy sites.
+            <strong>🗄️ Database Query Caching:</strong> Advanced object caching for database queries. Reduces MySQL database load by caching complex query results directly in memory.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
-                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (Requires Redis or Memcached).
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (⚠️ <em>Requirement: A persistent object cache like Redis or Memcached must be active on your server. If missing, this feature cannot be enabled.</em>)
                   </div>
                </li>
                <li class="li-sm mt-8">
                   <strong>⚙️ Configuration Settings:</strong>
                   <ul class="ul-disc">
-                     <li class="li-std"><strong>Main Query TTL:</strong> Controls how long the primary content of a page (e.g., the main blog loop, single post content, or archive list) is stored in memory.
-                        <br><span class="txt-666b"><em>Recommended: 12-24 hours for static sites, 1-4 hours for news/blogs.</em></span>
-                     </li>
-                     <li class="li-std"><strong>Secondary Query TTL:</strong> Controls the lifespan of auxiliary data found in sidebars, widgets, "Related Posts" sections, and menus. These usually update less frequently than main content.
-                        <br><span class="txt-666b"><em>Recommended: Can typically be set 2x-3x longer than Main Query TTL (e.g., 24 hours).</em></span>
-                     </li>
-                     <li class="li-std"><strong>⛔ Exclude Post Types:</strong> A comma-separated list of post types that should <strong>never</strong> be cached to ensure data accuracy.
-                        <br><span class="txt-666b"><em>Default: <code>shop_order, ticket, product</code> (Essential for e-commerce sites to prevent caching order data).</em></span>
-                     </li>
-                     <li class="li-sm"><strong>🗨️ Flush on New Comment:</strong> When enabled, the query cache is automatically cleared whenever a visitor posts a comment.
-                        <br><span class="txt-666b"><em>Why? It ensures "Comment Counts" and "Recent Comments" widgets update immediately across the site.</em></span>
-                     </li>
+                     <li class="li-std"><strong>🕒 Main Query TTL:</strong> Controls how long primary page queries (e.g., your homepage, single posts/pages, and archive loops) are stored.<br><span class="txt-666b"><em>Tip: Set to 12-24 hours for mostly static sites, or 1-4 hours for frequently updated sites. (Options range from 5 Minutes to 1 Week).</em></span></li>
+                     <li class="li-std"><strong>🕒 Secondary Query TTL:</strong> Controls caching for auxiliary queries (widgets, recent posts, related posts, and sidebars).<br><span class="txt-666b"><em>Tip: These are less critical and can typically be cached 2-3x longer than main queries.</em></span></li>
+                     <li class="li-std"><strong>⛔️ Exclude Post Types:</strong> A comma-separated list of post types that should never be cached to ensure real-time data accuracy.<br><span class="txt-666b"><em>Default exclusions: <code>shop_order, ticket, product</code> (Crucial for dynamic e-commerce operations).</em></span></li>
+                     <li class="li-std"><strong>⛔️ Exclude Post IDs:</strong> Specific post or page IDs (comma-separated) whose queries should always bypass the cache (e.g., highly dynamic members-only dashboards).</li>
+                     <li class="li-std"><strong>💾 Flush on Post Save/Update:</strong> When enabled, the entire query cache is automatically cleared whenever a post or page is published, updated, or deleted. Ensures visitors always see fresh content.</li>
+                     <li class="li-std"><strong>🗨️ Flush on New Comment:</strong> When enabled, the query cache clears whenever a comment is posted or its moderation status changes. Recommended for active blogs to keep comment counts perfectly synced.</li>
                   </ul>
                </li>
             </ul>
          </li>
          <li class="li-xl">
-            <strong>𝐆 Font Loading Optimization:</strong> Optimizes the delivery of external fonts (particularly Google Fonts) to eliminate render-blocking resources, improve First Contentful Paint (FCP), and reduce Cumulative Layout Shift (CLS).
+            <strong>𝐆 Font Loading Optimization:</strong> Optimizes the delivery of external fonts (specifically Google Fonts) to eliminate render-blocking resources, significantly improving your First Contentful Paint (FCP) and reducing Cumulative Layout Shift (CLS).
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
-                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> with default settings for most sites.
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (Leave default options checked for most sites).
                   </div>
                </li>
                <li class="li-sm mt-8">
-                  <strong>⚙️ Configuration Options:</strong>
+                  <strong>⚙️ Optimization Strategy:</strong>
                   <ul class="ul-disc">
-                     <li class="li-std"><strong>Async Google Fonts Loading:</strong> Loads Google Fonts asynchronously to prevent blocking page rendering. Fonts are preloaded and then applied without delaying the initial page display.
-                        <br><span class="txt-666b"><em>Recommended: ✔ Enabled (Default). This technique uses <code>rel="preload"</code> and media switching to eliminate render-blocking CSS.</em></span>
-                     </li>
-                     <li class="li-std"><strong>Font Display Swap:</strong> Automatically adds <code>display=swap</code> parameter to Google Fonts URLs. This ensures text remains visible during font loading (FOIT prevention) by displaying fallback fonts first, then swapping to custom fonts when ready.
-                        <br><span class="txt-666b"><em>Recommended: ✔ Enabled (Default). Critical for improving perceived performance and Core Web Vitals.</em></span>
-                     </li>
-                     <li class="li-std"><strong>Preconnect to Font Domains:</strong> Establishes early connections to <code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code> using <code>rel="preconnect"</code>. This reduces DNS lookup and connection time when fonts are requested.
-                        <br><span class="txt-666b"><em>Recommended: ✔ Enabled (Default). Reduces latency by ~100-300ms on initial font requests.</em></span>
-                     </li>
-                     <li class="li-sm"><strong>Remove Google Fonts Completely:</strong> Completely blocks all Google Fonts from loading on your site. Use this option if you want to rely entirely on system fonts or have self-hosted all required fonts.
-                        <br><span class="txt-666b"><em>Recommended: ✘ Disabled (Default). Only enable if you've confirmed your theme and plugins work correctly without Google Fonts.</em></span>
-                        <br><span class="txt-d63638"><strong>⚠️ Warning:</strong> Enabling this may break theme/plugin designs that depend on Google Fonts. Test thoroughly before deploying.</span>
-                     </li>
+                     <li class="li-std"><strong>⚡ Async Google Fonts:</strong> Loads fonts in the background so they do not stop the page from rendering. Uses advanced <code>rel="preload"</code> and media-switching techniques.<br><span class="txt-666b"><em>Recommended: ✔ Enabled</em></span></li>
+                     <li class="li-std"><strong>👁️ Force "display=swap":</strong> Ensures text remains visible immediately using a fallback system font, then seamlessly swaps to your custom font once downloaded. Prevents the dreaded "Flash of Invisible Text" (FOIT).<br><span class="txt-666b"><em>Recommended: ✔ Enabled</em></span></li>
+                     <li class="li-std"><strong>🔌 Preconnect to Font CDN:</strong> Establishes an early, prioritized connection to <code>fonts.gstatic.com</code>, reducing DNS lookup latency by hundreds of milliseconds.<br><span class="txt-666b"><em>Recommended: ✔ Enabled</em></span></li>
+                     <li class="li-std"><strong>🚫 Remove Google Fonts:</strong> A nuclear option that completely strips Google Fonts from your site for maximum privacy and raw performance.<br><span class="txt-666b"><em>Recommended: ✘ Disabled (Default). Only enable if you've confirmed your theme and plugins work correctly without Google Fonts.</em></span><br><span class="txt-d63638"><strong>⚠️ Warning:</strong> This forces your site to use standard system fonts and disables the three optimization options above. Test thoroughly before deploying.</span></li>
                   </ul>
                </li>
-               <li class="li-sm mt-8"><em>(Note: When "Remove Google Fonts" is enabled, all other font optimization options are automatically disabled as they become irrelevant.)</em></li>
             </ul>
          </li>
          <li class="li-xl">
-            <strong>🖼️ Lazy Load Images &amp; Iframes:</strong> Defers loading of images and iframes until they are about to enter the viewport, reducing initial page load time and bandwidth usage.
+            <strong>⏲ Lazy Load Images &amp; Iframes:</strong> Enforces native browser lazy loading by intelligently injecting <code>loading="lazy"</code> and <code>decoding="async"</code> attributes into images and iframes to save bandwidth and improve load times.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
-                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                     <strong>💡 Smart LCP Detection:</strong> Unlike basic lazy loaders, this tool automatically detects "Above the Fold" contexts (like headers, heroes, logos) and the first few images on the page. It applies <code>loading="eager"</code> and <code>fetchpriority="high"</code> to these critical elements to dramatically boost your Largest Contentful Paint (LCP) score, while safely lazy-loading the rest.
                   </div>
                </li>
-               <li class="li-sm mt-8"><em>(Note: This uses native browser lazy loading with the <code>loading="lazy"</code> attribute. Particularly beneficial for content-heavy pages with multiple images.)</em></li>
             </ul>
          </li>
          <li class="li-xl">
-            <strong>😀 Emoji Scripts:</strong> Disables the <code>wp-emoji-release.min.js</code> script. All modern browsers render emojis natively.
+            <strong>😊 Emoji Scripts:</strong> Disables the <code>wp-emoji-release.min.js</code> script. All modern browsers render emojis natively.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">

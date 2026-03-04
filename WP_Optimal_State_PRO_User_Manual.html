@@ -1671,7 +1671,7 @@ SET FOREIGN_KEY_CHECKS = 1;</code></pre>
          <p class="mb-0">If you are already using another caching plugin, <strong>🚫 DO NOT</strong> enable "Server-Side Page Caching" or "Browser Caching" in WP Optimal State PRO. You can, however, still use all the "WordPress Core Optimizations" (Section 7.4).</p>
       </blockquote>
       <h3 id="ch-7-2" class="h3title">💨 7.2. Feature: Server-Side Page Caching</h3>
-      <p>This is the single most effective way to speed up your site. It converts heavy PHP processing into instant static HTML.</p>
+      <p>This is the single most effective way to speed up your site. It converts heavy PHP processing into instant static HTML. When a visitor requests a page, a lightweight cached file is served directly, bypassing slow PHP and database queries. For example, after enabling this, viewing your homepage for the second time will load instantly from a pre-generated HTML file instead of rebuilding the page from scratch. Combine this with browser caching for ultimate performance.</p>
       <ul class="ul-std">
          <li class="li-std">
             <strong>🎯 The Concept (Dynamic vs. Static):</strong>
@@ -2127,7 +2127,49 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
       <p>This is a comprehensive suite of toggles and configurations designed to disable or optimize non-essential WordPress features that can slow down your site.<br>These are all <strong>safe to use</strong> alongside other third-party caching plugins.</p>
       <ul class="ul-std">
          <li class="li-xl">
-            <strong>🗄️ Database Query Caching:</strong> Advanced object caching for database queries. Reduces MySQL database load by caching complex query results directly in memory.
+            <strong>🌐 Server-Side Page Caching:</strong> Drastically improves site speed by storing fully rendered pages as static HTML files. When a visitor requests a page, the lightweight cached file is served directly, bypassing slow PHP and database queries. For example, after enabling this, viewing your homepage for the second time will load instantly from a pre-generated HTML file instead of rebuilding the page from scratch. Combine this with browser caching for ultimate performance. <strong>DO NOT ACTIVATE if you already use a caching plugin such as WP Rocket, LiteSpeed, WP Super Cache, etc</strong> (see <a href="#ch-7-2">section 7.2</a> for more details).
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (if not using another caching plugin).
+                  </div>
+               </li>
+               <li class="li-sm mt-8">
+                  <strong>⚙️ Configuration Settings:</strong>
+                  <ul class="ul-disc">
+                     <li class="li-std"><strong>📊 Cache Status:</strong> Real-time stats showing Total Cached Pages, Mobile-Specific Pages, Total Size, and Last Write time.</li>
+                     <li class="li-std"><strong>🗑️ Purge All Cache:</strong> Instantly deletes all <code>.html</code> files in the cache directory.</li>
+                     <li class="li-std"><strong>🔋 Automatic Preload:</strong> Scans your <code>sitemap.xml</code> and simulates a visit to every URL to generate the cache file. Runs in background batches to prevent timeouts.</li>
+                     <li class="li-std"><strong>🕒 Cache Lifetime:</strong> The maximum age of a cache file (default: 24 hours). After this expires, the next visitor will trigger a fresh page generation.</li>
+                     <li class="li-std"><strong>❓ Query String Handling:</strong> Controls how URLs with parameters are cached (Ignore All, Include Safe, or Unique Cache).</li>
+                     <li class="li-std"><strong>⛔️ Exclude Pages:</strong> Enter URL fragments to block caching (e.g., <code>/my-account/*</code> or <code>/forum/</code>). Supports wildcards (<code>*</code>).</li>
+                     <li class="li-std"><strong>📲 Mobile-Specific Cache:</strong> Creates a separate <code>-mobile.html</code> cache file for mobile User-Agents. Enable <strong>ONLY</strong> if your site serves different HTML/Layouts to mobile devices.</li>
+                     <li class="li-std"><strong>🛡️ Disable Cookie Checks:</strong> Serves cached pages to everyone, ignoring consent cookies. <strong>⚠️ GDPR Warning:</strong> Only use if you do not use a cookie banner.</li>
+                     <li class="li-std"><strong>⤷ Custom Consent Cookie:</strong> If you use a custom solution, enter your specific cookie name here (e.g., <code>my_custom_consent</code>).</li>
+                  </ul>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>💻 Browser Caching (.htaccess):</strong> Enables browser caching by adding optimized caching and security rules to your .htaccess file. This improves page load times for returning visitors by storing static assets like your logo, CSS files, and JavaScript in their browser. For example, after a user visits your site, their browser will save your logo locally, so it doesn't need to be downloaded again on their next visit. Requires Apache server with writable .htaccess file. For Nginx servers, manual configuration is required (<a href="#ch-7-3-1" class="txt-link-warn">Section 7.3.1</a>).
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (if on Apache and not using another caching plugin).
+                  </div>
+               </li>
+               <li class="li-sm mt-8">
+                  <strong>⚙️ What It Adds:</strong>
+                  <ul class="ul-disc">
+                     <li class="li-std"><strong><code>mod_expires</code>:</strong> Tells browsers how long to cache file types (e.g., "cache images for 1 year," "cache CSS for 1 month").</li>
+                     <li class="li-std"><strong><code>mod_deflate</code> / <code>mod_brotli</code>:</strong> Enables Gzip and Brotli compression, making your files smaller.</li>
+                     <li class="li-std"><strong><code>mod_headers</code>:</strong> Adds security headers (like X-Content-Type-Options, X-Frame-Options) to improve your site's security score.</li>
+                  </ul>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>🗄️ Database Query Caching:</strong> Advanced object caching for database queries. Reduces MySQL database load by caching complex query results directly in memory. For example, the list of recent posts in your sidebar will be stored in Redis or Memcached after the first page load, so subsequent page views don't need to query the database again for the same information.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -2148,7 +2190,7 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
             </ul>
          </li>
          <li class="li-xl">
-            <strong>𝐆 Font Loading Optimization:</strong> Optimizes the delivery of external fonts (specifically Google Fonts) to eliminate render-blocking resources, significantly improving your First Contentful Paint (FCP) and reducing Cumulative Layout Shift (CLS).
+            <strong>𝐆 Font Loading Optimization:</strong> Optimizes delivery of external fonts (Google Fonts) to eliminate render-blocking resources, improve First Contentful Paint (FCP), and reduce Cumulative Layout Shift (CLS). For example, instead of your site appearing with invisible text while waiting for a custom font to download, text will immediately appear using a system font, then seamlessly swap to your custom font once it's ready.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -2167,7 +2209,7 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
             </ul>
          </li>
          <li class="li-xl">
-            <strong>⏲ Lazy Load Images &amp; Iframes:</strong> Enforces native browser lazy loading by intelligently injecting <code>loading="lazy"</code> and <code>decoding="async"</code> attributes into images and iframes to save bandwidth and improve load times.
+            <strong>⏲ Lazy Load Images &amp; Iframes:</strong> Enforces native browser lazy loading by injecting <code>loading="lazy"</code> and <code>decoding="async"</code> attributes into images and iframes. This improves Core Web Vitals by deferring off-screen media until needed. For example, images at the bottom of a long blog post will only load when the user scrolls down to them, saving bandwidth and speeding up the initial page display.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -2177,27 +2219,23 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
             </ul>
          </li>
          <li class="li-xl">
-            <strong>😊 Emoji Scripts:</strong> Disables the <code>wp-emoji-release.min.js</code> script. All modern browsers render emojis natively.
+            <strong>🤖 Bad Bot Blocker:</strong> Blocks resource-intensive SEO crawlers that provide competitive intelligence to other businesses. Does NOT block legitimate search engines like Google, Bing, or regional search engines. For example, bots like AhrefsBot and SemrushBot, which can consume significant server resources by crawling your entire site daily, will be blocked from accessing your content. You can customize the list to match your needs (see <a href="#ch-7-6">section 7.6</a> for more details).
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
-                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (especially useful for reducing server load on shared hosting).
                   </div>
+               </li>
+               <li class="li-sm mt-8">
+                  <strong>⚙️ Configuration:</strong>
+                  <ul class="ul-disc">
+                     <li class="li-std"><strong>🤖 Blocked Bots List:</strong> Customize the list of bot User-Agents to block (one per line). Default list includes MJ12bot, AhrefsBot, SemrushBot, DotBot, PetalBot, Bytespider, Mauibot, MegaIndex, SerpstatBot, BLEXBot, DataForSeoBot, and AspiegelBot.</li>
+                  </ul>
                </li>
             </ul>
          </li>
          <li class="li-xl">
-            <strong>💓 Heartbeat API Control:</strong> The Heartbeat API creates frequent server requests to handle auto-saving and post-locking. This can cause high server CPU load.
-            <ul class="toc-sublist">
-               <li class="li-sm">
-                  <div class="rec-box">
-                     <strong>💡 Recommendation:</strong> "Slow Down (Every 2 minutes)."
-                  </div>
-               </li>
-            </ul>
-         </li>
-         <li class="li-xl">
-            <strong>📝 Post Revisions Limit:</strong> Controls how many old versions of a post are saved.
+            <strong>📝 Post Revisions Limit:</strong> WordPress saves a new copy every time you click "Save Draft". Limiting revisions prevents database bloat while keeping recent versions for safety. For example, instead of saving 50 versions of a single blog post, you can limit it to 5, keeping the database lean while still having a safety net.
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -2207,21 +2245,8 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
                <li class="li-sm mt-8"><em>(Note: If this setting is defined in your <code>wp-config.php</code> file, this control will be disabled.)</em></li>
             </ul>
          </li>
-         <li class="li-xl"><strong>🔗 REST API Link Tag:</strong> Removes the <code>&lt;link rel="https://api.w.org/" ...&gt;</code> tag from your site's header. (Safe to activate).</li>
-         <li class="li-xl"><strong>🔗 RSD (Really Simple Discovery) Link:</strong> Removes the RSD link tag, which is only used by old desktop blogging clients. (Safe to activate).</li>
          <li class="li-xl">
-            <strong>🔗 Self Pingbacks:</strong> Prevents your site from sending <em>itself</em> a "pingback" notification when you link to one of your own posts.
-            <ul class="toc-sublist">
-               <li class="li-sm">
-                  <div class="rec-box">
-                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
-                  </div>
-               </li>
-            </ul>
-         </li>
-         <li class="li-xl"><strong>🔗 Shortlink Tag:</strong> Removes the <code>&lt;link rel='shortlink' ...&gt;</code> tag. (Safe to activate).</li>
-         <li class="li-xl">
-            <strong>🗑️ Automatic Trash Emptying:</strong> Sets how long items stay in the trash before being permanently deleted.
+            <strong>🗑️ Automatic Trash Emptying:</strong> By default, WordPress automatically purges trashed posts and pages older than 30 days. However, you can customize this period or completely disable automatic emptying. For example, you can set it to 7 days to keep your trash cleaner for longer, or disable auto-empty if you prefer to manually review trash contents before permanent deletion. <strong>⚠ Warning: Once emptied, deleted content cannot be recovered.</strong>
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -2231,10 +2256,108 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
                <li class="li-sm mt-8"><em>(Note: If this setting is defined in your <code>wp-config.php</code> file, this control will be disabled.)</em></li>
             </ul>
          </li>
-         <li class="li-xl"><strong>🔗 Windows Live Writer Manifest:</strong> Removes the <code>wlwmanifest.xml</code> link tag, used by a discontinued Microsoft product. (Safe to activate).</li>
-         <li class="li-xl"><strong>🏷️ WordPress Version Meta Tag:</strong> Removes the <code>&lt;meta name="generator" ...&gt;</code> tag. This is a minor security improvement, as it hides your WP version from simple scanners. (Safe to activate).</li>
          <li class="li-xl">
-            <strong>🔌 XML-RPC Interface:</strong> Disables a legacy API (<code>xmlrpc.php</code>) that is no longer needed by most sites and is a common target for brute-force attacks.
+            <strong>ᯤ XML-RPC Interface:</strong> Disables the XML-RPC API used by legacy mobile apps. It has been replaced by the REST API and is a frequent target for brute-force attacks. For example, with this enabled, automated attack scripts trying to guess your password via the <code>xmlrpc.php</code> file will be completely blocked, reducing server load and improving security.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>၊၊||၊ Heartbeat API Control:</strong> Reduces or disables the WordPress Heartbeat API that creates frequent AJAX calls (every 15-60 seconds). This saves server resources but may disable real-time features like post editing locks. For example, on a site where multiple authors aren't simultaneously editing the same post, you can set it to "Slow Down" to reduce background AJAX requests by 75%.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> "Slow Down (Every 2 minutes)."
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>😊 Emoji Scripts:</strong> Removes the emoji detection JavaScript (wp-emoji-release.min.js) loaded on every page. Modern browsers display emojis natively, making this script redundant. For example, on a business website that never uses emojis, this removes an unnecessary HTTP request and JavaScript execution, slightly improving page load speed.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>↩️ Self Pingbacks:</strong> Prevents WordPress from creating pingback notifications when you link to your own posts, reducing unnecessary database operations. For example, if you write a blog post that links to another post on your own site, without this feature WordPress would create a pingback comment for that internal link, cluttering your comments section and adding database overhead.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>🔗 REST API Link Tag:</strong> Removes the <code>&lt;link rel="https://api.w.org/" ...&gt;</code> tag from your site's header. For example, viewing your site's HTML source will no longer include the line <code>&lt;link rel='https://api.w.org/' href='https://yoursite.com/wp-json/' /&gt;</code>. The REST API itself remains fully functional; only the auto-discovery header is removed. (Safe to activate).
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>🔗 Shortlink Tag:</strong> Removes the <code>&lt;link rel='shortlink' ...&gt;</code> tag from your page headers. For example, a single post page will no longer output <code>&lt;link rel='shortlink' href='https://yoursite.com/?p=123' /&gt;</code>. Shortlinks are rarely used, and removing them saves minimal bandwidth. (Safe to activate).
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>🔗 RSD (Really Simple Discovery) Link:</strong> Removes the RSD link tag, which is only used by old desktop blogging clients. For example, the line <code>&lt;link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://yoursite.com/xmlrpc.php?rsd" /&gt;</code> will be removed from your site's header. If you don't use desktop software like Windows Live Writer to blog, this is safe to activate.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>🪟 Windows Live Writer Manifest:</strong> Removes the <code>wlwmanifest.xml</code> link tag, used by a discontinued Microsoft product. For example, the tag <code>&lt;link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://yoursite.com/wp-includes/wlwmanifest.xml" /&gt;</code> will be removed. This is completely safe as the software is no longer in use.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>♯ WordPress Version Meta Tag:</strong> Removes the <code>&lt;meta name="generator" content="WordPress X.Y.Z" /&gt;</code> tag. This is a minor security improvement, as it hides your WordPress version from simple scanners. For example, automated bots scanning for vulnerable WordPress versions will not see your version number in the page source.
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>📡 Feed Links (RSS & Atom):</strong> Removes RSS and Atom feed discovery links from page headers. The feeds themselves remain accessible via their direct URLs; only the auto-discovery <code>&lt;link&gt;</code> tags are removed. For example, after activation, a request to <code>https://yoursite.com/feed/</code> will still return your RSS feed, but the browser will no longer automatically discover it. (Safe to activate).
+            <ul class="toc-sublist">
+               <li class="li-sm">
+                  <div class="rec-box">
+                     <strong>💡 Recommendation:</strong> <strong>Activate</strong> (set to "✔ Active").
+                  </div>
+               </li>
+            </ul>
+         </li>
+         <li class="li-xl">
+            <strong>🔗 Post Relational Links:</strong> Removes legacy relational <code>&lt;link&gt;</code> tags (index, start, parent, prev, next) from page headers. These are navigation hints not used by modern browsers. For example, on a single post page, the link <code>&lt;link rel='prev' href='https://yoursite.com/previous-post/' /&gt;</code> will no longer be output. (Safe to activate).
             <ul class="toc-sublist">
                <li class="li-sm">
                   <div class="rec-box">
@@ -2244,7 +2367,7 @@ location ~* \.(?:css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|woff|woff2|ttf|eot)$ 
             </ul>
          </li>
       </ul>
-      <h3 id="ch-7-4" class="h3title">7.4. 🔐 Advanced Security Features</h3>
+      <h3 class="h3title">🔐 Advanced Security Features</h3>
       <h4 id="ch-7-4-1" class="h4title">7.4.1. File Path Validation & Path Traversal Protection</h4>
       <p>The plugin implements multi-layer file path validation to prevent directory traversal attacks and unauthorized file access:</p>
       <h5>Validation Layers</h5>

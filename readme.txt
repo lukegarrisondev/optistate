@@ -1,11 +1,11 @@
-=== Optimal State – WordPress Cleaner, Optimizer, Caching Engine, Backup Manager & Security Enhancer ===
-Plugin Name: Optimal State - Replaces 5 Plugins: WP-Optimize, WP Rocket, UpdraftPlus, Loginizer, Better Search Replace
+=== Optimal State – Cleaner, Optimizer, Caching Engine, Backup Manager & Security Enhancer ===
+Plugin Name: Optimal State - 5 Plugins in One: WP-Optimize, WP Rocket, UpdraftPlus, Loginizer, Better Search & Replace
 Contributors: lukegarry
-Tags: optimization, speed, database, caching, performance
+Tags: speed, optimization, query, caching, database, pagespeed, bloat, security, cleaning
 Requires at least: 5.5
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 1.2.2
+Stable tag: 1.3.0
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -761,6 +761,18 @@ The manual is searchable, and you can download it to access it offline.
 
 == Changelog ==
 
+= 1.3.0 - March 2026 =
+* Updated the server-side caching feature to improve the performance and reliability of the cache preloading and cache purging functionalities.
+* Improved the reliability of the Legacy Plugin Data Scanner to minimize false positives. 
+* Added two performance features: Removal of 1. Feed Links (RSS & Atom) and 2. Post Relational Links.
+* Powered up the Database Query Caching feature by adding two extra settings and optimizing how things work.
+* Added validation of security headers via external link to the Browser Caching feature.
+* Added several new recommendations to the Health Score Database tool.
+* Added several new recommendations to the Performance Metrics (PageSpeed) tool.
+* Implemented an additional security check in the database table deletion function within the Database Structure Analysis tool.
+* Refined the Login Page Protection tool to increase its efficiency and reduce its impact on website performance.
+* Completely redesigned the main plugin class (class-optistate.php), optimizing a dozen areas for greater efficiency and improved compatibility.
+
 = 1.2.2 - February 2026 =
 * The JavaScript code has been completely rewritten for better efficiency and reliability.
 * Improved Legacy Plugin Data Scanner for deeper scanning.
@@ -772,7 +784,6 @@ The manual is searchable, and you can download it to access it offline.
 * The Bad Bot Blocker tool has been upgraded and now works perfectly and efficiently on Nginx servers as well.
 * The Login Page Protection tool has been revised to increase its efficiency against massive brute force attacks, while still being completely reliable.
 * The user manual has been updated, expanded, and is now more user-friendly.
-
 
 = 1.2.1 - February 2026 =
 **New Feature: Legacy Plugin Data Scanner**
@@ -853,7 +864,7 @@ The manual is searchable, and you can download it to access it offline.
 
 == Upgrade Notice ==
 
-= 1.2.1 =
+= 1.3.0 =
 This is a free version with limited but perfectly functional features. To unlock full functionality upgrade to Pro version.
 [__Get Full Version__](https://payhip.com/b/AS3Pt)
 
@@ -905,6 +916,7 @@ Note: The PageSpeed Insights feature is optional and only activates when you man
 - [Live Interactive Demo](https://spiritualseek.com/wp-content/uploads/2025/11/optistate-preview.html)
 - [Get Pro Version](https://payhip.com/b/AS3Pt)
 - [Support Page](https://payhip.com/optistate/contact)
+- [User Manual](https://spiritualseek.com/wp-content/uploads/2025/11/WP_Optimal_State_PRO_User_Manual.html)
 
 = Feature Requests =
 We actively develop Optimal State based on user feedback. If you have a feature request or enhancement idea, please contact us through the support page. Many current features were implemented based on user suggestions.
